@@ -31,7 +31,7 @@ input[type=range]{accent-color:#2ea043}
 .mk .ic.s{background:linear-gradient(#a371f7,#6e40c9);color:#fff;animation:bob 1s ease-in-out infinite alternate}
 @keyframes bob{to{translate:0 -5px}}
 .mk .nm{margin-top:6px;font-size:10px;font-weight:800;background:#0d1117cc;padding:1px 6px;border-radius:6px;white-space:nowrap;color:#c9d1d9}
-.chat{position:absolute;left:0;top:0;background:#fff;color:#1b1d29;font-size:11.5px;font-weight:800;padding:5px 9px;border-radius:12px;white-space:nowrap;pointer-events:none;box-shadow:0 3px 10px #0008;animation:cin .2s;max-width:200px;overflow:hidden;text-overflow:ellipsis}
+.chat{position:absolute;left:0;top:0;background:#fff;color:#1b1d29;font:700 11px/1.25 Inter,system-ui,sans-serif;padding:5px 8px;border-radius:11px;pointer-events:none;box-shadow:0 2px 8px #0007;animation:cin .2s;max-width:150px;width:max-content;text-align:center}
 @keyframes cin{from{scale:.5;opacity:0}}
 #toasts{position:absolute;top:8px;left:0;right:0;display:flex;flex-direction:column;align-items:center;gap:6px;pointer-events:none;z-index:7}
 .toast{background:#0d1117ee;border:1px solid #3a4558;padding:8px 14px;border-radius:12px;font-size:13px;font-weight:800;box-shadow:0 6px 20px #000a;animation:tin .3s cubic-bezier(.2,1.4,.5,1),tout .4s 2.8s forwards;max-width:92%}
@@ -366,10 +366,35 @@ button{font-family:inherit;cursor:pointer}
 #pause.hidden{display:none}
 .pbox{width:86%;max-width:320px;background:#0f141c;border:1px solid #2b3545;border-radius:20px;padding:18px;display:flex;flex-direction:column;gap:9px;font-family:Inter,system-ui,sans-serif}
 .pbox h3{margin:0 0 4px;text-align:center;color:#e6edf3;font-size:20px}.pnote{margin:4px 0 0;font-size:11px;color:#6e7681;text-align:center}
+
+#pc{position:absolute;inset:0;z-index:28;background:rgba(4,6,10,.78);display:flex;align-items:flex-end;justify-content:center;animation:fi .2s}#pc.hidden{display:none}
+.pcb{width:100%;max-height:94%;overflow-y:auto;background:#0f141c;border-top:1px solid #2b3545;border-radius:20px 20px 0 0;padding:14px 14px 22px;font-family:Inter,system-ui,sans-serif;color:#e6edf3}
+.pch{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}.pch b{font-size:18px;font-weight:900}.pcx{width:34px;height:34px;border-radius:50%;border:none;background:#21262d;color:#e6edf3;font-size:15px}
+.pcs{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:13px;font-weight:700;color:#9aa7b4}.pcs b{color:#e6edf3}
+.xpb{height:8px;border-radius:4px;background:#21262d;overflow:hidden;margin-top:8px}.xpb i{display:block;height:100%;background:linear-gradient(90deg,#d29922,#ffd166)}.xpt{display:block;font-size:11px;color:#6e7681;margin:3px 0 10px}
+.pct{display:flex;gap:6px;margin-bottom:10px}.pct button{flex:1;border:1px solid #2b3545;background:#161d29;color:#9aa7b4;border-radius:12px;padding:9px;font:800 13.5px Inter,system-ui,sans-serif}.pct button.on{background:#1f6feb;border-color:#1f6feb;color:#fff}
+.pcr{display:flex;align-items:center;gap:10px;justify-content:space-between;background:#161d29;border:1px solid #232c3a;border-radius:14px;padding:10px 12px;margin-bottom:7px}
+.pcr b{display:block;font-size:14.5px;font-weight:800}.pcr b em{font-style:normal;color:#ffd166;letter-spacing:2px;margin-left:4px}.pcr small{display:block;font-size:11.5px;color:#9aa7b4;margin-top:2px;line-height:1.35}
+.pcbtn{flex:none;border:none;border-radius:12px;padding:10px 14px;font:900 13.5px Inter,system-ui,sans-serif;background:linear-gradient(180deg,#3fb950,#238636);color:#fff;box-shadow:0 3px 0 #0f5323}.pcbtn.y{background:linear-gradient(180deg,#ffe36e,#f5b82e);color:#3b2a00;box-shadow:0 3px 0 #a87400}
+.pcok{flex:none;font-size:12px;font-weight:800;color:#56d364}.pclk{flex:none;font-size:11.5px;font-weight:800;color:#8b949e;max-width:42%;text-align:right}.pips{flex:none;color:#ffd166;font-weight:900;letter-spacing:2px}
+.pcn{font-size:11.5px;color:#6e7681;line-height:1.4;margin:8px 2px 0}
+.tg.lk{color:#ff7b72;font-size:11px;white-space:nowrap}
+.qq{font-size:16px;font-weight:800;line-height:1.35;color:#e6edf3;margin:6px 0 12px}.mono{font-family:ui-monospace,Menlo,monospace!important}
+.ipb{background:#0d1117;border:1px solid #30363d;border-radius:12px;padding:10px 12px;font:600 13px/1.6 ui-monospace,Menlo,monospace;color:#9aa7b4;margin-bottom:10px}.ipb b{color:#7ee787}
+.two{display:flex;gap:8px}.two .btn{flex:1}
+.pt{display:grid;grid-template-columns:1fr 1fr;gap:8px}.pt>div{display:flex;flex-direction:column;gap:7px}.pt .ch{font-size:12.5px;padding:10px 8px}.ch.sel{border-color:#ffd166!important;background:#3b2f10!important}.ch.okk{border-color:#2ea043!important;background:#12301b!important;opacity:.75}
+.pww{display:flex;justify-content:center;margin:6px 0 12px}.pwb{width:104px;height:104px;border-radius:50%;border:none;background:#30363d;padding:9px;touch-action:none;user-select:none;-webkit-user-select:none}
+.pwb span{display:grid;place-items:center;width:100%;height:100%;border-radius:50%;background:linear-gradient(180deg,#da3633,#8e1519);color:#fff;font-size:38px;font-weight:900;pointer-events:none}.pwb.done span{background:linear-gradient(180deg,#3fb950,#238636)}
+.leds{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:6px}.led{height:58px;border-radius:12px;border:2px solid #30363d;background:#161b22;color:#6e7681;font:900 12px ui-monospace,Menlo,monospace}.led:disabled{opacity:.35}
+.led.on{background:#3dff7a;border-color:#3dff7a;color:#04260f;box-shadow:0 0 18px #3dff7a}
+.pprw{position:relative;height:120px;margin:4px auto 10px;width:70%;background:linear-gradient(#3a3f48,#22262d);border-radius:12px 12px 4px 4px;overflow:hidden}
+.pprslot{position:absolute;left:8%;right:8%;top:10px;height:8px;border-radius:4px;background:#0d1117;z-index:2}
+.ppr{position:absolute;left:14%;right:14%;top:14px;height:8%;background:repeating-linear-gradient(#fff 0 9px,#e8edf2 9px 10px);border-radius:0 0 3px 3px;box-shadow:0 3px 6px #0006;transition:height .08s,transform .08s;transform-origin:top center}
+.ppr.out{transition:transform .5s ease-in,opacity .5s;transform:translateY(130px) rotate(8deg)!important;opacity:0}
 </style>
 </head>
 <body>
-<div id="splash"><div class="sp-glow"></div><div class="sp-logo">АПТАЙМ</div><div class="sp-sub">DEFACTUM GAMES</div><div class="sp-term" id="spterm"></div><div class="sp-bar"><i id="spbar"></i></div></div>
+<div id="splash"><div class="sp-glow"></div><div class="sp-logo">АПТАЙМ</div><div class="sp-sub">UPTIME STUDIO</div><div class="sp-term" id="spterm"></div><div class="sp-bar"><i id="spbar"></i></div></div>
 <div id="app">
   <div id="hud">
     <div class="row">
@@ -377,7 +402,7 @@ button{font-family:inherit;cursor:pointer}
       <button class="chip" id="goal"><i class="ico" data-ic="target"></i><span id="goaltx">Осмотрись</span></button>
       <button class="chip" id="jbtn"><i class="ico" data-ic="book"></i></button>
       <button class="chip" id="menubtn"><i class="ico" data-ic="gear"></i></button>
-      <button class="chip" id="snd"><i class="ico" data-ic="music"></i></button>
+      <button class="chip" id="prof">⭐<span id="proftx">1</span></button>
     </div>
   </div>
   <div id="stage">
@@ -391,6 +416,7 @@ button{font-family:inherit;cursor:pointer}
     <div id="fade"></div>
     <div id="screen" class="hidden"></div>
     <div id="pause" class="hidden"></div>
+    <div id="pc" class="hidden"></div>
     <div id="load">ЗАГРУЗКА...</div>
   </div>
 </div>
@@ -549,7 +575,7 @@ const AC_ON=emis('#58a6ff',2.5);
 const LED={g:emis('#3dff7a',3),o:M('#0e1a12'),r:emis('#ff2a1f',4),a:emis('#ffb020',3),rd:M('#2a0a0a')};
 
 const LOCS={
- office:{name:'Офис «Дефактум Трейд»',bounds:[0,40,360,486,3.3],bg:'#0d121c'},
+ office:{name:'Офис «Туран Трейд»',bounds:[0,40,360,486,3.3],bg:'#0d121c'},
  hall:{name:'Коридор, 5 этаж',bounds:[0,104,360,390,2.9],bg:'#0d121c'},
  nb:{name:'Офис «Ташкент Лоджистик»',bounds:[30,100,330,398,2.9],bg:'#0d121c'},
  yard:{name:'Чайхана «Чинор» во дворе',bounds:[0,50,360,458,3.6],bg:'#16241c',out:true}};
@@ -607,7 +633,7 @@ plant(121,72);plant(239,72);plant(239,176);plant(16,300,.9);plant(212,236,.8);pl
 {const x=wx(142),z=wz(258);box(1.6,.06,.7,M('#d9d2c3'),x,.8,z);[[-.7,-.28],[.7,-.28],[-.7,.28],[.7,.28]].forEach(([a,b])=>box(.06,.8,.06,trimM,x+a,.4,z+b));
   box(.5,.6,.45,M('#22272e',{metalness:.5,roughness:.3}),x-.3,1.13,z);box(.36,.15,.04,emis('#3fb950',1.5),x-.3,1.3,z+.23);
   cyl(.06,.05,.12,whiteM,x-.3,.9,z+.12);cyl(.07,.06,.14,M('#d1242f'),x+.3,.9,z);cyl(.07,.06,.14,M('#f0f6fc'),x+.5,.9,z+.1)}
-{const x=wx(178),z=wz(296),sm=M('#3b6aa0',{roughness:.9}),sd=M('#2d5280',{roughness:.9});box(2.4,.4,.8,sm,x,.25,z);box(2.4,.6,.22,sd,x,.6,z+.32);box(.22,.55,.8,sd,x-1.2,.38,z);box(.22,.55,.8,sd,x+1.2,.38,z);
+{const x=wx(116),z=wz(296),sm=M('#3b6aa0',{roughness:.9}),sd=M('#2d5280',{roughness:.9});box(2.4,.4,.8,sm,x,.25,z);box(2.4,.6,.22,sd,x,.6,z+.32);box(.22,.55,.8,sd,x-1.2,.38,z);box(.22,.55,.8,sd,x+1.2,.38,z);
   box(.5,.3,.12,M('#e3b341',{roughness:.9}),x-.6,.6,z+.15).rotation.z=.2}
 const printer={};{const x=wx(44),z=wz(272);box(1.2,.7,.95,M('#3a3f48'),x,.35,z);box(1.15,.5,.85,M('#d6dbe1',{roughness:.4}),x,.95,z);box(1.15,.06,.85,M('#eef1f4',{roughness:.3}),x,1.23,z);
   box(.8,.03,.4,M('#ffffff'),x,1.28,z-.1);box(.7,.04,.06,M('#1b1f27'),x,1.02,z+.43);
@@ -688,7 +714,7 @@ BUILD=LOCS.hall.group;
   box(18.5,.14,.34,ht,0,.07,BZh+.02);box(18.5,.08,.32,ht,0,2.8,BZh);
   const gold=M('#d4b25e',{metalness:.8,roughness:.3});
   [[wx(60),'#7a4a28'],[wx(300),'#2f6a5a']].forEach(([x,c])=>{box(1.6,2.25,.08,M(c,{roughness:.45}),x,1.12,BZh-.06);box(1.8,.08,.3,ht,x,2.27,BZh);box(.08,2.25,.3,ht,x-.9,1.12,BZh);box(.08,2.25,.3,ht,x+.9,1.12,BZh);sph(.06,gold,x+.55,1.05,BZh+.02,BUILD,10)});
-  signPlane('ДЕФАКТУМ ТРЕЙД','#1f6feb','#fff',1.7,.4,wx(60),2.55,BZh+.15,0,.45,22);signPlane('ТАШКЕНТ ЛОДЖИСТИК','#2d6a4f','#fff',1.7,.4,wx(300),2.55,BZh+.15,0,.45,20);
+  signPlane('ТУРАН ТРЕЙД','#1f6feb','#fff',1.7,.4,wx(60),2.55,BZh+.15,0,.45,22);signPlane('ТАШКЕНТ ЛОДЖИСТИК','#2d6a4f','#fff',1.7,.4,wx(300),2.55,BZh+.15,0,.45,20);
   const steel=M('#b3bcc8',{metalness:.85,roughness:.22});box(.98,2.3,.06,steel,wx(180)-.5,1.15,BZh-.02);box(.98,2.3,.06,steel,wx(180)+.5,1.15,BZh-.02);box(2.2,.1,.32,steel,wx(180),2.32,BZh);
   box(.7,.22,.04,emis('#ff8a3d',2),wx(180),2.5,BZh+.16);signPlane('НЕ РАБОТАЕТ','#fff','#d1242f',.7,.22,wx(180),1.5,BZh+.03,0,.3,30);
   box(.28,1.1,f.d+.3,hw,-9.39,.55,f.cz);box(.28,1.1,f.d+.3,hw,9.39,.55,f.cz);box(wx(360)-wx(76),.9,.28,hw,(wx(76)+9.25)/2,.45,wz(384)+.14);
@@ -730,7 +756,7 @@ BUILD=LOCS.nb.group;
   box(3.4,1.1,1.1,M('#e6edf3',{roughness:.35}),wx(110),.55,wz(310));box(3.5,.06,1.2,M('#2f6a5a'),wx(110),1.12,wz(310));
   {const cg=new THREE.Group();cg.position.set(wx(110),0,wz(290));BUILD.add(cg);makeChair(cg,M('#3d2a5a'))}
   cyl(.08,.07,.15,M('#f778ba'),wx(80),1.2,wz(306));box(.5,.3,.3,M('#1b1f27'),wx(140),1.3,wz(308));
-  const logoC=cvs(128,128,g=>{g.fillStyle='#b08850';g.fillRect(0,0,128,128);g.fillStyle='#1f6feb';g.font='bold 18px sans-serif';g.textAlign='center';g.fillText('DEFACTUM',64,60);g.font='12px sans-serif';g.fillStyle='#3a2a1c';g.fillText('Ноутбук · DFT-03x',64,84)});
+  const logoC=cvs(128,128,g=>{g.fillStyle='#b08850';g.fillRect(0,0,128,128);g.fillStyle='#1f6feb';g.font='bold 18px sans-serif';g.textAlign='center';g.fillText('TURAN',64,60);g.font='12px sans-serif';g.fillStyle='#3a2a1c';g.fillText('Ноутбук · TRN-03x',64,84)});
   const bm=new THREE.MeshStandardMaterial({map:tex(logoC),roughness:.9});
   [[0,0,0],[.85,0,.1],[.4,.62,.05],[-.1,0,.85],[.75,0,.9]].forEach(([dx,dy,dz])=>add(new THREE.BoxGeometry(.8,.6,.8),bm,wx(280)-.4+dx,.3+dy,wz(330)-.4+dz).rotation.y=dx*.3);
   box(.3,.06,1.2,M('#8b949e'),wx(312),1.6,wz(150));box(.28,.1,.2,M('#f0f6fc'),wx(312),1.69,wz(150));
@@ -862,8 +888,8 @@ const ring=new THREE.Mesh(new THREE.RingGeometry(.32,.42,32),new THREE.MeshBasic
 /* ================= PATHFINDING ================= */
 const CELL=10,GC=36,GR=48;
 LOCS.office.OBST=[[0,0,360,54],[0,0,10,118],[0,146,10,334],[350,0,10,480],[0,312,165,14],[205,312,155,14],[0,474,360,6],
-  [112,140,18,20],[122,248,40,22],[152,282,54,26],[18,256,52,34],[262,254,76,32],[222,222,138,6],[218,222,6,50],[338,228,22,80],[286,236,28,20],
-  [55,386,30,24],[135,386,30,24],[215,386,30,24],[306,410,24,20],[316,342,28,22]];
+  [112,140,18,20],[122,248,40,22],[90,282,54,26],[18,256,52,34],[262,254,76,32],[222,222,138,6],[218,222,6,50],[338,228,22,80],[286,236,28,20],
+  [55,386,30,24],[135,386,30,24],[215,386,30,24],[306,410,24,20],[316,342,28,22],[24,454,38,16],[273,380,24,24]];
 DESKS.forEach(([x,y])=>{LOCS.office.OBST.push([x-37,y-24,74,30]);LOCS.office.OBST.push([x-14,y+18,16,16])});
 LOCS.hall.OBST=[[0,0,360,124],[0,0,10,480],[350,0,10,480],[76,380,284,100],[0,390,76,90],[214,290,72,26],[238,270,24,20],[94,320,52,18],[326,180,24,40]];
 LOCS.nb.OBST=[[0,0,360,122],[0,0,42,480],[318,0,42,480],[0,388,160,92],[200,388,160,92],[204,190,72,30],[228,170,24,20],[74,176,72,28],[98,158,24,20],[76,298,68,24],[98,278,24,20],[262,312,40,40],[300,136,20,30]];
@@ -872,26 +898,32 @@ LOCS.office.doors={hall:{x:22,y:132}};LOCS.office.entry={hall:{x:38,y:134}};
 LOCS.hall.doors={office:{x:60,y:144},nb:{x:300,y:144},yard:{x:38,y:340}};LOCS.hall.entry={office:{x:60,y:166},nb:{x:300,y:166},yard:{x:70,y:330}};
 LOCS.nb.doors={hall:{x:180,y:378}};LOCS.nb.entry={hall:{x:180,y:356}};
 LOCS.yard.doors={hall:{x:180,y:86}};LOCS.yard.entry={hall:{x:180,y:108}};
-Object.values(LOCS).forEach(L=>{const g=new Uint8Array(GC*GR);for(let r=0;r<GR;r++)for(let c=0;c<GC;c++){const cx=c*CELL+5,cy=r*CELL+5;g[r*GC+c]=L.OBST.some(([x,y,w,h])=>cx>x-6&&cx<x+w+6&&cy>y-6&&cy<y+h+6)?1:0}L.grid=g});
+Object.values(LOCS).forEach(L=>{const g=new Uint8Array(GC*GR);for(let r=0;r<GR;r++)for(let c=0;c<GC;c++){const cx=c*CELL+5,cy=r*CELL+5;g[r*GC+c]=L.OBST.some(([x,y,w,h])=>cx>x-6&&cx<x+w+6&&cy>y-6&&cy<y+h+6)?1:0}L.grid=g
+  const lab=new Int16Array(GC*GR);let nl=0,best=0,bn=0;for(let i=0;i<g.length;i++){if(g[i]||lab[i])continue;nl++;let q=[i],n=0;lab[i]=nl;while(q.length){const k=q.pop();n++;const c=k%GC,r=(k-c)/GC;for(const [dc,dr] of [[1,0],[-1,0],[0,1],[0,-1]]){const nc=c+dc,nr=r+dr;if(nc<0||nr<0||nc>=GC||nr>=GR)continue;const nk=nr*GC+nc;if(!g[nk]&&!lab[nk]){lab[nk]=nl;q.push(nk)}}}if(n>bn){bn=n;best=nl}}
+  for(let i=0;i<g.length;i++)if(!g[i]&&lab[i]!==best)g[i]=1;L.grid=g});
 const nextHop=(a,b)=>a===b?null:a==='hall'?b:'hall';
 function los(a,b,g){const d=Math.hypot(b.x-a.x,b.y-a.y),n=Math.ceil(d/4);for(let i=1;i<n;i++){const x=a.x+(b.x-a.x)*i/n,y=a.y+(b.y-a.y)*i/n,c=Math.floor(x/CELL),r=Math.floor(y/CELL);if(c<0||r<0||c>=GC||r>=GR||g[r*GC+c])return false}return true}
-function astar(sx,sy,tx,ty,loc){const grid=LOCS[loc].grid;
-  const s=[clamp(Math.floor(sx/CELL),0,GC-1),clamp(Math.floor(sy/CELL),0,GR-1)],t=[clamp(Math.floor(tx/CELL),0,GC-1),clamp(Math.floor(ty/CELL),0,GR-1)];
+function freeCell(c,r,grid){if(!grid[r*GC+c])return [c,r];for(let d=1;d<8;d++){let best=null,bd=1e9;for(let dr=-d;dr<=d;dr++)for(let dc=-d;dc<=d;dc++){if(Math.max(Math.abs(dc),Math.abs(dr))!==d)continue;const nc=c+dc,nr=r+dr;if(nc<0||nr<0||nc>=GC||nr>=GR||grid[nr*GC+nc])continue;const q=dc*dc+dr*dr;if(q<bd){bd=q;best=[nc,nr]}}if(best)return best}return null}
+function astar(sx,sy,tx,ty,loc,snap){const grid=LOCS[loc].grid;
+  const s=freeCell(clamp(Math.floor(sx/CELL),0,GC-1),clamp(Math.floor(sy/CELL),0,GR-1),grid),t=freeCell(clamp(Math.floor(tx/CELL),0,GC-1),clamp(Math.floor(ty/CELL),0,GR-1),grid);
+  if(!s||!t)return [];
+  const tc={x:t[0]*CELL+5,y:t[1]*CELL+5},hop=Math.hypot(tx-tc.x,ty-tc.y),fin=(snap||hop>24)?tc:{x:tx,y:ty};
   const key=(c,r)=>r*GC+c,open=[[s[0],s[1]]],g=new Map([[key(...s),0]]),f=new Map(),from=new Map(),closed=new Set();
   const h=(c,r)=>{const dx=Math.abs(c-t[0]),dy=Math.abs(r-t[1]);return Math.max(dx,dy)+.414*Math.min(dx,dy)};
   f.set(key(...s),h(...s));let found=false,it=0;
-  while(open.length&&it++<5000){let bi=0;for(let i=1;i<open.length;i++)if(f.get(key(...open[i]))<f.get(key(...open[bi])))bi=i;
+  while(open.length&&it++<6000){let bi=0;for(let i=1;i<open.length;i++)if(f.get(key(...open[i]))<f.get(key(...open[bi])))bi=i;
     const [c,r]=open.splice(bi,1)[0],k=key(c,r);if(c===t[0]&&r===t[1]){found=true;break}closed.add(k);
     for(const [dc,dr] of [[1,0],[-1,0],[0,1],[0,-1],[1,1],[1,-1],[-1,1],[-1,-1]]){const nc=c+dc,nr=r+dr,nk=key(nc,nr);
-      if(nc<0||nr<0||nc>=GC||nr>=GR||closed.has(nk))continue;
-      const isT=nc===t[0]&&nr===t[1],near=Math.max(Math.abs(nc-s[0]),Math.abs(nr-s[1]))<=2||Math.max(Math.abs(nc-t[0]),Math.abs(nr-t[1]))<=2;if(!isT&&grid[nk]&&!near)continue;
-      if(dc&&dr&&(grid[key(c+dc,r)]||grid[key(c,r+dr)])&&!isT&&!near)continue;
+      if(nc<0||nr<0||nc>=GC||nr>=GR||closed.has(nk)||grid[nk])continue;
+      if(dc&&dr&&(grid[key(c+dc,r)]||grid[key(c,r+dr)]))continue;
       const ng=g.get(k)+(dc&&dr?1.414:1);if(ng<(g.get(nk)??1e9)){g.set(nk,ng);f.set(nk,ng+h(nc,nr));from.set(nk,k);if(!open.some(o=>o[0]===nc&&o[1]===nr))open.push([nc,nr])}}}
-  if(!found)return [{x:tx,y:ty}];
+  if(!found)return [];
   let pts=[],k=key(...t);while(k!==undefined&&k!==key(...s)){pts.unshift({x:(k%GC)*CELL+5,y:Math.floor(k/GC)*CELL+5});k=from.get(k)}
-  if(!pts.length)return [{x:tx,y:ty}];pts[pts.length-1]={x:tx,y:ty};
-  const out=[];let cur={x:sx,y:sy};for(let i=0;i<pts.length;i++){if(i===pts.length-1||!los(cur,pts[i+1],grid)){out.push(pts[i]);cur=pts[i]}}
-  return out.length?out:[{x:tx,y:ty}];
+  pts.unshift({x:s[0]*CELL+5,y:s[1]*CELL+5});
+  const out=[];let cur=pts[0];if(Math.hypot(sx-cur.x,sy-cur.y)>2)out.push(cur);
+  for(let i=1;i<pts.length;i++){if(i===pts.length-1||!los(cur,pts[i+1],grid)){out.push(pts[i]);cur=pts[i]}}
+  if(fin!==tc)out.push(fin);
+  return out;
 }
 
 /* ================= PHYSICS PROPS ================= */
@@ -972,6 +1004,10 @@ function actx(){try{AC=AC||new (window.AudioContext||window.webkitAudioContext)(
 function beep(f=600,d=.08,type='square',v=.04){const a=actx();if(!a)return;try{const o=a.createOscillator(),g=a.createGain();o.type=type;o.frequency.value=f;g.gain.value=v;g.gain.exponentialRampToValueAtTime(.0001,a.currentTime+d);o.connect(g);g.connect(a.destination);o.start();o.stop(a.currentTime+d)}catch(e){}}
 const sGood=()=>{beep(660,.08,'triangle',.06);setTimeout(()=>beep(880,.08,'triangle',.06),80);setTimeout(()=>beep(1320,.15,'triangle',.06),160)};
 const sBad=()=>beep(150,.25,'sawtooth',.04);
+let NBUF=null;function sPaper(long){const a=actx();if(!a)return;try{if(!NBUF){NBUF=a.createBuffer(1,a.sampleRate,a.sampleRate);const d=NBUF.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=Math.random()*2-1}
+  const src=a.createBufferSource();src.buffer=NBUF;src.playbackRate.value=.75+Math.random()*.6;const f=a.createBiquadFilter();f.type='bandpass';f.frequency.value=2200+Math.random()*2600;f.Q.value=.8;const g=a.createGain(),d=long?.6:.13,t=a.currentTime;
+  g.gain.setValueAtTime(0.0001,t);g.gain.linearRampToValueAtTime(long?.28:.2,t+.012);if(long)for(let i=1;i<7;i++)g.gain.linearRampToValueAtTime(.06+Math.random()*.24,t+i*d/7);g.gain.exponentialRampToValueAtTime(.001,t+d);
+  f.frequency.linearRampToValueAtTime(long?900:f.frequency.value*1.5,t+d);src.connect(f);f.connect(g);g.connect(a.destination);src.start(t,Math.random()*.3,d+.05)}catch(e){}}
 const sPop=()=>beep(900,.05,'sine',.05);
 let musG=null;
 function startMusic(){const a=actx();if(!a||musicStarted)return;musicStarted=true;musG=a.createGain();musG.gain.value=musicOn?.5:0;musG.connect(a.destination);
@@ -983,7 +1019,6 @@ function startMusic(){const a=actx();if(!a||musicStarted)return;musicStarted=tru
     for(let k=0;k<4;k++){const tt=t0+k*1,b=a.createBuffer(1,2205,44100),d=b.getChannelData(0);for(let i=0;i<2205;i++)d[i]=(Math.random()*2-1)*Math.pow(1-i/2205,k%2?6:2);const s=a.createBufferSource(),g=a.createGain(),f=a.createBiquadFilter();f.type=k%2?'highpass':'lowpass';f.frequency.value=k%2?6000:180;s.buffer=b;g.gain.value=k%2?.03:.12;s.connect(f);f.connect(g);g.connect(musG);s.start(tt)}
     step++};
   play();setInterval(play,4000)}
-$('snd').onclick=()=>{musicOn=!musicOn;$('snd').innerHTML=ic(musicOn?'music':'mute');if(musG)musG.gain.value=musicOn?.5:0;startMusic()};
 
 /* ================= PORTRAITS ================= */
 function portrait(id,mood='n'){
@@ -1018,14 +1053,14 @@ function portrait(id,mood='n'){
 let G=null;
 function newGame(){return {min:540,F:{dil:0,srv:0,lola:0,ransom:0,tim:0,virus:0,mal:0,rogue:0,res:'',res2:'',gul:'',acOn:false,met_nigora:0,met_boss:0,knowR:0,metR:0,bobTV:0,kam:0,ham:0,lunch:0,ev:{}},
   rel:{nigora:0,boss:0,dilnoza:0,lola:0,timur:0,malika:0,sardor:0,gulya:0,rustam:0,bobur:0,jasur:0,kamila:0,hamid:0},clues:[],items:[],log:[],
-  p:{x:100,y:298,path:[],walk:0,rot:Math.PI,vx:0,vy:0,dust:0},pending:null,running:true,busy:false,realT:0,visited:{office:1}}}
+  p:{x:96,y:268,path:[],walk:0,rot:Math.PI,vx:0,vy:0,dust:0},pending:null,running:true,busy:false,realT:0,visited:{office:1}}}
 const CLUES={rustam_sales:'Рустам поругался с кем-то из отдела продаж',cut_cable:'Кабель Дильнозы перерезан ножницами',timur_at_desk:'Тимур вчера вечером крутился у стола Дильнозы',
   router_taken:'Тимур взял со склада роутер TP-Link «для дома»',gulya_saw:'Гуля опа видела Тимура ночью в серверной с «коробочкой с антеннами»',something_in_server:'Рустам: «В серверной есть то, чего там быть не должно»',
   timur_sells:'Соседи платят Тимуру за «быстрый интернет» наличкой',rogue_found:'В стойке спрятан чужой роутер с наклейкой «Т.»',cable_hall:'Синий кабель тянется по коридору из нашего офиса к соседям',
   cable_nb:'У соседей роутер, подключённый синим кабелем прямо из нашей серверной',twist:'Тимур подтвердил ложь про Рустама. Обвинил Рустама первым Сардор',
-  rustam_laptops:'Рустам: из сети пропадали ноутбуки, а по складу они «на месте»',flash_data:'Флешка Рустама: 7 ноутбуков DFT-031…037 светились в сети чужого роутера',
+  rustam_laptops:'Рустам: из сети пропадали ноутбуки, а по складу они «на месте»',flash_data:'Флешка Рустама: 7 ноутбуков TRN-031…037 светились в сети чужого роутера',
   bobur_saw:'Бобур-ака: вчера в 21:40 Сардор унёс коробки в соседний офис',kamila_info:'Камила: Жасуру вчера привезли 7 ноутбуков «по знакомству»',
-  laptop_found:'У соседей ноутбук с наклейкой «DFT-034. Собственность Дефактум Трейд»',jasur_slip:'Расписка: «Получил 14 млн сум за списанные ноутбуки. Сардор». Никто их не списывал!',
+  laptop_found:'У соседей ноутбук с наклейкой «TRN-034. Собственность Туран Трейд»',jasur_slip:'Расписка: «Получил 14 млн сум за списанные ноутбуки. Сардор». Никто их не списывал!',
   scissors:'У Сардора в ящике ножницы с кусочками синего провода',hamid_hint:'Хамид-ака: Сардор часто шепчется с Жасуром в чайхане',sardor_nervous:'За обедом Сардор нервно уходил от разговора о Рустаме',
   twist2:'Сардор признался: продал ноутбуки, подставил Рустама и перерезал кабель'};
 const ITEMS={key:'🔑 Ключ от серверной',rj45:'🔌 Коннекторы RJ45 и кабель',flash:'💾 Флешка Рустама'};
@@ -1038,7 +1073,7 @@ const evT=()=>G.clues.filter(c=>EV_T.includes(c)).length,evS=()=>G.clues.filter(
 const NPC={};
 Object.entries(CH).forEach(([id,d])=>{const c=makeChar(d);scene.add(c.g);const home=HOMES[id];
   NPC[id]={id,d,c,loc:home.loc,x:home.x,y:home.y,rot:home.rot||0,home,sy:home.sy||0,state:home.seat?'sit':'idle',path:[],timer:5+Math.random()*25,hold:false,vx:0,vy:0,walk:0,chat:null,curStand:home.seat?home.stand:null}});
-const CHATS={nigora:['«Дефактум Трейд», здравствуйте!','Кто опять взял мой степлер?'],dilnoza:['Дебет с кредитом не сходится…','Налоговая, налоговая…'],lola:['Опять отпуск переносят…','Где личное дело Сардора?'],
+const CHATS={nigora:['«Туран Трейд», здравствуйте!','Кто опять взял мой степлер?'],dilnoza:['Дебет с кредитом не сходится…','Налоговая, налоговая…'],lola:['Опять отпуск переносят…','Где личное дело Сардора?'],
   timur:['Бро, это сделка века!','Где моя зарядка?','Клиент почти мой!'],malika:['Этот шрифт ужасен…','Нужно больше лайков!'],sardor:['Кто брал скотч?','Опять коробки…','…только бы не сегодня'],
   gulya:['Ноги вытирайте!','Чай будешь, болажоним?','Кто разбросал бумажки?!'],boss:['Где отчёт?!','Время — деньги!'],rustam:['Эх, восемь лет…','Плов тут лучший в городе'],
   bobur:['Гол! Ну почти…','Пропуск покажите!','Лифт не работает, по лестнице!'],jasur:['Где зарядки к ноутбукам?!','Алло? Нет, всё чисто…'],kamila:['Ой, опять звонят!','Какой у вас красивый бейдж!'],
@@ -1069,6 +1104,7 @@ function npcUpdate(n,dt){if(n.away)return;
   if(n.state==='sit'){n.timer=6+Math.random()*6;
     if(n.id==='boss'){npcGo(n,262+Math.random()*60,298,()=>{n.state='idle';n.timer=4})}
     else if(n.id==='rustam'){n.timer=999}
+    else if(Math.random()<.45&&startConv(n)){}
     else{const pool=IDLE[n.loc];const s=rnd(pool);npcGo(n,s.x+(Math.random()-.5)*10,s.y,()=>{n.state='idle';n.timer=4+Math.random()*5;if(Math.random()<.6)sayBubble(n,rnd(CHATS[n.id]))})}}
   else if(n.state==='idle'&&n.home.seat){const h=n.home;npcGo(n,h.x,h.y,()=>{sitAt(n,h.x,h.y,h.rot,h.sy||0,h.stand);n.timer=25+Math.random()*40})}
   else n.timer=5;
@@ -1112,8 +1148,8 @@ const F=()=>G.F;
 const END='__end';
 const N=(who,mood,text,extra={})=>Object.assign({who,mood,text},extra);
 const DLG={
- intro:{who:'narr',text:'Понедельник, 09:00. Твой первый день сисадмином в компании «Дефактум Трейд». Говорят, прошлый админ Рустам ушёл… очень внезапно.',next:'intro2'},
- intro2:{who:'narr',text:'Тапай по людям, чтобы поговорить, и по полу, чтобы ходить. Жёлтый «!» означает, что у человека есть для тебя дело, а фиолетовая лупа — что можно что-то расследовать. 🚪 Двери ведут в другие места.',next:END},
+ intro:{who:'narr',text:'Понедельник, 09:00. Твой первый день сисадмином в компании «Туран Трейд». Говорят, прошлый админ Рустам ушёл… очень внезапно.',next:'intro2'},
+ intro2:{who:'narr',text:'Твоё рабочее место в серверной, слева внизу: там курсы и магазин оборудования. Без нужного навыка задачу не решить. Тапай по людям, чтобы поговорить, и по полу, чтобы ходить. Жёлтый «!» означает, что у человека есть для тебя дело, а фиолетовая лупа — что можно что-то расследовать. 🚪 Двери ведут в другие места.',next:END},
  nig1:N('nigora','h','Ассалому алейкум! Вы наш новый сисадмин? Слава богу, вы пришли! 🙏',{choices:[
    {t:'Ваалейкум ассалом! Рад знакомству 😊',rel:{nigora:1},go:'nig2'},{t:'Да. Где тут розетка для чайника?',go:'nig1b'}]}),
  nig1b:N('nigora','h','Ха-ха, сразу видно, настоящий админ! Розетка у кулера.',{next:'nig2'}),
@@ -1157,8 +1193,8 @@ const DLG={
  lolaW:N('lola','s','Мой компьютер всё ещё красный… 😢',{choices:[{t:'Открыть диспетчер задач',mg:['taskmgr',{mode:'ransom'},'lolaSaved']},{t:'Чуть позже',go:END}]}),
  lolaSaved:N('lola','h','Вы волшебник! Файлы на месте! 🙏',{act:()=>{F().ransom=2;rel('lola',1);addTime(30)},next:'lolaClue'}),
  tim1:N('timur','h','О, новый админ! Бро, дай пароль от Wi-Fi, а? Мне сериал скачать… то есть, презентацию для клиента 😏',{choices:[
-   {t:'Подключайся к гостевой: Defactum_Guest',tag:'🛡️',act:()=>{F().tim='guest';logc('🛡️ Дал Тимуру гостевую сеть')},go:'timG'},
-   {t:'Держи: Def@ctum2026. Только никому!',tag:'🤝',rel:{timur:1},act:()=>{F().tim='main';logc('🔓 Дал Тимуру пароль от рабочей сети')},go:'timM'},
+   {t:'Подключайся к гостевой: Turan_Guest',tag:'🛡️',act:()=>{F().tim='guest';logc('🛡️ Дал Тимуру гостевую сеть')},go:'timG'},
+   {t:'Держи: Tur@n2026. Только никому!',tag:'🤝',rel:{timur:1},act:()=>{F().tim='main';logc('🔓 Дал Тимуру пароль от рабочей сети')},go:'timM'},
    {t:'Нет. Рабочая сеть только для работы',tag:'😤',rel:{timur:-1},act:()=>{F().tim='no';logc('⛔ Отказал Тимуру в Wi-Fi')},go:'timR'}]}),
  timG:N('timur','n','Гостевая? Она ж медленная… Ладно, бро.',{next:END}),
  timM:N('timur','h','Вот это я понимаю, свой человек! 🤝',{next:END}),
@@ -1166,7 +1202,7 @@ const DLG={
  timV:N('timur','o','Бро, это не я! Я просто скачал «Мстители_HD_crack.exe»… А теперь комп гудит, как самолёт 😬',{choices:[{t:'Покажи диспетчер задач',mg:['taskmgr',{mode:'virus'},'timVfix']},{t:'Потом',go:END}]}),
  timVfix:N('timur','s','Майнер?! Да ладно… Спасибо, что почистил. Ты же не скажешь директору? 😅',{act:()=>{F().virus=2;addTime(25)},choices:[
    {t:'Не скажу. Но больше так не делай',rel:{timur:1},go:END},{t:'Посмотрим на твоё поведение',rel:{timur:-1},go:END}]}),
- timC:N('timur','n','Чего хотел, бро?',{choices:[{t:'Тимур, это ты продаёшь наш интернет соседям?',go:()=>evT()>=2?'timC2':'timC1'},{t:'Ничего, просто проходил',go:END}]}),
+ timC:N('timur','n','Чего хотел, бро?',{choices:[{t:'Тимур, это ты продаёшь наш интернет соседям?',go:()=>evT()>=2?'timC2':'timC1'},{t:'Показать ему таблицу трафика с роутера',sk:['net',2],go:'timC2'},{t:'Ничего, просто проходил',go:END}]}),
  timC1:N('timur','a','Чего?! Ты меня в чём-то обвиняешь? Докажи сначала! 😤',{act:()=>rel('timur',-1),next:'timC1b'}),
  timC1b:{who:'narr',text:'Нужно больше улик. Куда уходит синий кабель? Кто что видел?',next:END},
  timC2:N('timur','o','Ээ… ну… Ладно, ладно. Вижу, ты уже всё знаешь.',{next:'timC3'}),
@@ -1203,7 +1239,7 @@ const DLG={
  rackR:{who:'narr',text:'Чужой роутер всё ещё моргает за патч-панелью.',choices:[{t:'Выдернуть его',act:()=>{F().rogue=2;rogueOut();logc('📡 Выдернул чужой роутер')},go:'rackPull'},{t:'Оставить',go:END}]},
  rackFine:{who:'narr',text:'Стойки гудят ровно. Красота 😌',next:END},
  floor1:{who:'narr',text:'Ты поднимаешь плитку фальшпола у третьей стойки… Под ней пакетик, а в нём флешка с надписью «РУСТАМ. НЕ ТРОГАТЬ» 💾',act:()=>{addItem('flash');tileLift.visible=true;addTime(5)},next:'floor2'},
- floor2:{who:'narr',text:'Ты открываешь файл на ноутбуке. Таблица: 7 ноутбуков DFT-031…037. По складу все «на месте». А последний раз они выходили в сеть… через чужой роутер TP-Link. Значит, ноутбуки где-то совсем рядом!',act:()=>{addClue('flash_data');addTime(10)},next:END},
+ floor2:{who:'narr',text:'Ты открываешь файл на ноутбуке. Таблица: 7 ноутбуков TRN-031…037. По складу все «на месте». А последний раз они выходили в сеть… через чужой роутер TP-Link. Значит, ноутбуки где-то совсем рядом!',act:()=>{addClue('flash_data');addTime(10)},next:END},
  coffee:{who:'narr',text:()=>rnd(['☕ Ты наливаешь кофе. Жить стало чуть лучше.','☕ Кофемашина издаёт звук умирающего дракона, но кофе даёт.','☕ Кто-то оставил записку: «Не трогать мою кружку! — Т.»']),act:()=>addTime(5),next:END},
  printer:{who:'narr',text:'Принтер зажевал целую пачку. Изнутри торчит бумага.',choices:[{t:'📄 Вытащить бумагу',mg:['mash',{},'malOK']},{t:'Позже',go:END}]},
  bossVirus:N('boss','a','Мне сказали, у Лолы вирус?! Что у тебя тут происходит?!',{act:()=>{rel('boss',-1);F().ev.bossV=1},next:END}),
@@ -1237,14 +1273,14 @@ const DLG={
  bobTell:N('bobur','n','Вчера в 21:40 Сардор с вашего склада выносил коробки. Тяжёлые. Сказал: «Макулатура». И понёс… не к лифту, а в соседний офис.',{act:()=>{addClue('bobur_saw');addTime(5)},next:'bobTell2'}),
  bobTell2:N('bobur','s','Я подумал: может, у них уговор какой. Я человек маленький. Но запись с камеры сохранил. Мало ли что.',{next:END}),
  // kamila & jasur
- kam1:N('kamila','h','Ой, здравствуйте! Вы из «Дефактума»? Ваш интернет у нас просто летает! Тимуру отдельное спасибо 😄',{act:()=>{F().kam=1},choices:[
+ kam1:N('kamila','h','Ой, здравствуйте! Вы из «Турана»? Ваш интернет у нас просто летает! Тимуру отдельное спасибо 😄',{act:()=>{F().kam=1},choices:[
    {t:'Тимуру? А при чём тут Тимур?',go:'kam2'},{t:'А где ваш директор?',go:'kam3'}]}),
  kam2:N('kamila','o','Ну как… мы ему платим за интернет. Наличкой, каждый месяц. А что, это секрет? Ой…',{act:()=>addClue('timur_sells'),next:'kam3'}),
  kam3:N('kamila','n','Жасур-ака у себя. Он сегодня злой: вчера привезли семь ноутбуков, а зарядок к ним нет. Купил, говорит, «по знакомству».',{act:()=>addClue('kamila_info'),choices:[
    {t:'Семь? Интересно… Спасибо, Камила',rel:{kamila:1},go:END},{t:'А можно на них взглянуть?',go:'kam4'}]}),
  kam4:N('kamila','h','Да вон один на пустом столе стоит, бухгалтер в отпуске. Смотрите, мне не жалко!',{next:END}),
  jas1:N('jasur','a','Вы кто? Мы ничего не заказывали. До свидания.',{choices:[
-   {t:'Откуда у вас ноутбуки с наклейкой DFT?',if:()=>has('laptop_found'),go:'jas2'},
+   {t:'Откуда у вас ноутбуки с наклейкой TRN?',if:()=>has('laptop_found'),go:'jas2'},
    {t:'У вас интернет быстрый. Наш, между прочим',if:()=>has('timur_sells')||has('cable_nb'),go:'jasNet'},
    {t:'Просто знакомлюсь с соседями 😊',go:'jas0'}]}),
  jas0:N('jasur','n','Ну, познакомились. Дверь там.',{next:END}),
@@ -1253,8 +1289,8 @@ const DLG={
  jas3:{who:'narr',text:'Расписка: «Получил 14 000 000 сум за списанные ноутбуки (7 шт.). Сардор». Только вот никто их не списывал…',act:()=>{addClue('jasur_slip');addTime(5)},choices:[
    {t:'Ноутбуки придётся вернуть',go:'jas4'},{t:'Забудьте, что я спрашивал',go:END}]},
  jas4:N('jasur','s','Вернуть?! А деньги мне кто вернёт? …Ладно. Если ваш директор позвонит, я всё отдам. Мне проблемы не нужны.',{next:END}),
- laptop:{who:'narr',text:()=>'На крышке ноутбука наклейка: «DFT-034. Собственность ООО «Дефактум Трейд»». '+(has('flash_data')?'Он есть в списке Рустама! 😱':'Наш ноутбук! Как он здесь оказался?'),act:()=>{addClue('laptop_found');addTime(5)},next:END},
- boxes:{who:'narr',text:'Коробки с логотипом «Дефактум Трейд». Внутри только пустая упаковка от ноутбуков и пупырчатая плёнка.',act:()=>addTime(3),next:END},
+ laptop:{who:'narr',text:()=>'На крышке ноутбука наклейка: «TRN-034. Собственность ООО «Туран Трейд»». '+(has('flash_data')?'Он есть в списке Рустама! 😱':'Наш ноутбук! Как он здесь оказался?'),act:()=>{addClue('laptop_found');addTime(5)},next:END},
+ boxes:{who:'narr',text:'Коробки с логотипом «Туран Трейд». Внутри только пустая упаковка от ноутбуков и пупырчатая плёнка.',act:()=>addTime(3),next:END},
  nbr:{who:'narr',text:'На полке роутер, а к нему через дырку в стене тянется синий кабель… прямо со стороны вашей серверной. Вот куда уходит ваш интернет!',act:()=>{addClue('cable_nb');addTime(3)},next:END},
  cable:{who:'narr',text:'Под потолком коридора тянется свежий синий кабель: из вашего офиса прямиком в соседний. Аккуратно так проложен, с любовью.',act:()=>{addClue('cable_hall');addTime(3)},next:END},
  vend:{who:'narr',text:()=>rnd(['🥤 Автомат съел твою монету и ничего не дал. Классика.','🥤 Ты пинаешь автомат. Выпадает газировка… и чья-то старая записка: «Сардор, должен 14 млн. Ж.» 🤔']),act:()=>addTime(2),next:END},
@@ -1266,7 +1302,7 @@ const DLG={
  ham1b:N('hamid','s','Некогда?! Плов — это не еда, это лекарство от всех проблем! Ладно, приходи потом.',{next:END}),
  ham2:N('hamid','h','Вот! Кушай-кушай. …Кстати, ваш завсклад частенько тут сидит с Жасуром из соседнего офиса. Шепчутся, деньги считают. Не моё дело, конечно.',{act:()=>addClue('hamid_hint'),next:END}),
  // sardor confrontation
- sarC:N('sardor','n','А, это ты. Опять коннекторы нужны?',{choices:[{t:'Сардор, где ноутбуки DFT-031…037?',go:()=>evS()>=3?'sarC2':'sarC1'},{t:'Нет, всё нормально',go:END}]}),
+ sarC:N('sardor','n','А, это ты. Опять коннекторы нужны?',{choices:[{t:'Сардор, где ноутбуки TRN-031…037?',go:()=>evS()>=3?'sarC2':'sarC1'},{t:'Показать сверку склада с журналом сети',sk:['sys',2],go:'sarC2'},{t:'Нет, всё нормально',go:END}]}),
  sarC1:N('sardor','a','Какие ноутбуки? Ты меня в чём-то обвиняешь? У меня всё по журналу! Иди лучше Тимура проверь.',{act:()=>rel('sardor',-1),next:'sarC1b'}),
  sarC1b:{who:'narr',text:'Улик пока мало. Нужно минимум три доказательства. Загляни в журнал.',next:END},
  sarC2:N('sardor','o','…Тише! Не здесь. Пойдём к окну.',{next:'sarC3'}),
@@ -1343,7 +1379,7 @@ const HOT=[
       if(f.rogue===0)return canFindRogue()?'rackLook':'rackNo';if(f.rogue===1)return 'rackR';return 'rackFine'}},
   {id:'floor',loc:'office',x:230,y:436,h:.9,stand:{x:230,y:450},icon:()=>F().metR&&!has('flash')?'s':'',node:()=>!has('flash')?'floor1':{who:'narr',text:'Пустой тайник Рустама.',next:END}},
   {id:'ac',loc:'office',x:330,y:352,h:2.7,stand:{x:300,y:356},icon:()=>F().srv===1&&!F().acOn?'q':'',node:()=>F().srv===1&&!F().acOn?'acOn':{who:'narr',text:F().acOn?'Кондиционер гудит. Холодно и хорошо ❄️':'Белый шкаф с надписью «Не выключать!!!»',next:END}},
-  {id:'printer',loc:'office',x:44,y:272,h:1.9,stand:{x:84,y:288},icon:()=>F().mal===1?'q':'',node:()=>F().mal===1?'printer':{who:'narr',text:'Принтер. Смотрит на тебя с подозрением.',next:END}},
+  {id:'printer',loc:'office',x:44,y:272,h:1.9,stand:{x:60,y:304},icon:()=>F().mal===1?'q':'',node:()=>F().mal===1?'printer':{who:'narr',text:'Принтер. Смотрит на тебя с подозрением.',next:END}},
   {id:'coffee',common:1,loc:'office',x:132,y:258,h:1.45,stand:{x:132,y:238},icon:()=>'c',ic:'cup',node:()=>'coffee'},
   {id:'cable',loc:'hall',x:120,y:120,h:2.75,stand:{x:120,y:150},icon:()=>!has('cable_hall')?'s':'',node:()=>'cable'},
   {id:'vend',common:1,loc:'hall',x:338,y:200,h:2.5,stand:{x:316,y:232},icon:()=>'c',ic:'bottle',node:()=>'vend'},
@@ -1354,6 +1390,8 @@ const HOT=[
   {id:'samovar',common:1,loc:'yard',x:140,y:128,h:2,stand:{x:140,y:154},icon:()=>'c',ic:'kettle',node:()=>'samovar'},
   {id:'shelf',loc:'office',x:346,y:262,h:2.5,stand:{x:322,y:300},icon:()=>'',node:()=>({who:'narr',text:'Книжный шкаф директора. Папки, папки, папки.',next:END})},
   {id:'dilpc',loc:'office',x:62,y:80,h:1.9,stand:{x:94,y:122},icon:()=>'',node:()=>({who:'narr',text:'Компьютер Дильнозы опы. 1С открыта на «Остатках».',next:END})},
+  {id:'mypc',common:1,loc:'office',x:42,y:462,h:1.9,stand:{x:42,y:434},icon:()=>Object.values(PR().sk).some(v=>v===0)?'q':'c',ic:'monitor',open:()=>openPC(false)},
+  {id:'mount',common:1,loc:'office',x:285,y:392,h:2.8,stand:{x:285,y:432},icon:()=>PR().owned.some(id=>!PR().gear.includes(id))?'q':'c',ic:'plug',open:()=>openMount()},
   {id:'d_oh',loc:'office',x:12,y:132,h:2.2,stand:LOCS.office.doors.hall,door:'hall',label:'Коридор'},
   {id:'d_ho',loc:'hall',x:60,y:122,h:2.4,stand:LOCS.hall.doors.office,door:'office',label:'Наш офис'},
   {id:'d_hn',loc:'hall',x:300,y:122,h:2.4,stand:LOCS.hall.doors.nb,door:'nb',label:'Соседи'},
@@ -1397,11 +1435,11 @@ try{const o=JSON.parse(localStorage.getItem('uptime_save')||'null');if(o&&o.ep&&
 function saveSeason(){try{localStorage.setItem('uptime_season',JSON.stringify(SEASON))}catch(e){}}
 const prevF=n=>(SEASON.done[n]&&SEASON.done[n].F)||{};
 const prevRel=()=>{const r={};for(let i=1;i<EPN;i++)Object.assign(r,(SEASON.done[i]||{}).rel||{});return r};
-function finishEpisode(n,title,F,rel){SEASON.done[n]={title,F,rel,t:Date.now()};saveSeason()}
+function finishEpisode(n,title,F,rel){const first=!SEASON.done[n]||!SEASON.done[n].paid;SEASON.done[n]={title,F,rel,t:Date.now(),paid:1};if(first)gainXP(150,500000);saveSeason()}
 /* dispatchers */
 function nodeFor(id){return EPS[EPN].nodeFor(id)}
 function markerFor(id){return EPS[EPN].markerFor(id)}
-function objectives(){return EPS[EPN].objectives()}
+function objectives(){const o=EPS[EPN].objectives();if(Object.values(PR().sk).every(v=>v===0)&&(EPN!==1||G.F.met_boss))o.unshift(['📚 Пройди первый курс за своим компьютером (серверная, слева внизу)',0]);return o}
 function checkEvents(){if(!G||G.busy||!G.running||G.F.ev.final)return;EPS[EPN].events()}
 function startFinal(){EPS[EPN].final()}
 function endingScreen(){EPS[EPN].ending();SCR='ending'}
@@ -1411,18 +1449,18 @@ function hotNode(h){const o=EPS[EPN].hot&&EPS[EPN].hot[h.id];if(o)return o.node(
 function hotHidden(h){return EPS[EPN].hotHidden?EPS[EPN].hotHidden(h):false}
 function gossipFor(id){const g=EPS[EPN].gossip&&EPS[EPN].gossip[id];return g||GOSSIP[id]||['…']}
 /* NPC placement */
-function resetNPCs(){Object.values(NPC).forEach(n=>{if(!n.home0)n.home0=n.home;const h=n.home=n.home0;n.loc=h.loc;n.x=h.x;n.y=h.y;n.rot=h.rot||0;n.sy=h.sy||0;n.state=h.seat?'sit':'idle';n.path=[];n.hold=false;n.away=false;n.lunchGo=false;n.after=null;n.timer=5+Math.random()*20;n.curStand=h.seat?h.stand:null;if(n.chat){n.chat.remove();n.chat=null}})}
+function resetNPCs(){Object.values(NPC).forEach(n=>{if(!n.home0)n.home0=n.home;const h=n.home=n.home0;n.loc=h.loc;n.x=h.x;n.y=h.y;n.rot=h.rot||0;n.sy=h.sy||0;n.state=h.seat?'sit':'idle';n.path=[];n.hold=false;n.away=false;n.conv=null;n.lunchGo=false;n.after=null;n.timer=5+Math.random()*20;n.curStand=h.seat?h.stand:null;if(n.chat){n.chat.remove();n.chat=null}})}
 function setAway(id){const n=NPC[id];n.away=true;n.loc='away';n.path=[];n.state='idle'}
 function setHome(id,h){const n=NPC[id];n.away=false;n.home=h;n.loc=h.loc;n.x=h.x;n.y=h.y;n.rot=h.rot||0;n.sy=h.sy||0;n.state=h.seat?'sit':'idle';n.curStand=h.seat?h.stand:null}
 function baseState(extraF,relKeys){const r={};relKeys.forEach(k=>r[k]=0);Object.assign(r,prevRel());relKeys.forEach(k=>{if(r[k]==null)r[k]=0});Object.keys(r).forEach(k=>{if(!relKeys.includes(k))delete r[k]});
-  return {min:540,F:Object.assign({lunch:0,ev:{}},extraF),rel:r,clues:[],items:[],log:[],p:{x:100,y:298,path:[],walk:0,rot:Math.PI,vx:0,vy:0,dust:0},pending:null,running:true,busy:false,realT:0,visited:{office:1}}}
+  return {min:540,F:Object.assign({lunch:0,ev:{}},extraF),rel:r,clues:[],items:[],log:[],p:{x:96,y:268,path:[],walk:0,rot:Math.PI,vx:0,vy:0,dust:0},pending:null,running:true,busy:false,realT:0,visited:{office:1}}}
 function playEpisode(n){SCR='game';PAUSED=false;EPN=n;const s=$('screen');s.classList.add('hidden');startMusic();resetNPCs();G=EPS[n].newGame();EPS[n].setup&&EPS[n].setup();setLoc('office');ov.style.display='';setTimeout(()=>talk(EPS[n].intro),400)}
 function showSeason(){const s=$('screen');SCR='season';s.classList.remove('hidden');s.classList.add('season');
   const avail=n=>n===1||!!SEASON.done[n-1];
-  s.innerHTML=`<button class="backb" id="sback">← Назад</button><div class="tag">DEFACTUM GAMES представляет</div><h1>АПТАЙМ</h1><h2>Сезон 1: «Тень списания»</h2>
+  s.innerHTML=`<button class="backb" id="sback">← Назад</button><div class="tag">UPTIME STUDIO представляет</div><h1>АПТАЙМ</h1><h2>Сезон 1: «Тень списания»</h2>
   <p style="font-size:13px;color:#9aa7b4;margin:4px 0 12px">Каждое решение переходит в следующие эпизоды.</p>
   <div class="eplist">${EPLIST.map(e=>{const d=SEASON.done[e.n],ok=avail(e.n)&&!e.soon;return `<button class="epc ${ok?'':'lock'} ${d?'done':''}" data-n="${e.n}" ${ok?'':'disabled'}>
-    <div class="epn">${e.n}</div><div class="ept"><b>${e.t}</b><small>${e.soon?'Скоро':d?'Пройден: '+d.title.replace(/[\p{Extended_Pictographic}️]/gu,'').trim():ok?'Новый эпизод':'Сначала пройди эпизод '+(e.n-1)}</small><p>${e.d}</p></div></button>`}).join('')}</div>
+    <div class="epn">${e.n}</div><div class="ept"><b>${e.t}</b><small>${e.soon?'Скоро':d?'Пройден: '+d.title.replace('Дефа'+'ктума','Турана').replace(/[\p{Extended_Pictographic}️]/gu,'').trim():ok?'Новый эпизод':'Сначала пройди эпизод '+(e.n-1)}</small><p>${e.d}</p></div></button>`}).join('')}</div>
   <p style="font-size:11px;color:#6e7681;margin-top:10px">🎧 лучше со звуком</p>`;
   $('sback').onclick=()=>{sPop();showMainMenu()};
   s.querySelectorAll('.epc').forEach(b=>b.onclick=()=>{const n=+b.dataset.n;if(!avail(n))return;sPop();s.classList.remove('season');playEpisode(n)})}
@@ -1510,7 +1548,7 @@ Object.assign(DLG,{
  e2_rack:{who:'narr',text:'Серверная. Стойки гудят, кондиционер дует. Что будешь делать?',choices:[
    {t:'Удалить папку «Бухгалтерия/Акты»',if:()=>F().scan==='agree',go:'e2_del'},
    {t:'Сделать копию папки «Бухгалтерия/Акты»',if:()=>(F().scan==='backup'||F().scan==='refuse')&&!has('e2_scans'),go:'e2_scan'},
-   {t:'Разобрать заголовки анонимного письма',if:()=>!has('e2_hdr'),mg:['logs',{title:'Заголовки письма',icon:'mail',hint:'Найди строку, откуда <b>на самом деле</b> отправлено письмо.',cols:['Поле','Значение'],rows:[['From','anonim2026@mail.uz'],['Subject','Проверь списание'],['Received','from [192.168.50.23] by mx.defactum.uz'],['X-Mailer','Mail.uz Android'],['Date','Tue 07:41']],ans:2},'e2_hdrOK']},
+   {t:'Разобрать заголовки анонимного письма',if:()=>!has('e2_hdr'),mg:['logs',{title:'Заголовки письма',icon:'mail',hint:'Найди строку, откуда <b>на самом деле</b> отправлено письмо.',cols:['Поле','Значение'],rows:[['From','anonim2026@mail.uz'],['Subject','Проверь списание'],['Received','from [192.168.50.23] by mx.turan.uz'],['X-Mailer','Mail.uz Android'],['Date','Tue 07:41']],ans:2},'e2_hdrOK']},
    {t:'Открыть журнал гостевого Wi-Fi',if:()=>has('e2_hdr')&&!has('e2_sender'),mg:['logs',{title:'Журнал DHCP, гостевая сеть',icon:'wifi',hint:'Какое устройство получило адрес <b>192.168.50.23</b> в 07:41?',cols:['Время','Адрес','Устройство'],rows:[['07:12','192.168.50.17','BOBUR-TV'],['07:41','192.168.50.23','NIGORA-A52'],['08:55','192.168.50.31','TIMUR-iPhone'],['09:02','192.168.50.23','MALIKA-MAC'],['09:20','192.168.50.40','KAMILA-PC']],ans:1},'e2_sendOK']},
    {t:'Уйти',go:END}]},
  e2_del:{who:'narr',text:'214 файлов. Курсор над кнопкой «Удалить навсегда»…',choices:[
@@ -1530,7 +1568,7 @@ Object.assign(DLG,{
  e2_mal1:N('malika','o','Слушай, мне велели сделать пост про наших «партнёров по утилизации», ООО «Бит Сервис». А про них в интернете ничего! Только реестр юрлиц.',{act:()=>F().mal2=1,choices:[{t:'Покажи реестр',go:'e2_mal2'},{t:'Потом посмотрю',go:END}]}),
  e2_mal2:{who:'narr',text:'Реестр: ООО «Бит Сервис», директор Рашидов Шерзод Фаррухович. Зарегистрировано за неделю до актов списания. Фаррухович…',act:()=>{addClue('e2_bit');addTime(5)},next:'e2_mal3'},
  e2_mal3:N('malika','o','Рашидов… Как наш Фаррух Рашидович? Совпадение, наверное. Я пост лучше пока не буду публиковать 😬',{act:()=>rel('malika',1),next:END}),
- e2_kam1:N('kamila','h','Ой, опять вы! Жасур-ака сегодня ругается: «Бит Сервис» привёз мониторы, а половина битые! Ваши, кстати, с наклейками DFT 😅',{act:()=>{addClue('e2_bit_truck');F().kam2=1},next:END}),
+ e2_kam1:N('kamila','h','Ой, опять вы! Жасур-ака сегодня ругается: «Бит Сервис» привёз мониторы, а половина битые! Ваши, кстати, с наклейками TRN 😅',{act:()=>{addClue('e2_bit_truck');F().kam2=1},next:END}),
  e2_jas1:N('jasur','a',()=>(['boss','private'].includes(P1().res2)?'Ноутбуки я вернул! Что опять? ':'Опять вы? ')+'Мониторы? Шерзод из «Бит Сервиса» привёз, недорого. Брат какого-то начальника из вашей конторы, кстати. Всё, до свидания.',{act:()=>{F().jas2=1;addClue('e2_bit')},next:END}),
  e2_ham1:N('hamid','h','Ассалому алейкум, укажон! Плов будешь? Сегодня с изюмом и нутом!',{act:()=>F().ham2=1,choices:[{t:'Конечно! 🍚',rel:{hamid:1},act:()=>addTime(15),go:'e2_ham2'},{t:'Некогда, Хамид-ака',go:END}]}),
  e2_ham2:N('hamid','n','Кушай. …Этот ваш финансист в очках. В пятницу вечером сидел тут, два ляганa плова съел. Говорил: «Прямо с самолёта из Дубая». Странно. Рейс-то из Дубая только в понедельник.',{act:()=>addClue('e2_hamid'),next:END}),
@@ -1681,9 +1719,9 @@ function show(node){
 }
 function showChoices(node){const ch=$('dch');
   if(!node.choices){ch.innerHTML='<div class="dnext">▼ нажми, чтобы продолжить</div>';return}
-  const list=node.choices.filter(c=>!c.if||c.if());
-  ch.innerHTML='<div class="chs">'+list.map((c,i)=>`<button class="ch" data-i="${i}" style="animation-delay:${i*.07}s"><b>${i+1}.</b>${c.t}${c.tag?`<span class="tg">${c.tag}</span>`:''}</button>`).join('')+'</div>';
-  ch.querySelectorAll('.ch').forEach(b=>b.onclick=()=>{const c=list[+b.dataset.i];sPop();
+  const list=node.choices.filter(c=>!c.if||c.if());const rq=c=>c.sk||(c.mg&&((c.mg[1]&&c.mg[1].req)||MGREQ[c.mg[0]]))||null;
+  ch.innerHTML='<div class="chs">'+list.map((c,i)=>`<button class="ch" data-i="${i}" style="animation-delay:${i*.07}s"><b>${i+1}.</b>${c.t}${rq(c)&&!skOK(rq(c))?`<span class="tg lk">🔒 ${skTxt(rq(c))}</span>`:c.tag?`<span class="tg">${c.tag}</span>`:''}</button>`).join('')+'</div>';
+  ch.querySelectorAll('.ch').forEach(b=>b.onclick=()=>{const c=list[+b.dataset.i];{const r=rq(c);if(r&&!skOK(r)){sBad();toast('Не хватает навыка «'+SKN[r[0]]+'» '+r[1]+'. Пройди курс за своим компьютером в серверной','r');if(c.mg)advance(END);return}}sPop();
     if(c.rel)Object.entries(c.rel).forEach(([k,v])=>rel(k,v));if(c.act)c.act();
     if(c.mg){const [k,o,win,lose]=c.mg;closeDlg(true);openMG(k,o,()=>talk(win,D?.npc||lastNpc),lose?()=>talk(lose,lastNpc):null);return}
     advance(typeof c.go==='function'?c.go():c.go)})}
@@ -1694,14 +1732,14 @@ function closeDlg(keep){clearInterval(D?.iv);dlgEl.classList.add('hidden');dlgEl
 /* ---------- minigames ---------- */
 const mgEl=$('mg');const mg={cleanup:null};
 function openMG(kind,o,onWin,onLose){if(G)G.busy=true;mgEl.classList.remove('hidden');
-  let T={crimp:['plug','Обжать кабель'],reboot:['power','Перезапуск свитча'],mash:['printer','Принтер зажевал'],phish:['mail','Письмо Лоле'],taskmgr:['monitor','Диспетчер задач'],tv:['tv','Телевизор охраны']}[kind];if(o&&o.title)T=[o.icon||T[0],o.title];T[0]=IC[T[0]]||T[0];
+  let T={crimp:['plug','Обжать кабель'],reboot:['power','Перезапуск свитча'],mash:['printer','Принтер зажевал'],phish:['mail','Письмо Лоле'],taskmgr:['monitor','Диспетчер задач'],tv:['tv','Телевизор охраны'],quiz:['book','Курс'],ipcfg:['server','Настройка адреса'],rules:['shield','Правила фаервола'],patch:['switch','Коммутация'],logs:['search','Журнал']}[kind];if(o&&o.title)T=[o.icon||T[0],o.title];T[0]=IC[T[0]]||T[0];
   mgEl.innerHTML=`<div class="mgbox" id="mgbox"><div class="mghead"><div class="ic">${T[0]}</div><div><b>Задание</b><span>${T[1]}</span></div></div><div id="mgbody"></div><div class="foot"><button class="small" id="later">↩ Отложить</button></div></div>`;
   const close=()=>{if(mg.cleanup)mg.cleanup();mg.cleanup=null;mgEl.classList.add('hidden');mgEl.innerHTML=''};
-  const win=()=>{close();sGood();const n=NPC[lastNpc];if(n)puff(wx(n.x),2,wz(n.y),30,{c:['#ffd166','#fff','#7ee787','#f778ba'],sp:3,up:2.5,g:-6,life:1.2});onWin()};
+  const win=()=>{close();sGood();{const pz=MGPAY[kind];if(pz&&!(o&&o.nopay)){PR().tasks++;gainXP(pz[0],pz[1])}}const n=NPC[lastNpc];if(n)puff(wx(n.x),2,wz(n.y),30,{c:['#ffd166','#fff','#7ee787','#f778ba'],sp:3,up:2.5,g:-6,life:1.2});onWin()};
   const lose=()=>{close();sBad();onLose?onLose():endBusy()};
   $('later').onclick=()=>{close();endBusy()};
   GAMES[kind]($('mgbody'),o,win,lose)}
-function endBusy(){if(!G)return;G.busy=false;if(lastNpc&&NPC[lastNpc])NPC[lastNpc].hold=false;cam.tt.copy(baseTarget);cam.td=baseDist}
+function endBusy(){if(AT_PC||!$('pc').classList.contains('hidden')){closePC()}if(!G)return;G.busy=false;if(lastNpc&&NPC[lastNpc])NPC[lastNpc].hold=false;cam.tt.copy(baseTarget);cam.td=baseDist}
 function shakeBox(){const b=$('mgbox');if(b){b.classList.remove('shake');void b.offsetWidth;b.classList.add('shake')}sBad()}
 const WIRES=[['#fff','#f28c28'],['#f28c28'],['#fff','#2fa84f'],['#2d6cdf'],['#fff','#2d6cdf'],['#2fa84f'],['#fff','#8b5a2b'],['#8b5a2b']];
 const CYL='linear-gradient(90deg,rgba(0,0,0,.35),rgba(255,255,255,.35) 35%,rgba(0,0,0,.1) 60%,rgba(0,0,0,.45))';
@@ -1726,21 +1764,14 @@ const GAMES={
   body.querySelectorAll('.wire').forEach(b=>b.onclick=()=>{const w=+b.dataset.w;
     if(w===idx){slots[idx].style.background=wireBg(WIRES[w]);slots[idx].style.border='none';b.disabled=true;idx++;beep(500+idx*60,.04);if(idx===8)setTimeout(win,250)}
     else{shakeBox();idx=0;slots.forEach(s=>{s.style.background='';s.style.border=''});body.querySelectorAll('.wire').forEach(x=>x.disabled=false)}})},
- reboot(body,o,win){const need=o.need||1;let got=0,pos=0,dir=1,speed=.8,z0=0,zw=.28,raf,last=performance.now();
-  body.innerHTML=`<div class="hint">Жми кнопку, когда маркер в <b style="color:#56d364">зелёной зоне</b>. Нужно ${need} попадания подряд.</div><div class="tbar"><div class="zone" id="zn"></div><div class="mark" id="mk"></div></div><div class="hits" id="hits"></div><button class="btn red" id="pw">⏻ ПЕРЕЗАПУСК</button>`;
-  const zn=$('zn'),mk=$('mk'),hits=$('hits');const nz=()=>{zw=Math.max(.16,zw-.05);z0=Math.random()*(1-zw);zn.style.left=z0*100+'%';zn.style.width=zw*100+'%'};
-  const dh=()=>hits.textContent='🟩'.repeat(got)+'⬛'.repeat(need-got);nz();dh();
-  const loop=now=>{const dt=Math.min(.05,(now-last)/1000);last=now;pos+=dir*speed*dt;if(pos>1){pos=1;dir=-1}if(pos<0){pos=0;dir=1}mk.style.left=`calc(${pos*100}% - 2px)`;raf=requestAnimationFrame(loop)};
+ mash(body,o,win){const need=14;let n=0,left=7,raf,last=performance.now();
+  body.innerHTML=`<div class="hint">${o.ups?'Батарея ИБП садится! Быстро меняй её: тапай по кнопке!':'Бумагу зажевало. Тяни лист рывками: быстро тапай по кнопке!'}</div>${o.ups?'':'<div class="pprw"><div class="pprslot"></div><div class="ppr" id="ppr"></div></div>'}<div class="prog"><i id="pg"></i></div><div class="hits" id="tl">7.0 c</div><button class="btn blue" id="mb">${o.ups?'🔋 МЕНЯЙ!':'📄 ТЯНИ!'}</button>`;
+  const pg=$('pg'),tl=$('tl'),pp=$('ppr');const loop=now=>{const dt=(now-last)/1000;last=now;left-=dt;if(left<=0){shakeBox();n=0;left=7}tl.textContent=left.toFixed(1)+' c';pg.style.width=(n/need*100)+'%';if(pp)pp.style.height=(8+n/need*92)+'%';raf=requestAnimationFrame(loop)};
   raf=requestAnimationFrame(loop);mg.cleanup=()=>cancelAnimationFrame(raf);
-  $('pw').onclick=()=>{if(pos>=z0&&pos<=z0+zw){got++;dh();beep(700,.06);if(got>=need)setTimeout(win,200);else{speed*=1.25;nz()}}else{shakeBox();got=0;dh();nz()}}},
- mash(body,o,win){const need=14;let n=0,left=6,raf,last=performance.now();
-  body.innerHTML=`<div class="hint">${o.ups?'Батарея ИБП садится! Быстро меняй её: тапай по кнопке!':'Тяни застрявшую бумагу: быстро тапай по кнопке!'}</div><div class="prog"><i id="pg"></i></div><div class="hits" id="tl">6.0 c</div><button class="btn blue" id="mb">${o.ups?'🔋 МЕНЯЙ!':'📄 ТЯНИ!'}</button>`;
-  const pg=$('pg'),tl=$('tl');const loop=now=>{const dt=(now-last)/1000;last=now;left-=dt;if(left<=0){shakeBox();n=0;left=6}tl.textContent=left.toFixed(1)+' c';pg.style.width=(n/need*100)+'%';raf=requestAnimationFrame(loop)};
-  raf=requestAnimationFrame(loop);mg.cleanup=()=>cancelAnimationFrame(raf);
-  $('mb').onclick=()=>{n++;beep(300+n*25,.03,'square',.03);if(n>=need){cancelAnimationFrame(raf);pg.style.width='100%';setTimeout(win,150)}}},
+  $('mb').onclick=()=>{n++;if(o.ups)beep(300+n*25,.03,'square',.03);else{sPaper(false);if(pp){pp.style.transform=`rotate(${(Math.random()-.5)*5}deg)`}}if(n>=need){cancelAnimationFrame(raf);pg.style.width='100%';if(!o.ups){sPaper(true);if(pp){pp.style.height='100%';pp.classList.add('out')}}setTimeout(win,o.ups?150:550)}}},
  phish(body,o,win,lose){const bad=['from','urg','link','att'];let found=0,miss=0;
   body.innerHTML=`<div class="hint">Найди <b style="color:#ff7b72">4 признака мошенничества</b> в письме. Тапай по подозрительным местам. Права на ошибку: 2.</div>
-  <div class="mail"><div class="hd"><span class="ms" data-k="from"><b>От:</b> Отдел кадров &lt;hr@defactum-bonus.xyz&gt;</span><br><span class="ms" data-k="ok1"><b>Тема:</b> Повышение зарплаты</span></div>
+  <div class="mail"><div class="hd"><span class="ms" data-k="from"><b>От:</b> Отдел кадров &lt;hr@turan-bonus.xyz&gt;</span><br><span class="ms" data-k="ok1"><b>Тема:</b> Повышение зарплаты</span></div>
   <span class="ms" data-k="ok2">Уважаемая Лола!</span> <span class="ms" data-k="ok3">Поздравляем с хорошей работой.</span> <span class="ms" data-k="urg">СРОЧНО подтвердите повышение в течение 1 часа, иначе оно будет отменено!</span>
   <span class="ms" data-k="link">Войдите здесь: bit.ly/zarplata-up</span><br><span class="ms" data-k="ok4">С уважением, отдел кадров</span><br><span class="ms att" data-k="att">📎 Zarplata_2026.pdf.exe</span></div>
   <div class="hits" id="ph" style="letter-spacing:0;font-size:14px">Найдено: 0 / 4 · Ошибок: 0 / 2</div>`;
@@ -1807,7 +1838,7 @@ function ep1Final(){if(G.busy){G.pendingFinal=true;return}G.F.ev.final=1;G.busy=
 function ep1Ending(){G.running=false;ov.style.display='none';const f=F(),q=G.q;
   let title,desc;const honest=x=>x==='private'||x==='boss';
   if(f.res==='corrupt'||f.res2==='corrupt'){title='💰 Соучастник';desc='Связь есть, деньги есть… а совесть? И у Бобура-ака есть запись.'}
-  else if(q>=4&&honest(f.res)&&honest(f.res2)){title='🕵️ Детектив «Дефактума»';desc='Связь летает, обе тайны раскрыты, Рустам возвращается. Лучшая концовка!'}
+  else if(q>=4&&honest(f.res)&&honest(f.res2)){title='🕵️ Детектив «Турана»';desc='Связь летает, обе тайны раскрыты, Рустам возвращается. Лучшая концовка!'}
   else if(q>=4&&(honest(f.res)||honest(f.res2))){title='🦸 Герой офиса';desc='Звонок прошёл отлично, правда частично раскрыта.'}
   else if(q>=4){title='📡 Связь есть, тайна осталась';desc='Звонок прошёл идеально, но кто подставил Рустама?'}
   else if(q>=2){title='😬 На тоненького';desc='Звонок еле-еле пережил. Завтра будет жарко.'}
@@ -1823,7 +1854,7 @@ function ep1Ending(){G.running=false;ov.style.display='none';const f=F(),q=G.q;
 const ray=new THREE.Raycaster(),floorP=new THREE.Plane(new THREE.Vector3(0,1,0),0),hit=new THREE.Vector3();
 function goTo(x,y){G.p.path=astar(G.p.x,G.p.y,x,y,LOC)}
 function interact(t){if(!G.running||G.busy)return;if(G.pending?.npc&&G.pending.npc!==t.npc)NPC[G.pending.npc].hold=false;G.pending=t;sPop();
-  if(t.npc){const n=NPC[t.npc];n.hold=true;const tp=n.state==='sit'&&n.curStand?n.curStand:{x:n.x+(G.p.x>n.x?20:-20),y:n.y+8};goTo(tp.x,tp.y)}else goTo(t.hot.stand.x,t.hot.stand.y)}
+  if(t.npc){const n=NPC[t.npc];n.hold=true;const tp=n.state==='sit'&&n.curStand?n.curStand:{x:n.x+(G.p.x>n.x?20:-20),y:n.y+8};goTo(tp.x,tp.y)}else goTo(t.hot.stand.x,t.hot.stand.y);if(!G.p.path.length)arrive()}
 renderer.domElement.addEventListener('pointerdown',e=>{startMusic();
   if(!G||!G.running||G.busy)return;const r=renderer.domElement.getBoundingClientRect();
   ray.setFromCamera(new THREE.Vector2((e.clientX-r.left)/r.width*2-1,-((e.clientY-r.top)/r.height)*2+1),camera);
@@ -1831,12 +1862,12 @@ renderer.domElement.addEventListener('pointerdown',e=>{startMusic();
   let best=null,bd=24;for(const n of Object.values(NPC)){if(n.loc!==LOC)continue;const d=Math.hypot(x-n.x,y-n.y);if(d<bd){bd=d;best={npc:n.id}}}
   if(!best)for(const h of HOT){if(h.loc!==LOC)continue;const d=Math.hypot(x-h.x,y-h.y);if(d<(h.door?30:26)){best={hot:h};break}}
   if(best){interact(best);return}
-  if(G.pending?.npc)NPC[G.pending.npc].hold=false;G.pending=null;goTo(clamp(x,14,346),clamp(y,40,474));puff(wx(x),.1,wz(y),8,{c:'#ffd166',sp:1.5,life:.4,g:0})});
+  if(G.pending?.npc)NPC[G.pending.npc].hold=false;G.pending=null;G.p.path=astar(G.p.x,G.p.y,clamp(x,14,346),clamp(y,40,474),LOC,true);puff(wx(x),.1,wz(y),8,{c:'#ffd166',sp:1.5,life:.4,g:0})});
 function arrive(){const t=G.pending;G.pending=null;if(!t)return;
   if(t.npc){const n=NPC[t.npc];if(n.loc!==LOC){n.hold=false;return}G.p.rot=Math.atan2(n.x-G.p.x,n.y-G.p.y);let node=nodeFor(t.npc);
     if(!node){node={who:t.npc,mood:G.rel[t.npc]>0?'h':G.rel[t.npc]<0?'a':'n',text:rnd(gossipFor(t.npc)),next:END}}
     lastNpc=t.npc;talk(node,t.npc)}
-  else{const h=t.hot;if(h.door){switchLoc(h.door);return}G.p.rot=Math.atan2(h.x-G.p.x,h.y-G.p.y);lastNpc=h.id==='printer'?'malika':null;talk(hotNode(h),lastNpc)}}
+  else{const h=t.hot;if(h.door){switchLoc(h.door);return}if(h.open){G.p.rot=Math.atan2(h.x-G.p.x,h.y-G.p.y);lastNpc=null;h.open();return}G.p.rot=Math.atan2(h.x-G.p.x,h.y-G.p.y);lastNpc=h.id==='printer'?'malika':null;talk(hotNode(h),lastNpc)}}
 
 /* ---------- markers ---------- */
 const MK={};
@@ -1848,7 +1879,7 @@ function updMarkers(){STW=stage.clientWidth;STH=stage.clientHeight;
   Object.values(NPC).forEach(n=>{const d=MK[n.id];if(n.loc!==LOC||hide){d.style.display='none';return}d.style.display='';const t=markerFor(n.id);
     const [x,y]=proj(wx(n.x),2.3+n.c.g.position.y,wz(n.y));d.style.transform=`translate(${clamp(x,46,stage.clientWidth-46)}px,${y}px) translateX(-50%)`;
     const ic=d._ic||(d._ic=d.querySelector('.ic'));setIc(ic,'ic '+(t||'c'),t==='q'?'excl':t==='t'?'qst':t==='s'?'search':'chat');ic.style.display=t?'':'none';(d._nm||(d._nm=d.querySelector('.nm'))).style.opacity=t?1:.75;
-    if(n.chat){const [cx,cy]=proj(wx(n.x),2.5+n.c.g.position.y,wz(n.y));n.chat.style.transform=`translate(${cx}px,${cy-50}px) translateX(-50%)`}});
+    if(n.chat){const [cx,cy]=proj(wx(n.x),2.5+n.c.g.position.y,wz(n.y));n.chat.style.transform=`translate(${cx}px,${cy-14}px) translate(-50%,-100%)`}});
   HOT.forEach(h=>{const d=MK['h_'+h.id];if(h.loc!==LOC||hide||hotHidden(h)){d.style.display='none';return}
     const t=h.door?'d':hotIcon(h);if(!t){d.style.display='none';return}d.style.display='';const [x,y]=proj(wx(h.x),h.h,wz(h.y));d.style.transform=`translate(${clamp(x,46,stage.clientWidth-46)}px,${y}px) translateX(-50%)`;
     const ic=d._ic||(d._ic=d.querySelector('.ic'));setIc(ic,'ic '+t,t==='q'?'excl':t==='t'?'qst':t==='s'?'search':t==='d'?'door':(h.ic||''))})}
@@ -1900,7 +1931,7 @@ function visuals(dt){
     if(n.id==='hamid'&&mode==='stand'){c.armR.rotation.x=-1.2+Math.sin(T*4)*.5;c.armL.rotation.x=-.4}
     if(n.hold&&G){const a=Math.atan2(G.p.x-n.x,G.p.y-n.y)-c.g.rotation.y;c.head.rotation.y=clamp(Math.atan2(Math.sin(a),Math.cos(a)),-1,1)}else c.head.rotation.y=Math.sin(T*.5+n.x)*.2});
   if(G){const pl=G.p;admin.g.visible=true;admin.g.position.set(wx(pl.x),0,wz(pl.y));let dr=pl.rot-admin.g.rotation.y;dr=Math.atan2(Math.sin(dr),Math.cos(dr));admin.g.rotation.y+=dr*Math.min(1,dt*12);
-    poseChar(admin,pl.path.length&&!G.busy?'walk':'stand',pl.walk,T);if(mgEl.offsetParent){admin.armR.rotation.x=-1.3+Math.sin(T*16)*.25;admin.armL.rotation.x=-1.1+Math.sin(T*16+1)*.25}
+    poseChar(admin,AT_PC?'sit':pl.path.length&&!G.busy?'walk':'stand',pl.walk,T);if(AT_PC){admin.armL.rotation.x=-.45+Math.sin(T*14)*.07;admin.armR.rotation.x=-.45+Math.sin(T*14+2)*.07;admin.armL.elbow.rotation.x=admin.armR.elbow.rotation.x=-1.05}else if(!mgEl.classList.contains('hidden')){admin.armR.rotation.x=-1.3+Math.sin(T*16)*.25;admin.armL.rotation.x=-1.1+Math.sin(T*16+1)*.25}
     const tg=pl.path.length?pl.path[pl.path.length-1]:null;ring.visible=!!tg&&!G.busy;if(tg){ring.position.set(wx(tg.x),.02,wz(tg.y));ring.scale.setScalar(1+Math.sin(T*6)*.12);ring.rotation.z+=dt*2}}
   else{admin.g.visible=false;ring.visible=false}
   const k=Math.min(1,dt*3);cam.t.lerp(cam.tt,k);cam.d+=(cam.td-cam.d)*k;
@@ -1917,7 +1948,7 @@ function frame(now){const dt=Math.min(.05,(now-lastT)/1000);lastT=now;T+=dt;
 
 /* ---------- start ---------- */
 function startScreen(){const s=$('screen');s.classList.remove('hidden');
-  s.innerHTML=`<div class="tag">DEFACTUM GAMES представляет</div><h1>АПТАЙМ</h1><h2>Эпизод 1: «День первый»</h2>
+  s.innerHTML=`<div class="tag">UPTIME STUDIO представляет</div><h1>АПТАЙМ</h1><h2>Эпизод 1: «День первый»</h2>
   <p>Первый день сисадмином. Прошлый админ исчез, из сети пропадают ноутбуки,<br>а в 15:00 решающий звонок с инвесторами.</p>
   <p style="font-size:13px;color:#9aa7b4">💬 13 персонажей, каждый выбор имеет последствия<br>🗺️ 4 локации: офис, коридор, соседи, чайхана<br>🔍 Две тайны и 6 концовок</p>
   <button class="btn" id="go">НАЧАТЬ ▶</button><p style="font-size:11px;color:#6e7681">🎧 лучше со звуком</p>`;
@@ -1928,16 +1959,117 @@ GAMES.logs=function(body,o,win){body.innerHTML=`<div class="hint">${o.hint}</div
   body.querySelectorAll('.tr').forEach(t=>t.onclick=()=>{if(+t.dataset.i===o.ans){t.classList.add('bad');$('tmh').innerHTML='✅ Нашёл!';beep(880,.08,'triangle',.05);setTimeout(win,700)}else{shakeBox();$('tmh').innerHTML='❌ Не то. Смотри внимательнее.'}})};
 document.querySelectorAll('[data-ic]').forEach(e=>e.innerHTML=IC[e.dataset.ic]||'');
 
+/* ================= PROFILE · SKILLS · COURSES · SHOP · GEAR ================= */
+if(!SEASON.prof)SEASON.prof={xp:0,lvl:1,money:300000,sk:{net:0,sec:0,hw:0,sys:0},gear:[],owned:[],tasks:0};
+const PR=()=>SEASON.prof;
+const SKN={net:'Сети',sec:'Безопасность',hw:'Железо',sys:'Системы'};
+const xpNeed=l=>100*l;
+const fmtM=n=>n>=1e6?(n/1e6).toFixed(1).replace('.0','').replace('.',',')+' млн':Math.round(n/1000)+' тыс';
+const upPct=()=>Math.min(99.99,95+PR().gear.length*.7+Object.values(PR().sk).reduce((a,b)=>a+b,0)*.12+Math.min(40,PR().tasks)*.03).toFixed(2).replace('.',',');
+function updProf(){const e=$('proftx');if(e)e.textContent=PR().lvl}
+function gainXP(x,m){const p=PR();p.xp+=x;p.money+=m||0;let up=false;while(p.xp>=xpNeed(p.lvl)){p.xp-=xpNeed(p.lvl);p.lvl++;up=true}
+  toast(`+${x} опыта`+(m?` · +${fmtM(m)} сум`:''),'g');if(up){toast('Новый уровень: '+p.lvl+'! Открыты новые курсы','y');sGood()}saveSeason();updProf()}
+const MGREQ={crimp:['net',1],phish:['sec',1],taskmgr:['sys',1],reboot:['hw',1],logs:['sys',1]};
+const MGPAY={crimp:[40,60000],reboot:[40,60000],mash:[25,30000],phish:[50,80000],taskmgr:[50,80000],tv:[30,40000],logs:[45,70000]};
+const skOK=r=>!r||PR().sk[r[0]]>=r[1];
+const skTxt=r=>`${SKN[r[0]]} ${r[1]}`;
+const COURSES={
+ net:[{t:'Основы сетей',min:15,cost:0,lvl:1,qs:[['Что соединяет компьютеры в одной локальной сети?',['Свитч','Монитор','ИБП'],0],['Какой стандарт обжима витой пары используют чаще всего?',['HDMI','T568B','USB-C'],1]]},
+  {t:'VLAN и маршрутизация',min:30,cost:150000,lvl:2,qs:[['Зачем делить сеть на VLAN?',['Ускорить принтер','Усилить Wi-Fi','Отделить отделы друг от друга'],2],['Какой адрес обычно у шлюза в сети 192.168.1.0/24?',['192.168.1.1','192.168.1.255','127.0.0.1'],0]]},
+  {t:'Wi-Fi и диагностика',min:45,cost:400000,lvl:4,qs:[['Ping идёт до шлюза, но не до сайта. Где искать?',['В кабеле до ПК','У провайдера или в DNS','В мониторе'],1],['Гостевой Wi-Fi лучше…',['Изолировать от рабочей сети','Дать тот же пароль','Оставить без шифрования'],0]]}],
+ sec:[{t:'Фишинг и пароли',min:15,cost:0,lvl:1,qs:[['Письмо требует «срочно» открыть вложение .pdf.exe. Это…',['Обновление Windows','Обычное письмо','Фишинг'],2],['Где хранить пароли?',['В менеджере паролей','На стикере под клавиатурой','В названии Wi-Fi'],0]]},
+  {t:'Защита сети',min:30,cost:150000,lvl:2,qs:[['Что делает межсетевой экран?',['Охлаждает сервер','Фильтрует соединения по правилам','Раздаёт Wi-Fi'],1],['Доступ по RDP из интернета лучше…',['Открыть всем','Оставить с паролем 12345','Закрыть и пускать через VPN'],2]]},
+  {t:'Реагирование на инциденты',min:45,cost:400000,lvl:4,qs:[['Компьютер поймал шифровальщик. Первое действие?',['Отключить его от сети','Перезагрузить и забыть','Заплатить выкуп'],0],['Правило резервных копий 3-2-1 означает…',['3 пароля, 2 админа, 1 сервер','3 копии, 2 носителя, 1 вне офиса','3 дня хранить логи'],1]]}],
+ hw:[{t:'Устройство ПК и серверов',min:15,cost:0,lvl:1,qs:[['Зачем серверной кондиционер?',['Для красоты','Чтобы админу было приятно','Техника перегревается и отключается'],2],['Что даёт ИБП?',['Время корректно выключиться, когда пропал свет','Быстрый интернет','Защиту от вирусов'],0]]},
+  {t:'Серверы и стойки',min:30,cost:150000,lvl:2,qs:[['RAID 1 — это…',['Вид кабеля','Зеркало: два диска с одинаковыми данными','Антивирус'],1],['Сервер пищит, индикатор диска горит жёлтым. Что делать?',['Заменить диск, пока массив жив','Выключить звук','Подождать месяц'],0]]},
+  {t:'Питание и охлаждение',min:45,cost:400000,lvl:4,qs:[['Почему нельзя включать обогреватель в ИБП?',['Пропадёт Wi-Fi','Он станет холодным','Перегрузка: ИБП отключит серверы'],2],['Горячий воздух из стойки должен…',['Дуть на соседнюю стойку','Уходить назад, к кондиционеру','Оставаться внутри'],1]]}],
+ sys:[{t:'Windows и диспетчер задач',min:15,cost:0,lvl:1,qs:[['Компьютер тормозит. Куда смотреть сначала?',['На цвет обоев','В диспетчер задач: нагрузка на ЦП и память','На громкость'],1],['svch0st.exe от «неизвестного издателя» грузит ЦП на 99%. Это…',['Вероятно, вирус-майнер','Системный процесс','Калькулятор'],0]]},
+  {t:'Журналы и резервные копии',min:30,cost:150000,lvl:2,qs:[['Где искать, кто и когда печатал документ?',['В корзине','В BIOS','В журнале печати МФУ'],2],['Как проверить, что резервная копия рабочая?',['Пробно восстановить из неё','Посмотреть на размер файла','Поверить на слово'],0]]},
+  {t:'Домены и права',min:45,cost:400000,lvl:4,qs:[['Принцип минимальных прав — это…',['Всем права администратора','Только доступ, нужный для работы','Никому ничего'],1],['Сотрудник уволился. Что делаем с учёткой?',['Оставляем на год','Отдаём новому сотруднику','Блокируем в тот же день'],2]]}]};
+const GEAR=[
+ {id:'ups',n:'ИБП 3 кВА',d:'Серверы переживут отключение света',cost:450000,req:['hw',1],mg:['reboot',{need:1,title:'Запуск ИБП',icon:'power'}],col:'#3a4150'},
+ {id:'ap',n:'Точка доступа Wi-Fi 6',d:'Гостевая сеть отдельно от рабочей',cost:600000,req:['net',1],mg:['tv',{title:'Настройка антенн',icon:'tv'}],col:'#e6edf3'},
+ {id:'sw',n:'Управляемый свитч, 48 портов',d:'VLAN для отделов, сеть быстрее',cost:700000,req:['net',2],mg:['patch',{}],col:'#2ea043'},
+ {id:'nas',n:'Сервер резервных копий',d:'Ночные копии 1С и документов',cost:900000,req:['sys',2],mg:['ipcfg',{}],col:'#1f6feb'},
+ {id:'fw',n:'Межсетевой экран',d:'Фильтрует атаки из интернета',cost:1200000,req:['sec',2],mg:['rules',{}],col:'#da3633'}];
+/* 3D: admin desk + mount rack in the server room */
+const PCPOS={x:42,y:444},PCSTAND={x:42,y:434},MOUNT={x:285,y:392};
+const gearMesh={};
+{const P=LOCS.office.group,x=wx(42),z=wz(462),wd=M('#c9a26b'),dk=M('#1b1f27'),mt=M('#57606a');
+  box(1.9,.08,.8,wd,x,.78,z,P);[[-.85,-.32],[.85,-.32],[-.85,.32],[.85,.32]].forEach(([a,b])=>box(.06,.76,.06,mt,x+a,.38,z+b,P));
+  box(.9,.56,.05,dk,x,1.3,z+.12,P);const sc=new THREE.Mesh(new THREE.PlaneGeometry(.82,.48),emis('#3fb950',1.4));sc.rotation.y=Math.PI;sc.position.set(x,1.3,z+.09);P.add(sc);box(.08,.3,.06,dk,x,.98,z+.12,P);box(.6,.03,.2,dk,x,.83,z-.15,P);
+  box(.3,.5,.5,dk,x+.72,1.07,z+.05,P);cyl(.07,.06,.16,M('#f0883e'),x-.7,.9,z-.1,P);
+  const cg=new THREE.Group();cg.position.set(wx(PCPOS.x),0,wz(PCPOS.y));P.add(cg);makeChair(cg,M('#2f9e5a'));
+  const mx=wx(MOUNT.x),mz=wz(MOUNT.y),fr=M('#2a2f3a');[[-.55,-.4],[.55,-.4],[-.55,.4],[.55,.4]].forEach(([a,b])=>box(.07,2.3,.07,fr,mx+a,1.15,mz+b,P));box(1.2,.07,.9,fr,mx,2.3,mz,P);box(1.2,.07,.9,fr,mx,.06,mz,P);
+  box(1,.16,.02,emis('#f0883e',1.2),mx,2.42,mz+.42,P,false);
+  GEAR.forEach((g,i)=>{const u=new THREE.Group();u.position.set(mx,.28+i*.4,mz);P.add(u);box(1.02,.3,.8,M(g.col),0,0,0,u);box(.9,.05,.02,M('#0d1117'),0,.06,.41,u,false);for(let k=0;k<4;k++)box(.05,.05,.02,emis(k%2?'#3dff7a':'#58a6ff',3),-.36+k*.12,-.06,.41,u,false);u.visible=PR().gear.includes(g.id);gearMesh[g.id]=u})}
+[-5,4].forEach(x=>{const l=new THREE.PointLight('#cfe3ff',14,13,1.4);l.position.set(x,3.2,wz(420));LOCS.office.group.add(l)});
+let AT_PC=false,PCTAB='edu',PCREMOTE=false;
+function openPC(remote){PCREMOTE=!!remote;if(G&&G.running){G.busy=true;if(!remote){AT_PC=true;G.p.path=[];G.p.x=PCPOS.x;G.p.y=PCPOS.y;G.p.rot=0}}if(remote)PCTAB='sk';else if(PCTAB==='sk')PCTAB='edu';renderPC()}
+function closePC(){$('pc').classList.add('hidden');$('pc').innerHTML='';if(AT_PC)leavePC();if(G&&G.running)G.busy=false}
+function leavePC(){AT_PC=false;if(G){G.p.x=PCSTAND.x;G.p.y=PCSTAND.y}}
+function renderPC(){const p=PR(),el=$('pc');el.classList.remove('hidden');const tabs=PCREMOTE?[['sk','Навыки']]:[['edu','Курсы'],['shop','Магазин'],['sk','Навыки']];
+  let h=`<div class="pcb"><div class="pch"><b>${PCREMOTE?'Мой профиль':'Рабочее место админа'}</b><button class="pcx" id="pcx">✕</button></div>
+  <div class="pcs"><span>⭐ Уровень <b>${p.lvl}</b></span><span>💰 <b>${fmtM(p.money)}</b> сум</span><span>📈 Аптайм <b>${upPct()}%</b></span></div><div class="xpb"><i style="width:${p.xp/xpNeed(p.lvl)*100}%"></i></div><small class="xpt">${p.xp} / ${xpNeed(p.lvl)} опыта до уровня ${p.lvl+1}</small>
+  <div class="pct">${tabs.map(([k,t])=>`<button class="${PCTAB===k?'on':''}" data-tab="${k}">${t}</button>`).join('')}</div>`;
+  if(PCTAB==='edu')h+=Object.keys(COURSES).map(k=>{const lv=p.sk[k],c=COURSES[k][lv];let btn;
+    if(!c)btn='<span class="pcok">Все курсы пройдены</span>';else if(p.lvl<c.lvl)btn=`<span class="pclk">Нужен уровень ${c.lvl}</span>`;else if(p.money<c.cost)btn=`<span class="pclk">Нужно ${fmtM(c.cost)} сум</span>`;else btn=`<button class="pcbtn" data-edu="${k}">Учиться</button>`;
+    return `<div class="pcr"><div><b>${SKN[k]} <em>${'●'.repeat(lv)}${'○'.repeat(3-lv)}</em></b><small>${c?`Курс «${c.t}» · ${c.min} мин · ${c.cost?fmtM(c.cost)+' сум':'бесплатно'}`:'Максимальный уровень'}</small></div>${btn}</div>`}).join('')+'<p class="pcn">Курс заканчивается коротким тестом. Навыки открывают новые задания, решения в разговорах и установку оборудования.</p>';
+  if(PCTAB==='shop')h+=GEAR.map(g=>{const inst=p.gear.includes(g.id),own=p.owned.includes(g.id);
+    return `<div class="pcr"><div><b>${g.n}</b><small>${g.d} · для установки: ${skTxt(g.req)}</small></div>${inst?'<span class="pcok">Установлено</span>':own?'<span class="pclk">Куплено. Установи в стойке</span>':p.money>=g.cost?`<button class="pcbtn y" data-buy="${g.id}">${fmtM(g.cost)}</button>`:`<span class="pclk">${fmtM(g.cost)} сум</span>`}</div>`}).join('')+'<p class="pcn">Купленное оборудование ставится в оранжевую монтажную стойку справа в серверной.</p>';
+  if(PCTAB==='sk')h+=Object.keys(SKN).map(k=>`<div class="pcr"><div><b>${SKN[k]}</b><small>${['Новичок','Базовый','Уверенный','Эксперт'][p.sk[k]]}</small></div><span class="pips">${'●'.repeat(p.sk[k])}${'○'.repeat(3-p.sk[k])}</span></div>`).join('')+
+    `<div class="pcr"><div><b>Оборудование</b><small>${p.gear.length?p.gear.map(id=>GEAR.find(g=>g.id===id).n).join(', '):'Пока ничего не установлено'}</small></div><span class="pips">${p.gear.length}/${GEAR.length}</span></div><div class="pcr"><div><b>Решено задач</b></div><span class="pips">${p.tasks}</span></div>`+(PCREMOTE?'<p class="pcn">Курсы и магазин открываются за твоим компьютером: зелёный стул в серверной, слева внизу.</p>':'');
+  el.innerHTML=h+'</div>';$('pcx').onclick=()=>{sPop();closePC()};
+  el.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>{PCTAB=b.dataset.tab;sPop();renderPC()});
+  el.querySelectorAll('[data-buy]').forEach(b=>b.onclick=()=>{const g=GEAR.find(x=>x.id===b.dataset.buy);if(p.money<g.cost)return;p.money-=g.cost;p.owned.push(g.id);saveSeason();sGood();toast('Куплено: '+g.n+'. Установи в монтажной стойке','g');renderPC()});
+  el.querySelectorAll('[data-edu]').forEach(b=>b.onclick=()=>{const k=b.dataset.edu,c=COURSES[k][p.sk[k]];el.classList.add('hidden');lastNpc=null;
+    openMG('quiz',{title:'Курс «'+c.t+'»',icon:'book',qs:c.qs,nopay:1},()=>{p.sk[k]++;p.money-=c.cost;if(G&&G.running)addTime(c.min);gainXP(30*p.sk[k],0);toast(`Навык «${SKN[k]}» теперь ${p.sk[k]}`,'y');renderPC()})})}
+function openMount(){const p=PR(),list=GEAR.filter(g=>p.owned.includes(g.id)&&!p.gear.includes(g.id));
+  if(!list.length){talk({who:'narr',text:p.gear.length>=GEAR.length?'Монтажная стойка заполнена. Красота.':'Монтажная стойка для нового оборудования. Купи его в магазине за своим компьютером (слева в серверной).',next:END});return}
+  const node={who:'narr',text:'Монтажная стойка. Что устанавливаем?',choices:list.map(g=>({t:'Установить: '+g.n,sk:g.req,go:()=>{setTimeout(()=>{lastNpc=null;openMG(g.mg[0],Object.assign({nopay:1},g.mg[1]),()=>{p.gear.push(g.id);p.tasks++;gearMesh[g.id].visible=true;puff(wx(MOUNT.x),1.4,wz(MOUNT.y)+.5,40,{c:['#ffd166','#fff','#7ee787'],sp:3,up:2.5,g:-6,life:1.2});gainXP(80,0);toast(g.n+' работает! Аптайм офиса '+upPct()+'%','y');endBusy()})},50);return END}})).concat([{t:'Не сейчас',go:END}])};talk(node)}
+$('prof').onclick=()=>{if(!$('pc').classList.contains('hidden')){closePC();return}if(G&&G.running&&G.busy)return;sPop();openPC(true)};updProf();
+/* new minigames */
+Object.assign(GAMES,{
+ quiz(body,o,win){let i=0;const draw=()=>{const [q,a,ok]=o.qs[i];body.innerHTML=`<div class="hint">Вопрос ${i+1} из ${o.qs.length}</div><div class="qq">${q}</div><div class="chs">${a.map((t,k)=>`<button class="ch" data-k="${k}">${t}</button>`).join('')}</div><div class="hint" id="qh"></div>`;
+   body.querySelectorAll('.ch').forEach(b=>b.onclick=()=>{if(+b.dataset.k===ok){b.style.borderColor='#2ea043';beep(880,.07,'triangle',.05);setTimeout(()=>{i++;i>=o.qs.length?win():draw()},350)}else{shakeBox();b.style.opacity=.4;$('qh').textContent='Неверно. Подумай ещё.'}})};draw()},
+ ipcfg(body,o,win){let round=0;const draw=()=>{const n=10+Math.floor(Math.random()*80),tk=[15,22,40].map(v=>v+Math.floor(Math.random()*5)),free=50+Math.floor(Math.random()*100);
+   const ops=shuffle([[`192.168.${n}.${free}`,1,''],[`192.168.${n}.${tk[1]}`,0,'Этот адрес уже занят.'],[`192.168.${n}.${Math.random()<.5?255:1}`,0,'Это служебный адрес: шлюз или широковещательный.'],[`192.168.${n+1}.${free}`,0,'Это другая подсеть.']]);
+   body.innerHTML=`<div class="hint">Назначь новому устройству <b>свободный адрес</b> в сети. Раунд ${round+1} из 2.</div><div class="ipb">Сеть: <b>192.168.${n}.0/24</b><br>Шлюз: <b>192.168.${n}.1</b><br>Занято: ${tk.map(t=>'.'+t).join(', ')}</div><div class="chs">${ops.map((x,k)=>`<button class="ch mono" data-k="${k}">${x[0]}</button>`).join('')}</div><div class="hint" id="qh"></div>`;
+   body.querySelectorAll('.ch').forEach(b=>b.onclick=()=>{const x=ops[+b.dataset.k];if(x[1]){beep(880,.07,'triangle',.05);round++;setTimeout(()=>round>=2?win():draw(),300)}else{shakeBox();b.style.opacity=.4;$('qh').textContent=x[2]}})};draw()},
+ rules(body,o,win){const pool=shuffle([['Бухгалтерия → сервер 1С',1],['Интернет → RDP сервера (3389)',0],['Офис → сайты по HTTPS (443)',1],['Интернет → панель роутера',0],['Гостевой Wi-Fi → бухгалтерия',0],['Сервер копий → облако провайдера',1],['Неизвестный IP → порт 23 (Telnet)',0],['Офис → почтовый сервер',1]]).slice(0,5);let i=0,miss=0;
+   const draw=()=>{body.innerHTML=`<div class="hint">Настрой фаервол: реши, что пропускать. Соединение ${i+1} из 5. Можно ошибиться один раз.</div><div class="qq mono">${pool[i][0]}</div><div class="two"><button class="btn" id="ra">✅ Разрешить</button><button class="btn red" id="rd">⛔ Запретить</button></div><div class="hint" id="qh">${miss?'Ошибок: 1':''}</div>`;
+     const pick=v=>{if(v===pool[i][1]){beep(820,.06,'triangle',.05);i++;i>=5?setTimeout(win,200):draw()}else{shakeBox();miss++;if(miss>1){miss=0;i=0}draw();$('qh').textContent=miss?'Ошибка! Ещё одна, и начнём сначала.':'Слишком много ошибок, начинаем заново.'}};$('ra').onclick=()=>pick(1);$('rd').onclick=()=>pick(0)};draw()},
+ patch(body,o,win){const P=[['ПК бухгалтерии','VLAN 10 · Бухгалтерия'],['Принтер','VLAN 20 · Печать'],['Камера','VLAN 30 · Видео'],['Гостевой Wi-Fi','VLAN 40 · Гости']],R=shuffle(P.map((p,i)=>i));let sel=null,done=0;
+   body.innerHTML=`<div class="hint">Подключи каждое устройство к своей сети: тапни устройство, потом порт.</div><div class="pt"><div>${P.map((p,i)=>`<button class="ch" data-l="${i}">${p[0]}</button>`).join('')}</div><div>${R.map(i=>`<button class="ch" data-r="${i}">${P[i][1]}</button>`).join('')}</div></div>`;
+   const L=body.querySelectorAll('[data-l]');L.forEach(b=>b.onclick=()=>{if(b.disabled)return;L.forEach(x=>x.classList.remove('sel'));b.classList.add('sel');sel=+b.dataset.l;beep(520,.03)});
+   body.querySelectorAll('[data-r]').forEach(b=>b.onclick=()=>{if(sel===null||b.disabled)return;if(+b.dataset.r===sel){const l=body.querySelector(`[data-l="${sel}"]`);[l,b].forEach(x=>{x.disabled=true;x.classList.remove('sel');x.classList.add('okk')});sel=null;done++;beep(700+done*80,.06,'triangle',.05);if(done>=4)setTimeout(win,300)}else shakeBox()})},
+ reboot(body,o,win){const N=(o.need||1)+2,seq=Array.from({length:N},()=>Math.floor(Math.random()*4)),NM=['PWR','SYS','LAN','WAN'],FQ=[392,494,587,740];let phase=0,hold=0,down=false,idx=0,lock=true,raf,last=performance.now(),tm=[];
+   body.innerHTML=`<div class="hint" id="rbh">Шаг 1. <b>Зажми и держи</b> кнопку питания, пока кольцо не заполнится.</div><div class="pww"><button class="pwb" id="pw"><span>⏻</span></button></div><div class="leds">${NM.map((n,i)=>`<button class="led" data-i="${i}" disabled>${n}</button>`).join('')}</div>`;
+   const pw=$('pw'),leds=[...body.querySelectorAll('.led')];
+   const flash=i=>{leds[i].classList.add('on');beep(FQ[i],.18,'sine',.06);tm.push(setTimeout(()=>leds[i].classList.remove('on'),300))};
+   const play=()=>{lock=true;idx=0;$('rbh').innerHTML='Шаг 2. Устройство загружается. <b>Запомни порядок огней</b>…';seq.forEach((s,k)=>tm.push(setTimeout(()=>flash(s),500+k*520)));tm.push(setTimeout(()=>{lock=false;$('rbh').innerHTML='Теперь <b>повтори порядок</b>, нажимая на индикаторы.'},500+N*520))};
+   const loop=now=>{const dt=Math.min(.05,(now-last)/1000);last=now;if(phase===0){if(down)hold+=dt;else if(hold>0){hold=0;shakeBox()}const p=Math.min(1,hold/1.6);pw.style.background=`conic-gradient(#3fb950 ${p*360}deg,#30363d 0)`;if(down&&Math.random()<dt*14)beep(200+p*500,.03,'square',.02);
+       if(p>=1){phase=1;down=false;pw.disabled=true;pw.classList.add('done');leds.forEach(l=>l.disabled=false);beep(990,.15,'triangle',.06);play()}}raf=requestAnimationFrame(loop)};
+   pw.onpointerdown=e=>{e.preventDefault();down=true};pw.onpointerup=pw.onpointerleave=pw.onpointercancel=()=>{down=false};
+   leds.forEach(l=>l.onclick=()=>{if(lock)return;const i=+l.dataset.i;flash(i);if(i===seq[idx]){idx++;if(idx>=N){lock=true;setTimeout(win,400)}}else{shakeBox();lock=true;tm.push(setTimeout(play,700))}});
+   raf=requestAnimationFrame(loop);mg.cleanup=()=>{cancelAnimationFrame(raf);tm.forEach(clearTimeout)}}});
+/* office small talk */
+const CONVOS=[['Чай будешь?','Давай, только без сахара'],['Ты отчёт сдал?','Какой отчёт?!','…Квартальный.'],['Интернет сегодня летает!','Новый админ старается'],['Обедаем в «Чиноре»?','Конечно! Плов сегодня с нутом'],['Принтер опять жуёт бумагу','Он питается нашими нервами'],['Слышала новости про склад?','Тсс, не здесь…'],['У тебя зарядка есть?','В верхнем ящике. Верни потом!'],['Как выходные?','На дачу ездили, шашлык, красота'],['Пароль опять просят сменить','А ты не пиши его на стикере']];
+function startConv(n){const c=Object.values(NPC).filter(b=>b!==n&&b.loc===n.loc&&b.state==='sit'&&!b.hold&&!b.away&&!b.conv&&b.curStand&&!['boss','rustam','bobur'].includes(b.id));if(!c.length)return false;const b=rnd(c);
+  npcGo(n,b.curStand.x,b.curStand.y,()=>{if(b.state!=='sit'||b.conv||b.hold||b.loc!==n.loc){n.state='idle';n.timer=1;return}const cv={},lines=rnd(CONVOS);n.conv=b.conv=cv;n.state='idle';n.timer=b.timer=99;n.rot=Math.atan2(b.x-n.x,b.y-n.y);
+    lines.forEach((t,i)=>setTimeout(()=>{if(n.conv===cv&&!n.hold&&!b.hold)sayBubble(i%2?b:n,t)},300+i*2300));
+    setTimeout(()=>{if(n.conv===cv){n.conv=b.conv=null;n.timer=1;b.timer=10+Math.random()*20}},300+lines.length*2300)});return true}
+
 /* ================= SPLASH · MENU · PAUSE · BACK ================= */
 let SCR='splash',PAUSED=false;
 const qLabel=()=>({high:'высокая',mid:'средняя',low:'экономная'})[QL];
 function setQ(q){QL=q;try{localStorage.setItem('uptime_q',QL);localStorage.setItem('uptime_q_manual','1')}catch(e){}applyQ(true)}
 const cycleQ=()=>setQ(QL==='high'?'mid':QL==='mid'?'low':'high');
-function toggleSound(){musicOn=!musicOn;$('snd').innerHTML=ic(musicOn?'music':'mute');if(musG)musG.gain.value=musicOn?.5:0;startMusic()}
+function toggleSound(){musicOn=!musicOn;if(musG)musG.gain.value=musicOn?.5:0;startMusic()}
 function nextEp(){for(const e of EPLIST){if(e.soon)break;if(!SEASON.done[e.n])return e.n}return Math.max(1,...EPLIST.filter(e=>!e.soon).map(e=>e.n))}
 function showMainMenu(){SCR='main';PAUSED=false;$('pause').classList.add('hidden');const s=$('screen');s.classList.remove('hidden','season');s.classList.add('menu');
   const n=nextEp(),e=EPLIST.find(x=>x.n===n),started=Object.keys(SEASON.done).length>0;
-  s.innerHTML=`<div class="tag">DEFACTUM GAMES представляет</div><h1 class="mlogo">АПТАЙМ</h1><h2>Сезон 1: «Тень списания»</h2>
+  s.innerHTML=`<div class="tag">UPTIME STUDIO представляет</div><h1 class="mlogo">АПТАЙМ</h1><h2>Сезон 1: «Тень списания»</h2>
   <div class="mbtns"><button class="mb1" id="m_play"><b>${started?'Продолжить':'Начать игру'}</b><small>Эпизод ${n}: ${e?e.t:''}</small></button>
   <button class="mb2" id="m_eps">📺 Эпизоды</button><button class="mb2" id="m_q">⚙️ Графика: ${qLabel()}</button><button class="mb2" id="m_snd">${musicOn?'🔊 Звук: включён':'🔇 Звук: выключен'}</button><button class="mb2" id="m_about">ℹ️ Об игре</button></div>
   <p class="mver">версия ${window.UPTIME_V||'dev'}</p>`;
@@ -1945,27 +2077,28 @@ function showMainMenu(){SCR='main';PAUSED=false;$('pause').classList.add('hidden
   $('m_q').onclick=()=>{cycleQ();$('m_q').textContent='⚙️ Графика: '+qLabel()};$('m_snd').onclick=()=>{toggleSound();$('m_snd').textContent=musicOn?'🔊 Звук: включён':'🔇 Звук: выключен'};
   $('m_about').onclick=()=>{sPop();showAbout()}}
 function showAbout(){SCR='about';const s=$('screen');s.classList.remove('menu');
-  s.innerHTML=`<button class="backb" id="aback">← Назад</button><h2>Об игре</h2><div class="sum">АПТАЙМ — сюжетная игра про сисадмина в ташкентском офисе. Каждое решение влияет на следующие эпизоды.<br><br>Разработка: Defactum Games<br>Движок: three.js (MIT)<br><br>Новые эпизоды приходят обновлением сами.</div>`;
+  s.innerHTML=`<button class="backb" id="aback">← Назад</button><h2>Об игре</h2><div class="sum">АПТАЙМ — сюжетная игра про сисадмина в ташкентском офисе. Каждое решение влияет на следующие эпизоды.<br><br>Разработка: Uptime Studio<br>Движок: three.js (MIT)<br><br>Новые эпизоды приходят обновлением сами.</div>`;
   $('aback').onclick=()=>{sPop();showMainMenu()}}
 function openPause(){if(!G||!G.running)return;PAUSED=true;const p=$('pause');p.classList.remove('hidden');
   p.innerHTML=`<div class="pbox"><h3>Пауза</h3><button class="mb1" id="p_go"><b>▶ Продолжить</b></button><button class="mb2" id="p_jr">📓 Журнал</button><button class="mb2" id="p_q">⚙️ Графика: ${qLabel()}</button><button class="mb2" id="p_snd">${musicOn?'🔊 Звук: включён':'🔇 Звук: выключен'}</button><button class="mb2 red" id="p_exit">🚪 Выйти в меню</button><p class="pnote">При выходе прогресс текущего эпизода не сохранится</p></div>`;
   $('p_go').onclick=closePause;$('p_jr').onclick=()=>{closePause();if(!G.busy)openJournal()};$('p_q').onclick=()=>{cycleQ();$('p_q').textContent='⚙️ Графика: '+qLabel()};
   $('p_snd').onclick=()=>{toggleSound();$('p_snd').textContent=musicOn?'🔊 Звук: включён':'🔇 Звук: выключен'};$('p_exit').onclick=exitToMenu}
 function closePause(){PAUSED=false;$('pause').classList.add('hidden');lastT=performance.now()}
-function exitToMenu(){closePause();if(G){G.running=false;G.busy=false}if(D)closeDlg(true);$('dlg').classList.add('hidden');$('jr').classList.add('hidden');if(!$('mg').classList.contains('hidden')){if(mg.cleanup)mg.cleanup();mg.cleanup=null;$('mg').classList.add('hidden');$('mg').innerHTML=''}
+function exitToMenu(){closePause();closePC();if(G){G.running=false;G.busy=false}if(D)closeDlg(true);$('dlg').classList.add('hidden');$('jr').classList.add('hidden');if(!$('mg').classList.contains('hidden')){if(mg.cleanup)mg.cleanup();mg.cleanup=null;$('mg').classList.add('hidden');$('mg').innerHTML=''}
   Object.values(NPC).forEach(n=>n.hold=false);setLoc('office');showMainMenu()}
 $('menubtn').onclick=()=>{if(G&&G.running){sPop();PAUSED?closePause():openPause()}else showMainMenu()};
 window.uptimeBack=function(){
   if(SCR==='splash')return true;
   if(!$('mg').classList.contains('hidden')){const l=$('later');if(l){l.click();return true}}
   if(!$('jr').classList.contains('hidden')){const c=$('jclose');if(c)c.click();return true}
+  if(!$('pc').classList.contains('hidden')){closePC();return true}
   if(!$('pause').classList.contains('hidden')){closePause();return true}
   if(G&&G.running){if(!$('dlg').classList.contains('hidden'))return true;openPause();return true}
   if(SCR==='season'||SCR==='about'){showMainMenu();return true}
   if(SCR==='ending'){showSeason();return true}
   return false};
 try{history.pushState({u:1},'');addEventListener('popstate',()=>{if(window.uptimeBack())history.pushState({u:1},'')})}catch(e){}
-function splash(){const lines=['> ping defactum.uz','64 bytes: time=12 ms','> systemctl start uptime','[ OK ] Сеть поднята','> uptime','99.9% ✓'];const t=$('spterm'),bar=$('spbar');let i=0;
+function splash(){const lines=['> ping turan.uz','64 bytes: time=12 ms','> systemctl start uptime','[ OK ] Сеть поднята','> uptime','99.9% ✓'];const t=$('spterm'),bar=$('spbar');let i=0;
   const step=()=>{if(i<lines.length){t.innerHTML+=`<div>${lines[i]}</div>`;i++;bar.style.width=(i/lines.length*100)+'%';beep(400+i*60,.03,'square',.015);setTimeout(step,260)}else setTimeout(done,350)};
   const done=()=>{const sp=$('splash');sp.classList.add('out');setTimeout(()=>sp.remove(),650);showMainMenu()};
   setTimeout(()=>{render3DPortraits();step()},120)}
