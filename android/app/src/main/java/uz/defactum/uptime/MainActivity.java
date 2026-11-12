@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 import android.view.WindowManager;
@@ -34,7 +35,7 @@ import java.net.URL;
 /**
  * АПТАЙМ: WebView-оболочка.
  * Игра лежит в assets/www (встроенная версия). Обновления игры скачиваются с GitHub Pages
- * в files/www и применяются при следующем запуске, без переустановки APK.
+ * при запуске (экран загрузки с процентами) в files/www, без переустановки APK. Качаются только изменившиеся файлы.
  * Если вышел новый APK (изменилась нативная часть), приложение предложит его скачать.
  */
 public class MainActivity extends Activity {
@@ -50,6 +51,11 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        if (Build.VERSION.SDK_INT >= 28) { // рисуем и под вырезом камеры: игра на весь экран
+            WindowManager.LayoutParams lp = getWindow().getAttributes();
+            lp.layoutInDisplayCutoutMode = WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES;
+            getWindow().setAttributes(lp);
+        }
         prefs = getSharedPreferences("uptime", MODE_PRIVATE);
         ota = new File(getFilesDir(), "www");
         applyPendingUpdate();
@@ -85,7 +91,7 @@ public class MainActivity extends Activity {
         });
         setContentView(web);
         hideBars();
-        web.loadUrl(HOST + "index.html");
+        web.loadDataWithBaseURL(HOST + "loader.html", LOADER, "text/html", "utf-8", null);
         new Thread(this::checkUpdates).start();
     }
 
@@ -133,9 +139,45 @@ public class MainActivity extends Activity {
         } else if (pend.exists()) deleteDir(pend);
     }
 
-    private void checkUpdates() {
+    static final String LOADER = "<!doctype html><html><head><meta charset='utf-8'><meta name='viewport' content='width=device-width,initial-scale=1,viewport-fit=cover'><style>"
+            + "html,body{margin:0;height:100%;background:#0b0f17;color:#e6edf3;font-family:sans-serif;overflow:hidden}"
+            + ".w{height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:22px}"
+            + "h1{margin:0;font-size:34px;letter-spacing:6px;font-weight:800}"
+            + ".b{display:flex;gap:7px;align-items:flex-end;height:64px}"
+            + ".b i{width:10px;height:14px;border-radius:5px;background:#2ea043;box-shadow:0 0 12px #2ea04399;animation:j .8s ease-in-out infinite}"
+            + ".b i:nth-child(2){animation-delay:.1s}.b i:nth-child(3){animation-delay:.2s}.b i:nth-child(4){animation-delay:.3s}.b i:nth-child(5){animation-delay:.4s}.b i:nth-child(6){animation-delay:.5s}.b i:nth-child(7){animation-delay:.6s}"
+            + "@keyframes j{0%,100%{height:14px;opacity:.55}50%{height:60px;opacity:1}}"
+            + ".p{width:70%;max-width:320px;height:10px;border-radius:5px;background:#1c2330;overflow:hidden}"
+            + "#f{height:100%;width:0;background:linear-gradient(90deg,#2ea043,#56d364);border-radius:5px;transition:width .2s}"
+            + "#n{font-size:26px;font-weight:800;color:#56d364;min-height:32px}#t{font-size:14px;color:#8b949e}"
+            + ".ok .b i{animation:none;height:60px}.ok #t{color:#56d364;font-weight:700;font-size:18px}"
+            + "</style></head><body><div class='w' id='w'><h1>АПТАЙМ</h1><div class='b'><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>"
+            + "<div id='n'></div><div class='p'><div id='f'></div></div><div id='t'>Проверка обновлений…</div></div>"
+            + "<script>function st(t){document.getElementById('t').textContent=t}"
+            + "function pr(p){document.getElementById('f').style.width=p+'%';document.getElementById('n').textContent=p+'%'}"
+            + "function ok(){pr(100);document.getElementById('w').className='w ok';st('✓ Успешно обновлено')}</script></body></html>";
+
+    private void js(String code) { runOnUiThread(() -> { if (web != null) web.evaluateJavascript(code, null); }); }
+
+    private void startGame(long delayMs) {
+        runOnUiThread(() -> web.postDelayed(() -> { web.loadUrl(HOST + "index.html"); web.postDelayed(() -> web.clearHistory(), 1500); }, delayMs));
+    }
+
+    private JSONObject currentHashes() {
         try {
-            JSONObject v = new JSONObject(new String(get(PAGES + "version.json?t=" + System.currentTimeMillis()), "UTF-8"));
+            File f = new File(ota, "version.json");
+            try (InputStream in = f.exists() ? new FileInputStream(f) : getAssets().open("www/version.json")) {
+                JSONObject h = new JSONObject(new String(readAll(in), "UTF-8")).optJSONObject("hash");
+                return h != null ? h : new JSONObject();
+            }
+        } catch (Exception e) { return new JSONObject(); }
+    }
+
+    /** При запуске: проверяем версию, качаем изменившиеся файлы с прогрессом, подменяем www и запускаем игру. */
+    private void checkUpdates() {
+        long wait = 0;
+        try {
+            JSONObject v = new JSONObject(new String(get(PAGES + "version.json?t=" + System.currentTimeMillis(), 4000, null), "UTF-8"));
             int webV = v.optInt("web", 0), apkV = v.optInt("apk", 0);
             if (apkV > BuildConfig.VERSION_CODE) {
                 runOnUiThread(() -> new AlertDialog.Builder(this)
@@ -146,33 +188,63 @@ public class MainActivity extends Activity {
             }
             int cur = Math.max(prefs.getInt("web", 0), bundledWeb());
             if (webV > cur) {
+                js("st('Загрузка обновления…');pr(0)");
                 File tmp = new File(getFilesDir(), "www_new");
                 deleteDir(tmp);
                 JSONArray files = v.getJSONArray("files");
-                for (int i = 0; i < files.length(); i++) {
+                JSONObject nh = v.optJSONObject("hash"), oh = currentHashes();
+                final int n = files.length();
+                final int[] last = {-1};
+                for (int i = 0; i < n; i++) {
                     String rel = files.getString(i);
                     if (rel.contains("..")) continue;
                     File out = new File(tmp, rel);
                     out.getParentFile().mkdirs();
-                    try (OutputStream os = new FileOutputStream(out)) { os.write(get(PAGES + rel + "?v=" + webV)); }
+                    String h = nh != null ? nh.optString(rel, "") : "";
+                    final int idx = i;
+                    Progress pg = frac -> { int p = Math.min(99, (int) ((idx + frac) * 100 / n)); if (p != last[0]) { last[0] = p; js("pr(" + p + ")"); } };
+                    boolean copied = false;
+                    if (!h.isEmpty() && h.equals(oh.optString(rel, ""))) { // файл не менялся — берём локальный
+                        try {
+                            File f = new File(ota, rel);
+                            try (InputStream in = f.exists() ? new FileInputStream(f) : getAssets().open("www/" + rel);
+                                 OutputStream os = new FileOutputStream(out)) { os.write(readAll(in)); }
+                            copied = true;
+                        } catch (Exception ignored) { }
+                    }
+                    if (!copied) try (OutputStream os = new FileOutputStream(out)) { os.write(get(PAGES + rel + "?v=" + webV, 8000, pg)); }
+                    pg.at(1);
                 }
                 try (OutputStream os = new FileOutputStream(new File(tmp, "version.json"))) { os.write(v.toString().getBytes("UTF-8")); }
-                new File(tmp, ".ready").createNewFile();
-                prefs.edit().putInt("web_pending", webV).apply();
-                runOnUiThread(() -> Toast.makeText(this, "Обновление игры скачано. Оно применится при следующем запуске.", Toast.LENGTH_LONG).show());
+                deleteDir(ota); // игра ещё не загружена, можно подменить сразу
+                if (!tmp.renameTo(ota)) throw new Exception("rename");
+                prefs.edit().putInt("web", webV).apply();
+                js("ok()");
+                wait = 900;
             }
-        } catch (Exception ignored) {
-            // нет интернета — играем во встроенную или ранее скачанную версию
+        } catch (Exception e) {
+            deleteDir(new File(getFilesDir(), "www_new"));
+            // нет интернета или обрыв — играем во встроенную или ранее скачанную версию
         }
+        startGame(wait);
     }
 
-    private static byte[] get(String url) throws Exception {
+    interface Progress { void at(double frac); }
+
+    private static byte[] get(String url, int connectMs, Progress pg) throws Exception {
         HttpURLConnection c = (HttpURLConnection) new URL(url).openConnection();
-        c.setConnectTimeout(8000);
+        c.setConnectTimeout(connectMs);
         c.setReadTimeout(20000);
         c.setInstanceFollowRedirects(true);
         if (c.getResponseCode() != 200) throw new Exception("HTTP " + c.getResponseCode());
-        try (InputStream in = c.getInputStream()) { return readAll(in); }
+        long total = c.getContentLength();
+        try (InputStream in = c.getInputStream()) {
+            ByteArrayOutputStream bo = new ByteArrayOutputStream();
+            byte[] b = new byte[16384];
+            int n;
+            while ((n = in.read(b)) > 0) { bo.write(b, 0, n); if (pg != null && total > 0) pg.at(Math.min(1, bo.size() / (double) total)); }
+            return bo.toByteArray();
+        }
     }
 
     private static byte[] readAll(InputStream in) throws Exception {
