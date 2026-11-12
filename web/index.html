@@ -1014,6 +1014,14 @@ window.uptimePause=()=>{try{AC&&AC.state==='running'&&AC.suspend()}catch(e){}};w
 document.addEventListener('visibilitychange',()=>document.hidden?uptimePause():uptimeResume());addEventListener('pagehide',uptimePause);addEventListener('blur',uptimePause);addEventListener('focus',uptimeResume);
 function sRadio(){const a=actx();if(!a||a.state!=='running')return;try{const n=a.sampleRate*.4,bf=a.createBuffer(1,n,a.sampleRate),d=bf.getChannelData(0);for(let i=0;i<n;i++)d[i]=(Math.random()*2-1)*(i%900<600?1:.3);
   const src=a.createBufferSource();src.buffer=bf;const f=a.createBiquadFilter();f.type='bandpass';f.frequency.value=1700;f.Q.value=1.6;const g=a.createGain();g.gain.value=.07;src.connect(f);f.connect(g);g.connect(a.destination);src.start();setTimeout(()=>beep(1250,.09,'square',.03),420)}catch(e){}}
+const VOW=[[730,1090],[300,870],[530,1840],[570,840],[440,1020]],VOICE={};
+function voiceOf(id){if(!VOICE[id]){let h=7;for(const ch of id)h=(h*31+ch.charCodeAt(0))%9973;const fem=['nigora','dilnoza','lola','malika','gulya','kamila'].includes(id),old=['boss','bobur','hamid','gulya','dilnoza','farrukh'].includes(id);VOICE[id]={f:(fem?205:112)+h%45-(old?14:0),roll:.18+(h%7)*.04}}return VOICE[id]}
+function babble(id){const a=actx();if(!a||a.state!=='running')return;try{const v=voiceOf(id),t=a.currentTime,roll=Math.random()<v.roll,d=roll?.16:.08+Math.random()*.05,f0=v.f*(.88+Math.random()*.3);
+  const o=a.createOscillator();o.type='sawtooth';o.frequency.setValueAtTime(f0,t);o.frequency.linearRampToValueAtTime(f0*(.82+Math.random()*.34),t+d);
+  const g=a.createGain();g.gain.setValueAtTime(.0001,t);g.gain.linearRampToValueAtTime(.11,t+.014);g.gain.setValueAtTime(.11,t+d*.6);g.gain.exponentialRampToValueAtTime(.001,t+d);
+  const vw=VOW[Math.floor(Math.random()*VOW.length)];vw.forEach((fq,k)=>{const b=a.createBiquadFilter();b.type='bandpass';b.frequency.value=fq;b.Q.value=k?9:6;o.connect(b);b.connect(g)});
+  if(roll){const l=a.createOscillator(),lg=a.createGain();l.type='square';l.frequency.value=27;lg.gain.value=.08;l.connect(lg);lg.connect(g.gain);l.start(t);l.stop(t+d)}
+  g.connect(a.destination);o.start(t);o.stop(t+d+.02)}catch(e){}}
 const RADIOL=['📻 «Пост один, приём. На пятом всё спокойно»','📻 «Шлагбаум опять заело? Принял»','📻 «Курьер к лифту… Лифт не работает, по лестнице!»','📻 «Кто оставил машину у ворот? Приём»','📻 «Смену сдаю в восемь. Конец связи»','📻 «Чай на посту остыл. Повторяю: остыл»'];let RADIOT=8;
 let NBUF=null;function sPaper(long){const a=actx();if(!a)return;try{if(!NBUF){NBUF=a.createBuffer(1,a.sampleRate,a.sampleRate);const d=NBUF.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=Math.random()*2-1}
   const src=a.createBufferSource();src.buffer=NBUF;src.playbackRate.value=.75+Math.random()*.6;const f=a.createBiquadFilter();f.type='bandpass';f.frequency.value=2200+Math.random()*2600;f.Q.value=.8;const g=a.createGain(),d=long?.6:.13,t=a.currentTime;
@@ -1725,7 +1733,7 @@ function show(node){
   if(who!=='narr'&&NPC[who]&&NPC[who].loc===LOC){const n=NPC[who];cam.tt.set((wx(n.x)+wx(G.p.x))/2,.8,(wz(n.y)+wz(G.p.y))/2);cam.td=baseDist*.5}
   const tx=$('dtx');let i=0,done=false;D.node=node;
   const finish=()=>{if(done)return;done=true;tx.textContent=txt;clearInterval(D.iv);showChoices(node)};
-  D.iv=setInterval(()=>{i+=2;tx.textContent=txt.slice(0,i);if(i%6===0)beep(who==='narr'?300:520+Math.random()*80,.02,'square',.012);if(i>=txt.length)finish()},28);
+  D.iv=setInterval(()=>{i+=2;tx.textContent=txt.slice(0,i);if(who==='narr'){if(i%6===0)beep(300,.02,'square',.012)}else if(i%8===0&&/[a-zа-яё]/i.test(txt[i]||txt[i-1]||''))babble(who);if(i>=txt.length)finish()},28);
   dlgEl.querySelector('.dbox').onclick=e=>{if(e.target.closest('.ch'))return;if(!done)finish();else if(!node.choices)advance(node.next)};
 }
 function showChoices(node){const ch=$('dch');
