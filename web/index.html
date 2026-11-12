@@ -27,7 +27,7 @@ html,body{margin:0;height:100%;height:100dvh;background:#0b0f17;color:#e6edf3;fo
 .mk .ic.c{background:#f6f8fa;color:#333;width:28px;height:28px;font-size:13px;opacity:.85;margin-top:-38px}
 .mk .ic.d{background:linear-gradient(#2ea043,#1a7f37);color:#fff;width:32px;height:32px;font-size:15px;margin-top:-40px}
 #phb{position:absolute;right:10px;bottom:10px;z-index:5;width:50px;height:50px;border-radius:16px;border:1px solid #30363d;background:#161b22ee;font-size:24px;box-shadow:0 4px 14px #0009;display:none}#phb.on{display:block}
-#ph{position:absolute;inset:0;z-index:28;background:rgba(4,6,10,.78);display:flex;align-items:flex-end;justify-content:center;animation:fi .2s}#ph.hidden{display:none}.phb{border:2px solid #2b3545;border-bottom:none}
+#phone{position:absolute;inset:0;z-index:28;background:rgba(4,6,10,.78);display:flex;align-items:flex-end;justify-content:center;animation:fi .2s}#phone.hidden{display:none}.phb{border:2px solid #2b3545;border-bottom:none}
 #locname{position:absolute;left:8px;bottom:8px;z-index:4;font-size:11px;font-weight:800;background:#0d1117cc;border:1px solid #30363d;padding:4px 9px;border-radius:9px;pointer-events:none;color:#c9d1d9}
 input[type=range]{accent-color:#2ea043}
 .mk .ic.s{background:linear-gradient(#a371f7,#6e40c9);color:#fff;animation:bob 1s ease-in-out infinite alternate}
@@ -433,7 +433,7 @@ button{font-family:inherit;cursor:pointer}
     <div id="screen" class="hidden"></div>
     <div id="pause" class="hidden"></div>
     <div id="pc" class="hidden"></div>
-    <div id="ph" class="hidden"></div>
+    <div id="phone" class="hidden"></div>
     <button id="phb" aria-label="Телефон">📱</button>
     <div id="adov" class="hidden"></div>
     <div id="load">ЗАГРУЗКА...</div>
@@ -2333,7 +2333,7 @@ function closeDlg(keep){clearInterval(D?.iv);stopSpeak();dlgEl.classList.add('hi
 /* ---------- minigames ---------- */
 const mgEl=$('mg');const mg={cleanup:null};
 function openMG(kind,o,onWin,onLose){if(G)G.busy=true;mgEl.classList.remove('hidden');
-  let T={crimp:['plug','Обжать кабель'],reboot:['power','Перезапуск свитча'],mash:['printer','Принтер зажевал'],phish:['mail','Письмо Лоле'],taskmgr:['monitor','Диспетчер задач'],tv:['tv','Телевизор охраны'],quiz:['book','Курс'],ipcfg:['server','Настройка адреса'],rules:['shield','Правила фаервола'],patch:['switch','Коммутация'],logs:['search','Журнал']}[kind];if(o&&o.title)T=[o.icon||T[0],o.title];T[0]=IC[T[0]]||T[0];
+  let T={crimp:['plug','Обжать кабель'],reboot:['power','Перезапуск свитча'],mash:['printer','Принтер зажевал'],phish:['mail','Подозрительное письмо'],taskmgr:['monitor','Диспетчер задач'],tv:['tv','Телевизор охраны'],quiz:['book','Курс'],ipcfg:['server','Настройка адреса'],rules:['shield','Правила фаервола'],patch:['switch','Коммутация'],logs:['search','Журнал']}[kind];if(o&&o.title)T=[o.icon||T[0],o.title];T[0]=IC[T[0]]||T[0];
   mgEl.innerHTML=`<div class="mgbox" id="mgbox"><div class="mghead"><div class="ic">${T[0]}</div><div><b>Задание</b><span>${T[1]}</span></div></div><div id="mgbody"></div><div class="foot"><button class="small" id="later">↩ Отложить</button></div></div>`;
   const close=()=>{if(mg.cleanup)mg.cleanup();mg.cleanup=null;mgEl.classList.add('hidden');mgEl.innerHTML=''};
   const win=()=>{close();sGood();bump('mg');if(kind==='crimp')bump('crimp');{const pz=MGPAY[kind];if(pz&&!(o&&o.nopay)){PR().tasks++;PR().budget+=40000;gainXP(Math.round(pz[0]*(1+.1*PR().small.filter(x=>x==='rj'||x==='tools').length+(mkOwn('phones')?.1:0))),pz[1])}}const n=NPC[lastNpc];if(n)puff(wx(n.x),2,wz(n.y),30,{c:['#ffd166','#fff','#7ee787','#f778ba'],sp:3,up:2.5,g:-6,life:1.2});onWin()};
@@ -2373,7 +2373,7 @@ const GAMES={
  phish(body,o,win,lose){const bad=['from','urg','link','att'];let found=0,miss=0;
   body.innerHTML=`<div class="hint">Найди <b style="color:#ff7b72">4 признака мошенничества</b> в письме. Тапай по подозрительным местам. Права на ошибку: 2.</div>
   <div class="mail"><div class="hd"><span class="ms" data-k="from"><b>От:</b> Отдел кадров &lt;hr@turan-bonus.xyz&gt;</span><br><span class="ms" data-k="ok1"><b>Тема:</b> Повышение зарплаты</span></div>
-  <span class="ms" data-k="ok2">Уважаемая Лола!</span> <span class="ms" data-k="ok3">Поздравляем с хорошей работой.</span> <span class="ms" data-k="urg">СРОЧНО подтвердите повышение в течение 1 часа, иначе оно будет отменено!</span>
+  <span class="ms" data-k="ok2">Здравствуйте, ${(lastNpc&&CH[lastNpc]?CH[lastNpc].name:'Лола').replace(' опа','')}!</span> <span class="ms" data-k="ok3">Поздравляем с хорошей работой.</span> <span class="ms" data-k="urg">СРОЧНО подтвердите повышение в течение 1 часа, иначе оно будет отменено!</span>
   <span class="ms" data-k="link">Войдите здесь: bit.ly/zarplata-up</span><br><span class="ms" data-k="ok4">С уважением, отдел кадров</span><br><span class="ms att" data-k="att">📎 Zarplata_2026.pdf.exe</span></div>
   <div class="hits" id="ph" style="letter-spacing:0;font-size:14px">Найдено: 0 / 4 · Ошибок: 0 / 2</div>`;
   body.querySelectorAll('.ms').forEach(s=>s.onclick=()=>{if(s.classList.contains('found')||s.classList.contains('wrong'))return;
@@ -2858,8 +2858,8 @@ function mkApply(it){const m=MKS();if(!it.rep&&!m.own.includes(it.id))m.own.push
 function mkTick(){const p=PR(),m=p.mk;if(!m||!m.ord.length||!G||!G.running||G.busy)return;const r=m.ord.find(o=>p.clock>=o.eta);if(!r)return;m.ord.splice(m.ord.indexOf(r),1);const it=MKT.find(x=>x.id===r.id);if(!it)return;
   toast('📦 Курьер привёз: '+it.n,'y');sGood();mkApply(it);saveSeason()}
 function openPhone(){if(!G||!G.running||G.busy)return;G.busy=true;G.p.path=[];sPop();renderPhone()}
-function closePhone(){const el=$('ph');el.classList.add('hidden');el.innerHTML='';if(G&&G.running)G.busy=false}
-function renderPhone(){const p=PR(),m=MKS(),el=$('ph'),ob=el.querySelector('.pcb'),st=ob?ob.scrollTop:0,key=PHTAB+PHCAT,same=el._k===key;el.classList.remove('hidden');
+function closePhone(){const el=$('phone');el.classList.add('hidden');el.innerHTML='';if(G&&G.running)G.busy=false}
+function renderPhone(){const p=PR(),m=MKS(),el=$('phone'),ob=el.querySelector('.pcb'),st=ob?ob.scrollTop:0,key=PHTAB+PHCAT,same=el._k===key;el.classList.remove('hidden');
   let h=`<div class="pcb phb"><div class="pch"><b>🛒 Bozor</b><button class="pcx" id="phx">✕</button></div><div class="pcr" style="background:#12261a;border-color:#1f5a33"><div><b>Твои деньги: ${fmtM(p.money)} сум</b><small>Зарплата и премии. Это личные покупки, директор не нужен</small></div></div>
   <div class="pct"><button data-t="shop" class="${PHTAB==='shop'?'on':''}">Каталог</button><button data-t="ord" class="${PHTAB==='ord'?'on':''}">Заказы${m.ord.length?' · '+m.ord.length:''}</button><button data-t="my" class="${PHTAB==='my'?'on':''}">Моё</button></div>`;
   if(PHTAB==='shop'){h+=`<div style="display:flex;gap:6px;overflow-x:auto;padding-bottom:8px;margin-bottom:4px">${MKCAT.map(([k,t])=>`<button data-c="${k}" style="flex:none;border:1px solid ${PHCAT===k?'#3fb950':'#2b3545'};background:${PHCAT===k?'#16321f':'#161d29'};color:${PHCAT===k?'#7ee787':'#9aa7b4'};border-radius:999px;padding:6px 12px;font:800 12.5px Inter,system-ui,sans-serif">${t}</button>`).join('')}</div>`+
@@ -2978,7 +2978,7 @@ window.uptimeBack=function(){
   if(!$('mg').classList.contains('hidden')){const l=$('later');if(l){l.click();return true}}
   if(!$('jr').classList.contains('hidden')){const c=$('jclose');if(c)c.click();return true}
   if(!$('pc').classList.contains('hidden')){closePC();return true}
-  if(!$('ph').classList.contains('hidden')){closePhone();return true}
+  if(!$('phone').classList.contains('hidden')){closePhone();return true}
   if(!$('pause').classList.contains('hidden')){closePause();return true}
   if(G&&G.running){if(!$('dlg').classList.contains('hidden'))return true;openPause();return true}
   if(SCR==='season'||SCR==='about'){showMainMenu();return true}
