@@ -1,0 +1,49 @@
+name: Сборка APK
+on:
+  push:
+    branches: [main]
+    paths: ['android/**', '.github/workflows/apk.yml']
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: android-actions/setup-android@v3
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.9'
+      - name: Встроить игру в APK
+        run: |
+          python3 tools/version.py
+          mkdir -p android/app/src/main/assets/www
+          cp -r web/* android/app/src/main/assets/www/
+      - name: Ключ подписи
+        env:
+          KS_B64: ${{ secrets.KS_B64 }}
+        run: |
+          if [ -n "$KS_B64" ]; then echo "$KS_B64" | base64 -d > android/app/release.jks; else cp android/keystore/release.jks android/app/release.jks; fi
+      - name: Сборка
+        env:
+          KS_PASS: ${{ secrets.KS_PASS || 'uptime2026' }}
+          KS_ALIAS: uptime
+        run: |
+          VC=$(cat android/version.txt)
+          gradle -p android assembleRelease -Pvc=$VC --no-daemon
+          cp android/app/build/outputs/apk/release/app-release.apk uptime.apk
+          echo "VC=$VC" >> $GITHUB_ENV
+      - uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v1.0.${{ env.VC }}
+          name: АПТАЙМ 1.0.${{ env.VC }}
+          body: Скачай uptime.apk и установи. Дальше игра обновляется сама.
+          files: uptime.apk
+          make_latest: true

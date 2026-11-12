@@ -1,0 +1,9 @@
+android/.gradle/
+android/build/
+android/app/build/
+android/app/src/main/assets/www/
+android/app/release.jks
+web/version.json
+local.properties
+*.iml
+.idea/
