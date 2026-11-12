@@ -33,9 +33,10 @@ jobs:
           if [ -n "$KS_B64" ]; then echo "$KS_B64" | base64 -d > android/app/release.jks; else cp android/keystore/release.jks android/app/release.jks; fi
       - name: Сборка
         env:
-          KS_PASS: ${{ secrets.KS_PASS || 'uptime2026' }}
+          KS_SECRET: ${{ secrets.KS_PASS }}
           KS_ALIAS: uptime
         run: |
+          export KS_PASS="${KS_SECRET:-$(cat android/keystore/pass.txt)}"
           VC=$(cat android/version.txt)
           gradle -p android assembleRelease -Pvc=$VC --no-daemon
           cp android/app/build/outputs/apk/release/app-release.apk uptime.apk
