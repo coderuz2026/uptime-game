@@ -396,6 +396,12 @@ button{font-family:inherit;cursor:pointer}
 .pcr.col{flex-direction:column;align-items:stretch;gap:7px}.orow{display:flex;justify-content:space-between;align-items:center;gap:8px}
 .stg{display:grid;grid-template-columns:repeat(4,1fr);gap:4px}.stg i{font-style:normal;font-size:10px;font-weight:800;text-align:center;padding:4px 2px;border-radius:7px;background:#21262d;color:#6e7681}.stg i.ok{background:#12301b;color:#56d364}.stg i.now{background:#3b2f10;color:#ffd166}
 .obar{height:7px;border-radius:4px;background:#21262d;overflow:hidden}.obar i{display:block;height:100%;background:linear-gradient(90deg,#1f6feb,#58a6ff)}
+#adov{position:absolute;inset:0;z-index:40;background:#000d;display:flex;align-items:center;justify-content:center}#adov.hidden{display:none}
+.adbox{width:86%;max-width:330px;background:#0f141c;border:1px solid #2b3545;border-radius:20px;padding:16px;display:flex;flex-direction:column;gap:10px;font-family:Inter,system-ui,sans-serif}
+.adtag{font-size:10.5px;font-weight:800;letter-spacing:.1em;color:#8b949e}.adpic{height:170px;border-radius:14px;background:linear-gradient(135deg,#1f6feb,#8957e5);display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:54px;color:#fff}.adpic small{font-size:12.5px;font-weight:700;text-align:center;opacity:.9;margin-top:6px;line-height:1.35}
+.adbar{height:5px;border-radius:3px;background:#21262d;overflow:hidden}.adbar i{display:block;height:100%;width:0;background:#ffd166;transition:width 5s linear}
+.mb1:disabled{filter:grayscale(.8);opacity:.6;animation:none}
+.adbtn{border:1px dashed #a371f7;background:#1c1530;color:#d2a8ff;border-radius:10px;padding:8px;font:800 12px Inter,system-ui,sans-serif}
 </style>
 </head>
 <body>
@@ -422,6 +428,7 @@ button{font-family:inherit;cursor:pointer}
     <div id="screen" class="hidden"></div>
     <div id="pause" class="hidden"></div>
     <div id="pc" class="hidden"></div>
+    <div id="adov" class="hidden"></div>
     <div id="load">ЗАГРУЗКА...</div>
   </div>
 </div>
@@ -1490,7 +1497,7 @@ function showSeason(){const s=$('screen');SCR='season';s.classList.remove('hidde
     <div class="epn">${e.n}</div><div class="ept"><b>${e.t}</b><small>${e.soon?'Скоро':d?'Пройден: '+d.title.replace('Дефа'+'ктума','Турана').replace(/[\p{Extended_Pictographic}️]/gu,'').trim():ok?'Новый эпизод':'Сначала пройди эпизод '+(e.n-1)}</small><p>${e.d}</p></div></button>`}).join('')}</div>
   <p style="font-size:11px;color:#6e7681;margin-top:10px">🎧 лучше со звуком</p>`;
   $('sback').onclick=()=>{sPop();showMainMenu()};
-  s.querySelectorAll('.epc').forEach(b=>b.onclick=()=>{const n=+b.dataset.n;if(!avail(n))return;sPop();s.classList.remove('season');playEpisode(n)})}
+  s.querySelectorAll('.epc').forEach(b=>b.onclick=()=>{const n=+b.dataset.n;if(!avail(n))return;if(n>=3&&!(SEASON.unl||{})[n]){showAd(()=>{SEASON.unl=SEASON.unl||{};SEASON.unl[n]=1;saveSeason();s.classList.remove('season');playEpisode(n)});return}sPop();s.classList.remove('season');playEpisode(n)})}
 function seasonButton(label){return `<button class="btn" id="tosea">${label||'К списку эпизодов ▶'}</button>`}
 
 /* ================= EPISODE 1 wrapper ================= */
@@ -2067,7 +2074,7 @@ function renderPC(){const p=PR(),el=$('pc');el.classList.remove('hidden');const 
     return `<div class="pcr"><div><b>${SKN[k]} <em>${'●'.repeat(lv)}${'○'.repeat(3-lv)}</em></b><small>${c?`Курс «${c.t}» · ${c.min} мин · ${c.cost?fmtM(c.cost)+' сум':'бесплатно'}`:'Максимальный уровень'}</small></div>${btn}</div>`}).join('')+'<p class="pcn">Курсы ты оплачиваешь из своей зарплаты. Курс заканчивается коротким тестом. Навыки открывают новые задания, решения в разговорах и установку оборудования.</p>';
   if(PCTAB==='shop'){const ord=id=>p.orders.find(o=>o.id===id);h+=`<div class="bud">Бюджет ИТ: <b>${fmtM(p.budget)} сум</b><small>Деньги компании. Крупные покупки согласует директор.</small></div>`;
     if(p.orders.length)h+='<div class="pcsec">Мои заявки</div>'+p.orders.map(r=>{const it=itemOf(r),w=r.st==='wait',pr=w?0:clamp((p.clock-r.t0)/(r.eta-r.t0),0,1),pp=w?0:r.pay/(r.eta-r.t0);
-      return `<div class="pcr col"><div class="orow"><b>${it.n}</b><span class="${w?'pclk':'pcok'}">${w?'Ждёт директора':'ещё '+fmtDur(r.eta-p.clock)}</span></div><div class="stg"><i class="${w?'now':'ok'}">Согласование</i><i class="${w?'':pr<pp?'now':'ok'}">Оплата</i><i class="${!w&&pr>=pp?'now':''}">Доставка</i><i>Склад</i></div><div class="obar"><i style="width:${(w?4:8+pr*92)}%"></i></div></div>`}).join('');
+      return `<div class="pcr col"><div class="orow"><b>${it.n}</b><span class="${w?'pclk':'pcok'}">${w?'Ждёт директора':'ещё '+fmtDur(r.eta-p.clock)}</span></div><div class="stg"><i class="${w?'now':'ok'}">Согласование</i><i class="${w?'':pr<pp?'now':'ok'}">Оплата</i><i class="${!w&&pr>=pp?'now':''}">Доставка</i><i>Склад</i></div><div class="obar"><i style="width:${(w?4:8+pr*92)}%"></i></div>${w?'':`<button class="adbtn" data-fast="${r.id}">🎬 Ускорить на 6 часов за рекламу</button>`}</div>`}).join('');
     h+='<div class="pcsec">Оборудование · поставка 1–2 дня</div>'+GEAR.map(g=>{const inst=p.gear.includes(g.id),own=p.owned.includes(g.id);
       return `<div class="pcr"><div><b>${g.n}</b><small>${g.d} · ${fmtM(g.cost)} сум · ${fmtDur(g.ship)} · установка: ${skTxt(g.req)}</small></div>${inst?'<span class="pcok">Установлено</span>':own?'<span class="pclk">На складе. Установи в стойке</span>':ord(g.id)?'<span class="pclk">Заявка подана</span>':`<button class="pcbtn y" data-req="${g.id}">Заявка</button>`}</div>`}).join('');
     h+='<div class="pcsec">Расходники · в пределах лимита админа, 3–4 часа</div>'+SMALL.map(g=>`<div class="pcr"><div><b>${g.n}</b><small>${g.d} · ${fmtM(g.cost)} сум · ${fmtDur(g.ship)}</small></div>${p.small.includes(g.id)?'<span class="pcok">Получено</span>':ord(g.id)?'<span class="pclk">Заказано</span>':p.budget>=g.cost?`<button class="pcbtn" data-ord="${g.id}">Заказать</button>`:'<span class="pclk">Нет бюджета</span>'}</div>`).join('')+'<p class="pcn">Время доставки идёт вместе с игровым временем. Ночь между эпизодами тоже считается.</p>'}
@@ -2075,6 +2082,7 @@ function renderPC(){const p=PR(),el=$('pc');el.classList.remove('hidden');const 
     `<div class="pcr"><div><b>Оборудование</b><small>${p.gear.length?p.gear.map(id=>GEAR.find(g=>g.id===id).n).join(', '):'Пока ничего не установлено'}</small></div><span class="pips">${p.gear.length}/${GEAR.length}</span></div><div class="pcr"><div><b>Решено задач</b></div><span class="pips">${p.tasks}</span></div>`+(PCREMOTE?'<p class="pcn">Курсы и магазин открываются за твоим компьютером: зелёный стул в серверной, слева внизу.</p>':'');
   el.innerHTML=h+'</div>';$('pcx').onclick=()=>{sPop();closePC()};
   el.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>{PCTAB=b.dataset.tab;sPop();renderPC()});
+  el.querySelectorAll('[data-fast]').forEach(b=>b.onclick=()=>{const r=p.orders.find(o=>o.id===b.dataset.fast);if(!r)return;if(adLeft()<=0){toast('На сегодня реклама закончилась. Приходи завтра','r');return}el.classList.add('hidden');showAd(()=>{r.t0-=360;r.eta-=360;saveSeason();toast('Поставщик поторопился: доставка быстрее на 6 часов','g');procTick();renderPC()})});
   el.querySelectorAll('[data-req]').forEach(b=>b.onclick=()=>{p.orders.push({id:b.dataset.req,kind:'gear',st:'wait'});saveSeason();sPop();toast('Заявка создана. Согласуй её у директора','b');renderPC()});
   el.querySelectorAll('[data-ord]').forEach(b=>b.onclick=()=>{const it=SMALL.find(x=>x.id===b.dataset.ord);if(p.budget<it.cost)return;const r={id:it.id,kind:'small',st:'ship'};p.orders.push(r);shipOrder(r,it);sGood();toast('Заказано: '+it.n+'. Доставка '+fmtDur(it.ship),'g');renderPC()});
   el.querySelectorAll('[data-edu]').forEach(b=>b.onclick=()=>{const k=b.dataset.edu,c=COURSES[k][p.sk[k]];el.classList.add('hidden');lastNpc=null;
@@ -2133,11 +2141,22 @@ function showMainMenu(){SCR='main';PAUSED=false;$('pause').classList.add('hidden
   const n=nextEp(),e=EPLIST.find(x=>x.n===n),started=Object.keys(SEASON.done).length>0;
   s.innerHTML=`<div class="tag">UPTIME STUDIO представляет</div><h1 class="mlogo">АПТАЙМ</h1><h2>Сезон 1: «Тень списания»</h2>
   <div class="mbtns"><button class="mb1" id="m_play"><b>${started?'Продолжить':'Начать игру'}</b><small>Эпизод ${n}: ${e?e.t:''}</small></button>
-  <button class="mb2" id="m_eps">📺 Эпизоды</button><button class="mb2" id="m_q">⚙️ Графика: ${qLabel()}</button><button class="mb2" id="m_snd">${musicOn?'🔊 Звук: включён':'🔇 Звук: выключен'}</button><button class="mb2" id="m_about">ℹ️ Об игре</button></div>
+  <button class="mb2" id="m_eps">📺 Эпизоды</button><button class="mb2" id="m_q">⚙️ Графика: ${qLabel()}</button><button class="mb2" id="m_snd">${musicOn?'🔊 Звук: включён':'🔇 Звук: выключен'}</button><button class="mb2" id="m_sup">💚 Поддержать</button><button class="mb2" id="m_about">ℹ️ Об игре</button></div>
   <p class="mver">версия ${window.UPTIME_V||'dev'}</p>`;
   $('m_play').onclick=()=>{sPop();s.classList.remove('menu');playEpisode(n)};$('m_eps').onclick=()=>{sPop();s.classList.remove('menu');showSeason()};
   $('m_q').onclick=()=>{cycleQ();$('m_q').textContent='⚙️ Графика: '+qLabel()};$('m_snd').onclick=()=>{toggleSound();$('m_snd').textContent=musicOn?'🔊 Звук: включён':'🔇 Звук: выключен'};
-  $('m_about').onclick=()=>{sPop();showAbout()}}
+  $('m_about').onclick=()=>{sPop();showAbout()};$('m_sup').onclick=()=>{sPop();showSupport()}}
+/* ---- реклама: пока заглушка. Позже сюда подключается AdMob через window.UptimeNative.showRewarded ---- */
+const AD_CAP=6;function adLeft(){const p=PR(),d=new Date().toDateString();if(!p.ad||p.ad.d!==d)p.ad={d,n:0};return AD_CAP-p.ad.n}
+function showAd(onReward){if(adLeft()<=0){toast('На сегодня реклама закончилась. Приходи завтра','r');return}const el=$('adov'),was=PAUSED;PAUSED=true;el.classList.remove('hidden');let t=5;
+  el.innerHTML=`<div class="adbox"><div class="adtag">РЕКЛАМА · демо</div><div class="adpic">🎬<small>Здесь будет видеоролик<br>от рекламной сети</small></div><div class="adbar"><i id="adbar"></i></div><button class="mb1" id="adx" disabled><b id="adt">Награда через 5</b></button></div>`;
+  requestAnimationFrame(()=>{const b=$('adbar');if(b)b.style.width='100%'});
+  const iv=setInterval(()=>{t--;const a=$('adt');if(!a){clearInterval(iv);return}if(t>0)a.textContent='Награда через '+t;else{clearInterval(iv);a.textContent='Забрать награду';$('adx').disabled=false}},1000);
+  $('adx').onclick=()=>{el.classList.add('hidden');el.innerHTML='';PAUSED=was;lastT=performance.now();PR().ad.n++;saveSeason();sGood();onReward()}}
+function showSupport(){SCR='about';const s=$('screen');s.classList.remove('menu');
+  s.innerHTML=`<button class="backb" id="aback">← Назад</button><h2>Поддержать игру</h2><div class="sum">АПТАЙМ бесплатная. Новые эпизоды выходят благодаря поддержке игроков.<br><br>Сейчас игра в разработке, поэтому реклама тут ненастоящая, а покупки появятся после выхода в Google Play.</div>
+  <div class="mbtns"><button class="mb1" id="s_ad"><b>🎬 Посмотреть рекламу</b><small>+20 тыс сум к зарплате · осталось сегодня: ${adLeft()}</small></button><button class="mb2" disabled style="opacity:.5">🚫 Отключить рекламу · скоро</button><button class="mb2" disabled style="opacity:.5">⭐ Ранний доступ к эпизодам · скоро</button></div>`;
+  $('aback').onclick=()=>{sPop();showMainMenu()};$('s_ad').onclick=()=>showAd(()=>{PR().money+=20000;saveSeason();toast('Спасибо за поддержку! +20 тыс сум','g');showSupport()})}
 function showAbout(){SCR='about';const s=$('screen');s.classList.remove('menu');
   s.innerHTML=`<button class="backb" id="aback">← Назад</button><h2>Об игре</h2><div class="sum">АПТАЙМ — сюжетная игра про сисадмина в ташкентском офисе. Каждое решение влияет на следующие эпизоды.<br><br>Разработка: Uptime Studio<br>Движок: three.js (MIT)<br><br>Новые эпизоды приходят обновлением сами.</div>`;
   $('aback').onclick=()=>{sPop();showMainMenu()}}
@@ -2150,7 +2169,7 @@ function exitToMenu(){closePause();closePC();if(G){G.running=false;G.busy=false}
   Object.values(NPC).forEach(n=>n.hold=false);setLoc('office');showMainMenu()}
 $('menubtn').onclick=()=>{if(G&&G.running){sPop();PAUSED?closePause():openPause()}else showMainMenu()};
 window.uptimeBack=function(){
-  if(SCR==='splash')return true;
+  if(SCR==='splash'||!$('adov').classList.contains('hidden'))return true;
   if(!$('mg').classList.contains('hidden')){const l=$('later');if(l){l.click();return true}}
   if(!$('jr').classList.contains('hidden')){const c=$('jclose');if(c)c.click();return true}
   if(!$('pc').classList.contains('hidden')){closePC();return true}
