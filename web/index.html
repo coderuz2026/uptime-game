@@ -1031,14 +1031,19 @@ function drawCam(T){const g=camC.getContext('2d');g.fillStyle='#0b0f15';g.fillRe
 
 /* ================= AUDIO ================= */
 let AC=null,musicOn=true,musicStarted=false;
+/* ================= ЗВУК: громкость по каналам ================= */
+let VOL={m:.6,v:.7,s:.8};try{Object.assign(VOL,JSON.parse(localStorage.getItem('uptime_vol')||'{}'))}catch(e){}
+const BUS={};function bus(k){const a=actx();if(!BUS[k]){BUS[k]=a.createGain();BUS[k].gain.value=VOL[k]*(k==='m'?1.6:1.25);BUS[k].connect(a.destination)}return BUS[k]}
+function setVol(k,v){VOL[k]=v;if(BUS[k])BUS[k].gain.value=v*(k==='m'?1.6:1.25);try{localStorage.setItem('uptime_vol',JSON.stringify(VOL))}catch(e){}}
+
 function actx(){try{AC=AC||new (window.AudioContext||window.webkitAudioContext)()}catch(e){}return AC}
-function beep(f=600,d=.08,type='square',v=.04){const a=actx();if(!a)return;try{const o=a.createOscillator(),g=a.createGain();o.type=type;o.frequency.value=f;g.gain.value=v;g.gain.exponentialRampToValueAtTime(.0001,a.currentTime+d);o.connect(g);g.connect(a.destination);o.start();o.stop(a.currentTime+d)}catch(e){}}
+function beep(f=600,d=.08,type='square',v=.04){const a=actx();if(!a)return;try{const o=a.createOscillator(),g=a.createGain();o.type=type;o.frequency.value=f;g.gain.value=v;g.gain.exponentialRampToValueAtTime(.0001,a.currentTime+d);o.connect(g);g.connect(bus('s'));o.start();o.stop(a.currentTime+d)}catch(e){}}
 const sGood=()=>{beep(660,.08,'triangle',.06);setTimeout(()=>beep(880,.08,'triangle',.06),80);setTimeout(()=>beep(1320,.15,'triangle',.06),160)};
 const sBad=()=>beep(150,.25,'sawtooth',.04);
 window.uptimePause=()=>{try{AC&&AC.state==='running'&&AC.suspend()}catch(e){}};window.uptimeResume=()=>{try{AC&&AC.state==='suspended'&&!document.hidden&&AC.resume()}catch(e){}};
 document.addEventListener('visibilitychange',()=>document.hidden?uptimePause():uptimeResume());addEventListener('pagehide',uptimePause);addEventListener('blur',uptimePause);addEventListener('focus',uptimeResume);
 function sRadio(){const a=actx();if(!a||a.state!=='running')return;try{const n=a.sampleRate*.4,bf=a.createBuffer(1,n,a.sampleRate),d=bf.getChannelData(0);for(let i=0;i<n;i++)d[i]=(Math.random()*2-1)*(i%900<600?1:.3);
-  const src=a.createBufferSource();src.buffer=bf;const f=a.createBiquadFilter();f.type='bandpass';f.frequency.value=1700;f.Q.value=1.6;const g=a.createGain();g.gain.value=.07;src.connect(f);f.connect(g);g.connect(a.destination);src.start();setTimeout(()=>beep(1250,.09,'square',.03),420)}catch(e){}}
+  const src=a.createBufferSource();src.buffer=bf;const f=a.createBiquadFilter();f.type='bandpass';f.frequency.value=1700;f.Q.value=1.6;const g=a.createGain();g.gain.value=.07;src.connect(f);f.connect(g);g.connect(bus('s'));src.start();setTimeout(()=>beep(1250,.09,'square',.03),420)}catch(e){}}
 const VOICE={};
 function voiceOf(id){if(!VOICE[id]){let h=7;for(const ch of id)h=(h*31+ch.charCodeAt(0))%9973;const fem=['nigora','dilnoza','lola','malika','gulya','kamila'].includes(id),old=['boss','bobur','hamid','gulya','dilnoza','farrukh'].includes(id);VOICE[id]={f:(fem?215:122)+h%36-(old?12:0),fs:fem?1.15:1,h}}return VOICE[id]}
 /* «симлиш»: слова из слогов (согласная+гласная), пульс голоса → 3 формантных резонатора с плавными переходами */
@@ -1069,7 +1074,7 @@ function sylBufs(id){if(SYL[id])return SYL[id];const a=actx(),sr=a.sampleRate,v=
     const fd=Math.floor(sr*.008);for(let i=0;i<n;i++)ch[i]*=.4/(pk||1)*Math.min(1,i/fd,(n-1-i)/fd);out.push(bf)}return SYL[id]=out}
 function stopSpeak(){SPK.forEach(s=>{try{s.stop()}catch(e){}});SPK=[]}
 function speak(id,txt,md){stopSpeak();const a=actx();if(!a||a.state!=='running'||!/[a-zа-яё]/i.test(txt))return;try{const bufs=sylBufs(id),g=a.createGain(),lpf=a.createBiquadFilter();lpf.type='lowpass';lpf.frequency.value=md==='a'?5500:4300;lpf.Q.value=.3;
-  g.gain.value={n:.2,h:.22,a:.26,s:.15,o:.23}[md]||.2;g.connect(lpf);lpf.connect(a.destination);const t0=a.currentTime+.05,base={n:1,h:1.07,a:.94,s:.9,o:1.12}[md]||1,end=txt.length*.014+.45;let t=0,last=-1,pp=0;
+  g.gain.value={n:.2,h:.22,a:.26,s:.15,o:.23}[md]||.2;g.connect(lpf);lpf.connect(bus('v'));const t0=a.currentTime+.05,base={n:1,h:1.07,a:.94,s:.9,o:1.12}[md]||1,end=txt.length*.014+.45;let t=0,last=-1,pp=0;
   while(t<end&&SPK.length<24){const p=Math.min(txt.length-1,Math.floor(t/.014));if(SPK.length&&/[.,!?…:—]/.test(txt.slice(pp,p))){t+=md==='s'?.2:.11}pp=p;
     let e=p;while(e<txt.length&&!'.!?…'.includes(txt[e]))e++;let b=p;while(b>0&&!'.!?…'.includes(txt[b-1]))b--;const pr=(p-b)/Math.max(8,e-b),q=txt[e]==='?',ex=txt[e]==='!',lastW=(e-p)*.014<.4;
     let r=base*(1.06-.11*pr);if(q&&lastW)r*=1.16;else if(ex&&pr<.35)r*=1.08;else if(lastW)r*=.94;r*=.98+Math.random()*.04;
@@ -1078,10 +1083,10 @@ const RADIOL=['📻 «Пост один, приём. На пятом всё сп
 let NBUF=null;function sPaper(long){const a=actx();if(!a)return;try{if(!NBUF){NBUF=a.createBuffer(1,a.sampleRate,a.sampleRate);const d=NBUF.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=Math.random()*2-1}
   const src=a.createBufferSource();src.buffer=NBUF;src.playbackRate.value=.75+Math.random()*.6;const f=a.createBiquadFilter();f.type='bandpass';f.frequency.value=2200+Math.random()*2600;f.Q.value=.8;const g=a.createGain(),d=long?.6:.13,t=a.currentTime;
   g.gain.setValueAtTime(0.0001,t);g.gain.linearRampToValueAtTime(long?.28:.2,t+.012);if(long)for(let i=1;i<7;i++)g.gain.linearRampToValueAtTime(.06+Math.random()*.24,t+i*d/7);g.gain.exponentialRampToValueAtTime(.001,t+d);
-  f.frequency.linearRampToValueAtTime(long?900:f.frequency.value*1.5,t+d);src.connect(f);f.connect(g);g.connect(a.destination);src.start(t,Math.random()*.3,d+.05)}catch(e){}}
+  f.frequency.linearRampToValueAtTime(long?900:f.frequency.value*1.5,t+d);src.connect(f);f.connect(g);g.connect(bus('s'));src.start(t,Math.random()*.3,d+.05)}catch(e){}}
 const sPop=()=>beep(900,.05,'sine',.05);
 let musG=null;
-function startMusic(){const a=actx();if(!a||musicStarted)return;musicStarted=true;musG=a.createGain();musG.gain.value=musicOn?.5:0;musG.connect(a.destination);
+function startMusic(){const a=actx();if(!a||musicStarted)return;musicStarted=true;musG=a.createGain();musG.gain.value=musicOn?.5:0;musG.connect(bus('m'));
   const lp=a.createBiquadFilter();lp.type='lowpass';lp.frequency.value=1100;lp.connect(musG);
   const CH_=[[57,60,64,67],[50,57,60,65],[55,59,62,65],[48,55,59,64]];let step=0;const mt=n=>440*Math.pow(2,(n-69)/12);
   const play=()=>{const t0=a.currentTime+.05,ch=CH_[step%4];
@@ -1508,10 +1513,10 @@ const prevF=n=>(SEASON.done[n]&&SEASON.done[n].F)||{};
 const prevRel=()=>{const r={};for(let i=1;i<EPN;i++)Object.assign(r,(SEASON.done[i]||{}).rel||{});return r};
 function finishEpisode(n,title,F,rel){const first=!SEASON.done[n]||!SEASON.done[n].paid;SEASON.done[n]={title,F,rel,t:Date.now(),paid:1};if(first){PR().budget+=1500000;gainXP(150,500000);toast('Директор увеличил бюджет ИТ на 1,5 млн сум','y')}saveSeason()}
 /* dispatchers */
-function nodeFor(id){const base=EPS[EPN].nodeFor(id);if(id==='boss'&&G.F.met_boss&&!G.F.ev.final&&PR().orders.some(o=>o.st==='wait'))return reqNode(base);return base}
-function markerFor(id){if(id==='boss'&&G.F.met_boss&&PR().orders.some(o=>o.st==='wait'))return 't';return EPS[EPN].markerFor(id)}
+function nodeFor(id){const base=EPS[EPN].nodeFor(id);if(id==='boss'&&G.F.met_boss&&!G.F.ev.final&&PR().orders.some(o=>o.st==='wait'))return reqNode(base);if(!base&&G.tk&&G.tk.id===id)return tkNode(id);return base}
+function markerFor(id){if(id==='boss'&&G.F.met_boss&&PR().orders.some(o=>o.st==='wait'))return 't';const m=EPS[EPN].markerFor(id);return !m&&G.tk&&G.tk.id===id?'q':m}
 function objectives(){const o=EPS[EPN].objectives();if(Object.values(PR().sk).every(v=>v===0)&&(EPN!==1||G.F.met_boss))o.unshift(['📚 Пройди первый курс за своим компьютером (серверная, слева внизу)',0]);PR().orders.forEach(r=>{const it=itemOf(r);o.push([r.st==='wait'?'📝 Согласовать у директора заявку: '+it.n:'📦 '+it.n+': '+stageOf(r)+', ещё '+fmtDur(r.eta-PR().clock),0])});return o}
-function checkEvents(){if(!G||G.busy||!G.running||G.F.ev.final)return;EPS[EPN].events()}
+function checkEvents(){if(!G||G.busy||!G.running||G.F.ev.final)return;EPS[EPN].events();if(!G.busy)tkTick()}
 function startFinal(){EPS[EPN].final()}
 function endingScreen(){EPS[EPN].ending();SCR='ending'}
 function ready(){return EPS[EPN].ready?EPS[EPN].ready():false}
@@ -1983,7 +1988,7 @@ EPS[3]={intro:'e3_intro',
 
 /* ---------- dialogue engine ---------- */
 const dlgEl=$('dlg');let D=null;
-function talk(nodeOrId,npcId){const node=typeof nodeOrId==='string'?DLG[nodeOrId]:nodeOrId;if(!node)return;G.busy=true;if(npcId&&NPC[npcId])NPC[npcId].hold=true;D={npc:npcId};show(node)}
+function talk(nodeOrId,npcId){const node=typeof nodeOrId==='string'?DLG[nodeOrId]:nodeOrId;if(!node)return;G.busy=true;if(npcId&&NPC[npcId]){NPC[npcId].hold=true;bump('talk')}D={npc:npcId};show(node)}
 function show(node){
   if(node.act)node.act();
   const who=node.who,isN=who==='narr',c=CH[who];const txt=typeof node.text==='function'?node.text():node.text;
@@ -2019,7 +2024,7 @@ function openMG(kind,o,onWin,onLose){if(G)G.busy=true;mgEl.classList.remove('hid
   let T={crimp:['plug','Обжать кабель'],reboot:['power','Перезапуск свитча'],mash:['printer','Принтер зажевал'],phish:['mail','Письмо Лоле'],taskmgr:['monitor','Диспетчер задач'],tv:['tv','Телевизор охраны'],quiz:['book','Курс'],ipcfg:['server','Настройка адреса'],rules:['shield','Правила фаервола'],patch:['switch','Коммутация'],logs:['search','Журнал']}[kind];if(o&&o.title)T=[o.icon||T[0],o.title];T[0]=IC[T[0]]||T[0];
   mgEl.innerHTML=`<div class="mgbox" id="mgbox"><div class="mghead"><div class="ic">${T[0]}</div><div><b>Задание</b><span>${T[1]}</span></div></div><div id="mgbody"></div><div class="foot"><button class="small" id="later">↩ Отложить</button></div></div>`;
   const close=()=>{if(mg.cleanup)mg.cleanup();mg.cleanup=null;mgEl.classList.add('hidden');mgEl.innerHTML=''};
-  const win=()=>{close();sGood();{const pz=MGPAY[kind];if(pz&&!(o&&o.nopay)){PR().tasks++;PR().budget+=40000;gainXP(Math.round(pz[0]*(1+.1*PR().small.filter(x=>x==='rj'||x==='tools').length)),pz[1])}}const n=NPC[lastNpc];if(n)puff(wx(n.x),2,wz(n.y),30,{c:['#ffd166','#fff','#7ee787','#f778ba'],sp:3,up:2.5,g:-6,life:1.2});onWin()};
+  const win=()=>{close();sGood();bump('mg');if(kind==='crimp')bump('crimp');{const pz=MGPAY[kind];if(pz&&!(o&&o.nopay)){PR().tasks++;PR().budget+=40000;gainXP(Math.round(pz[0]*(1+.1*PR().small.filter(x=>x==='rj'||x==='tools').length)),pz[1])}}const n=NPC[lastNpc];if(n)puff(wx(n.x),2,wz(n.y),30,{c:['#ffd166','#fff','#7ee787','#f778ba'],sp:3,up:2.5,g:-6,life:1.2});onWin()};
   const lose=()=>{close();sBad();onLose?onLose():endBusy()};
   $('later').onclick=()=>{close();endBusy()};
   GAMES[kind]($('mgbody'),o,win,lose)}
@@ -2260,7 +2265,7 @@ const TUTS=[['👆','Коснись пола, и герой пойдёт туд�
 let TUTON=false;function showTut(){TUTON=true;G.busy=true;let i=0;const el=document.createElement('div');el.style.cssText='position:fixed;inset:0;z-index:60;background:#000a;display:flex;align-items:center;justify-content:center;padding:24px';document.body.appendChild(el);
   const draw=()=>{el.innerHTML=`<div style="max-width:320px;width:100%;background:#161b22;border:1px solid #30363d;border-radius:18px;padding:22px 20px;text-align:center;box-shadow:0 12px 40px #000a"><div style="font-size:44px;line-height:1">${TUTS[i][0]}</div><p style="font-size:16px;line-height:1.45;margin:14px 0 6px;color:#e6edf3">${TUTS[i][1]}</p><div style="font-size:12px;color:#8b949e;margin-bottom:14px">${i+1} из ${TUTS.length}</div><button class="btn" id="tutn">${i<TUTS.length-1?'Дальше':'Понятно, играем!'}</button>${i<TUTS.length-1?'<div id="tuts" style="margin-top:12px;font-size:13px;color:#8b949e">Пропустить</div>':''}</div>`;
     const done=()=>{el.remove();TUTON=false;if(G)G.busy=false;try{localStorage.setItem('uptime_tut','1')}catch(e){}};$('tutn').onclick=()=>{sPop();if(++i>=TUTS.length)done();else draw()};const sk=$('tuts');if(sk)sk.onclick=done};draw()}
-let HUDC='',HUDG='';function hud(){procTick();if(!TUTON&&G&&G.running&&!G.busy&&SCR==='game'&&!localStorage.getItem('uptime_tut'))showTut();const c=fmt(G.min);if(c!==HUDC){HUDC=c;$('clock').textContent=c}const o=objectives().find(x=>!x[1]),g=o?o[0]:'Все задачи выполнены!';if(g!==HUDG){HUDG=g;$('goaltx').textContent=g}}
+let HUDC='',HUDG='';function hud(){procTick();metaCheck();if(!TUTON&&G&&G.running&&!G.busy&&SCR==='game'&&!localStorage.getItem('uptime_tut'))showTut();const c=fmt(G.min);if(c!==HUDC){HUDC=c;$('clock').textContent=c}const o=objectives().find(x=>!x[1]),g=o?o[0]:'Все задачи выполнены!';if(g!==HUDG){HUDG=g;$('goaltx').textContent=g}}
 let lastT=performance.now();
 let FR=0;
 function frame(now){requestAnimationFrame(frame);if(document.hidden)return;const dt=Math.min(.05,(now-lastT)/1000);const live=G&&G.running&&!PAUSED;
@@ -2417,15 +2422,80 @@ function setQ(q){QL=q;try{localStorage.setItem('uptime_q',QL);localStorage.setIt
 const cycleQ=()=>setQ(QL==='high'?'mid':QL==='mid'?'low':'high');
 function toggleSound(){musicOn=!musicOn;if(musG)musG.gain.value=musicOn?.5:0;startMusic()}
 function nextEp(){for(const e of EPLIST){if(e.soon)break;if(!SEASON.done[e.n])return e.n}return Math.max(1,...EPLIST.filter(e=>!e.soon).map(e=>e.n))}
+function showSound(){const el=document.createElement('div');el.id='sndov';el.style.cssText='position:fixed;inset:0;z-index:70;background:#000b;display:flex;align-items:center;justify-content:center;padding:20px';document.body.appendChild(el);
+  const row=(k,t)=>`<label style="display:block;margin:14px 0 4px;font-size:15px;color:#e6edf3">${t} <b id="sv_${k}" style="float:right;color:#56d364">${Math.round(VOL[k]*100)}%</b></label><input type="range" min="0" max="100" value="${Math.round(VOL[k]*100)}" data-k="${k}" style="width:100%;accent-color:#2ea043;height:28px">`;
+  el.innerHTML=`<div style="max-width:330px;width:100%;background:#161b22;border:1px solid #30363d;border-radius:18px;padding:20px"><h3 style="margin:0 0 4px;font-size:20px">🔊 Звук</h3>${row('m','🎵 Музыка')}${row('v','🗣️ Голоса')}${row('s','🔔 Эффекты')}<button class="btn" id="sndok" style="margin-top:18px">Готово</button></div>`;
+  el.querySelectorAll('input').forEach(i=>i.oninput=()=>{const k=i.dataset.k;startMusic();setVol(k,i.value/100);$('sv_'+k).textContent=i.value+'%';if(k==='s')beep(880,.06,'triangle',.05);if(k==='v'&&!SPK.length)speak('nigora','Привет, это проверка голоса!','h')});
+  $('sndok').onclick=()=>{sPop();stopSpeak();el.remove()}}
+/* ================= ДОСТИЖЕНИЯ, ЗАДАНИЯ ДНЯ, ЗАЯВКИ ================= */
+const today=()=>{const d=new Date();return d.getFullYear()*10000+(d.getMonth()+1)*100+d.getDate()};
+function MT(){const p=PR();if(!p.ach)p.ach={};if(!p.cnt)p.cnt={mg:0,crimp:0,tk:0,talk:0};if(!p.dq||p.dq.day!==today())p.dq={day:today(),c:{mg:0,tk:0,talk:0},got:{}};if(p.streak==null)p.streak=0;return p}
+function bump(k){const p=MT();p.cnt[k]=(p.cnt[k]||0)+1;if(p.dq.c[k]!=null)p.dq.c[k]++;metaCheck()}
+const ACH=[
+ ['ep1','🎬','Первый день','Пройди эпизод 1',p=>!!SEASON.done[1]],
+ ['ep3','📺','Сериал затянул','Пройди три эпизода',p=>[1,2,3].every(n=>SEASON.done[n])],
+ ['nopay','🛡️','Ни тийина','Переживи шифровальщик без выкупа',p=>{const d=SEASON.done[3];return !!d&&d.F&&d.F.restored&&!d.F.paid}],
+ ['crimp5','🔌','Золотые руки','Обожми 5 кабелей',p=>p.cnt.crimp>=5],
+ ['mg20','🧩','Мастер на все руки','Выиграй 20 мини-игр',p=>p.cnt.mg>=20],
+ ['tk5','📋','Заявка закрыта','Закрой 5 заявок коллег',p=>p.cnt.tk>=5],
+ ['tk25','🏅','Служба поддержки','Закрой 25 заявок коллег',p=>p.cnt.tk>=25],
+ ['learn4','📚','Вечный студент','Пройди по курсу в каждом навыке',p=>Object.values(p.sk).every(v=>v>=1)],
+ ['master','🎓','Профи','Прокачай любой навык до максимума',p=>Object.values(p.sk).some(v=>v>=3)],
+ ['gear3','🗄️','Своя серверная','Установи 3 единицы оборудования',p=>p.gear.length>=3],
+ ['gear5','🏢','Полный комплект','Установи всё оборудование',p=>p.gear.length>=5],
+ ['lvl5','⭐','Старший админ','Достигни 5 уровня',p=>p.lvl>=5],
+ ['st3','🔥','Три дня подряд','Заходи в игру 3 дня подряд',p=>p.streak>=3],
+ ['st7','📅','Неделя на посту','Заходи в игру 7 дней подряд',p=>p.streak>=7]];
+const DQ=[['mg','🧩','Выиграй 2 мини-игры',2,40000],['tk','📋','Закрой 2 заявки коллег',2,50000],['talk','💬','Поговори с коллегами 5 раз',5,30000]];
+function metaCheck(){const p=MT();let ch=false;
+  for(const a of ACH)if(!p.ach[a[0]]&&a[4](p)){p.ach[a[0]]=Date.now();ch=true;gainXP(40,50000);toast('🏆 Достижение: '+a[2]+' · +50 тыс сум','y');sGood()}
+  for(const q of DQ)if(!p.dq.got[q[0]]&&p.dq.c[q[0]]>=q[3]){p.dq.got[q[0]]=1;ch=true;gainXP(20,q[4]);toast('📅 Задание дня выполнено · +'+fmtM(q[4])+' сум','g');sGood()}
+  if(ch)saveSeason()}
+function dailyLogin(){const p=MT(),t=today();if(p.day===t)return;const y=new Date();y.setDate(y.getDate()-1);const yd=y.getFullYear()*10000+(y.getMonth()+1)*100+y.getDate();
+  p.streak=p.day===yd?p.streak+1:1;p.day=t;const m=30000*Math.min(p.streak,7);gainXP(20,m);saveSeason();metaCheck();
+  const el=document.createElement('div');el.style.cssText='position:fixed;inset:0;z-index:65;background:#000b;display:flex;align-items:center;justify-content:center;padding:24px';document.body.appendChild(el);
+  el.innerHTML=`<div style="max-width:320px;width:100%;background:#161b22;border:1px solid #f5c54266;border-radius:18px;padding:22px 20px;text-align:center"><div style="font-size:46px;line-height:1">🎁</div><h3 style="margin:10px 0 4px;font-size:20px">Награда за вход</h3><p style="margin:0 0 10px;color:#8b949e;font-size:14px">День ${p.streak} подряд</p><div style="display:flex;gap:4px;justify-content:center;margin-bottom:12px">${[1,2,3,4,5,6,7].map(d=>`<i style="width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-style:normal;font-size:12px;font-weight:800;background:${d<=p.streak?'#2ea043':'#21262d'};color:${d<=p.streak?'#fff':'#6e7681'}">${d}</i>`).join('')}</div><p style="font-size:22px;font-weight:800;color:#ffd166;margin:0 0 4px">+${fmtM(m)} сум</p><p style="font-size:12px;color:#8b949e;margin:0 0 14px">Заходи каждый день: награда растёт до 7-го дня</p><button class="btn" id="dlok">Забрать</button></div>`;
+  $('dlok').onclick=()=>{sGood();el.remove();if(SCR==='main')showMainMenu()}}
+function showAch(){SCR='about';const s=$('screen'),p=MT();s.classList.remove('menu');s.classList.add('season');
+  s.innerHTML=`<button class="backb" id="aback">← Назад</button><h2>Задания дня</h2>${DQ.map(q=>{const c=Math.min(p.dq.c[q[0]],q[3]),ok=p.dq.got[q[0]];return `<div class="sum" style="display:flex;align-items:center;gap:10px;margin:6px 0;${ok?'border-color:#2ea04388':''}"><span style="font-size:24px">${q[1]}</span><div style="flex:1;text-align:left"><b>${q[2]}</b><br><small style="color:#8b949e">${ok?'Выполнено':c+' из '+q[3]} · +${fmtM(q[4])} сум</small></div><span style="font-size:20px">${ok?'✅':''}</span></div>`}).join('')}
+  <p style="font-size:12px;color:#8b949e;margin:4px 0 14px">🔥 Дней подряд: ${p.streak}. Задания обновляются каждый день.</p>
+  <h2>Достижения ${Object.keys(p.ach).length}/${ACH.length}</h2>${ACH.map(a=>{const ok=p.ach[a[0]];return `<div class="sum" style="display:flex;align-items:center;gap:10px;margin:6px 0;opacity:${ok?1:.55};${ok?'border-color:#f5c54288':''}"><span style="font-size:24px;filter:${ok?'none':'grayscale(1)'}">${a[1]}</span><div style="flex:1;text-align:left"><b>${a[2]}</b><br><small style="color:#8b949e">${a[3]}</small></div><span style="font-size:20px">${ok?'🏆':'🔒'}</span></div>`}).join('')}`;
+  $('aback').onclick=()=>{sPop();showMainMenu()}}
+/* ---------- заявки коллег ---------- */
+const TICKETS=[
+ {b:'Принтер зажевал!',t:'Принтер опять жуёт бумагу, а мне срочно печатать. Посмотришь?',mg:['mash',{}],w:'Печатает! Рахмат, выручил.'},
+ {b:'Интернет еле ползёт…',t:'Интернет еле ползёт, страницы не открываются. Может, свитч перезапустить?',mg:['reboot',{need:1}],w:'Летает! Совсем другое дело.'},
+ {b:'Компьютер тормозит',t:'Компьютер думает по минуте над каждым кликом. Сделай что-нибудь.',mg:['taskmgr',{}],w:'О, ожил! Что это было? Ладно, не объясняй.'},
+ {b:'Странное письмо…',t:'Мне пришло письмо «от банка», просят срочно открыть вложение. Глянешь?',mg:['phish',{}],w:'Мошенники?! Хорошо, что письмо сначала увидел ты.'},
+ {b:'Сеть пропала!',t:'Стул переехал кабель под столом, и сеть пропала. Только не ругайся.',mg:['crimp',{}],w:'Есть сеть! С меня чай.'},
+ {b:'Забыл пароль…',t:'Опять не помню пароль от почты. Третий раз за месяц, да.',mg:null,w:'Менеджер паролей? Попробую. Рахмат!'}];
+function tkTick(){if(!G||!G.running||G.busy||EPN===3||!G.F.met_boss||G.F.ev.final)return;
+  if(G.tk){if(G.min>G.tk.till){const n=NPC[G.tk.id];G.tk=null;G.tkNext=G.min+(EPN===0?10:35);toast('⌛ '+CH[n.id].name+' не дождался помощи','r')}return}
+  if(G.tkNext==null)G.tkNext=G.min+(EPN===0?4:30);if(G.min<G.tkNext)return;
+  const c=['nigora','dilnoza','lola','timur','malika'].filter(id=>{const n=NPC[id];return n.loc==='office'&&!n.away&&!n.hold&&n.state==='sit'&&!EPS[EPN].nodeFor(id)&&id!==G.tkLast});if(!c.length)return;
+  const id=rnd(c),k=Math.floor(Math.random()*TICKETS.length);G.tk={id,k,till:G.min+(EPN===0?45:90)};G.tkLast=id;sayBubble(NPC[id],TICKETS[k].b);NPC[id].chatT=5;if(LOC!=='office')toast('📋 Новая заявка: '+CH[id].name,'b');beep(660,.08,'triangle',.04)}
+function tkNode(id){const T=TICKETS[G.tk.k],done=()=>{G.tk=null;G.tkNext=G.min+(EPN===0?8+Math.random()*10:40+Math.random()*35);G.tkDone=(G.tkDone||0)+1;gainXP(15,20000);bump('tk');toast('✅ Заявка закрыта · +20 тыс сум','g')},win={who:id,mood:'h',text:T.w,act:done,next:END};
+  return {who:id,mood:'s',text:T.t,choices:[T.mg?{t:'Сейчас починю',mg:[T.mg[0],T.mg[1],win]}:{t:'Сбросить пароль и поставить менеджер паролей',act:()=>addTime(5),go:()=>win},{t:'Чуть позже',go:END}]}}
+/* ---------- дежурство: свободная смена без сюжета ---------- */
+Object.assign(DLG,{fs_intro:{who:'narr',text:'Обычный рабочий день. Никаких тайн и детективов: только ты, офис и заявки коллег. Смена до 18:00.',next:END}});
+EPS[0]={intro:'fs_intro',
+ newGame(){return baseState({met_boss:1},['nigora','boss','dilnoza','lola','timur','malika','sardor','gulya','rustam','bobur','jasur','kamila','hamid','farrukh'])},
+ setup(){setAway('farrukh');if(prevF(2).rb){setAway('sardor');setHome('rustam',deskOf(5))}},
+ nodeFor:()=>null,markerFor:()=>'',hot:{},hotHidden:h=>!h.door&&!h.common,
+ objectives(){return [[G.tk?'📋 Заявка: '+CH[G.tk.id].name+' ждёт помощи':'Жди заявок от коллег',0],['Закрыто заявок: '+(G.tkDone||0),0],['Смена до 18:00',0]]},
+ events(){if(G.min>=1080&&!G.F.ev.final)startFinal()},
+ final(){if(G.busy){G.pendingFinal=true;return}G.F.ev.final=1;endingScreen()},
+ ending(){G.running=false;ov.style.display='none';const n=G.tkDone||0,s=$('screen');s.classList.remove('hidden');saveSeason();
+  s.innerHTML=`<div class="tag">СМЕНА ОКОНЧЕНА</div><h2 style="font-size:24px">${n>=8?'🏆 Герой офиса':n>=4?'👍 Хорошая смена':'☕ Тихий день'}</h2><p>Закрыто заявок: <b style="color:#ffd166">${n}</b></p><div class="sum">За каждую заявку ты получил опыт и премию. Заявки идут в задания дня и достижения.</div>${seasonButton('В меню ▶')}`;$('tosea').onclick=()=>showMainMenu()}};
 function showMainMenu(){SCR='main';PAUSED=false;$('pause').classList.add('hidden');const s=$('screen');s.classList.remove('hidden','season');s.classList.add('menu');
   const n=nextEp(),e=EPLIST.find(x=>x.n===n),started=Object.keys(SEASON.done).length>0;
   s.innerHTML=`<div class="tag">UPTIME STUDIO представляет</div><h1 class="mlogo">АПТАЙМ</h1><h2>Сезон 1: «Тень списания»</h2>
   <div class="mbtns"><button class="mb1" id="m_play"><b>${started?'Продолжить':'Начать игру'}</b><small>Эпизод ${n}: ${e?e.t:''}</small></button>
-  <button class="mb2" id="m_eps">📺 Эпизоды</button><button class="mb2" id="m_q">⚙️ Графика: ${qLabel()}</button><button class="mb2" id="m_snd">${musicOn?'🔊 Звук: включён':'🔇 Звук: выключен'}</button><button class="mb2" id="m_sup">💚 Поддержать</button><button class="mb2" id="m_about">ℹ️ Об игре</button></div>
+  <button class="mb2" id="m_eps">📺 Эпизоды</button><button class="mb2" id="m_q">⚙️ Графика: ${qLabel()}</button><button class="mb2" id="m_snd">🔊 Звук</button>${SEASON.done[1]?'<button class="mb2" id="m_fs">🛠️ Дежурство: смена без сюжета</button>':''}<button class="mb2" id="m_ach">🏆 Задания дня и достижения ${Object.keys(MT().ach).length}/${ACH.length}</button><button class="mb2" id="m_sup">💚 Поддержать</button><button class="mb2" id="m_about">ℹ️ Об игре</button></div>
   <p class="mver">версия ${window.UPTIME_V||'dev'}</p>`;
   $('m_play').onclick=()=>{sPop();s.classList.remove('menu');playEpisode(n)};$('m_eps').onclick=()=>{sPop();s.classList.remove('menu');showSeason()};
-  $('m_q').onclick=()=>{cycleQ();$('m_q').textContent='⚙️ Графика: '+qLabel()};$('m_snd').onclick=()=>{toggleSound();$('m_snd').textContent=musicOn?'🔊 Звук: включён':'🔇 Звук: выключен'};
-  $('m_about').onclick=()=>{sPop();showAbout()};$('m_sup').onclick=()=>{sPop();showSupport()}}
+  $('m_q').onclick=()=>{cycleQ();$('m_q').textContent='⚙️ Графика: '+qLabel()};$('m_snd').onclick=()=>{sPop();showSound()};$('m_ach').onclick=()=>{sPop();showAch()};if($('m_fs'))$('m_fs').onclick=()=>{sPop();s.classList.remove('menu');playEpisode(0)};
+  $('m_about').onclick=()=>{sPop();showAbout()};$('m_sup').onclick=()=>{sPop();showSupport()};metaCheck();dailyLogin()}
 /* ---- реклама: пока заглушка. Позже сюда подключается AdMob через window.UptimeNative.showRewarded ---- */
 const AD_CAP=6;function adLeft(){const p=PR(),d=new Date().toDateString();if(!p.ad||p.ad.d!==d)p.ad={d,n:0};return AD_CAP-p.ad.n}
 function showAd(onReward){if(adLeft()<=0){toast('На сегодня реклама закончилась. Приходи завтра','r');return}const el=$('adov'),was=PAUSED;PAUSED=true;el.classList.remove('hidden');let t=5;
@@ -2441,9 +2511,9 @@ function showAbout(){SCR='about';const s=$('screen');s.classList.remove('menu');
   s.innerHTML=`<button class="backb" id="aback">← Назад</button><h2>Об игре</h2><div class="sum">АПТАЙМ — сюжетная игра про сисадмина в ташкентском офисе. Каждое решение влияет на следующие эпизоды.<br><br>Разработка: Uptime Studio<br>Движок: three.js (MIT)<br><br>Новые эпизоды приходят обновлением сами.</div>`;
   $('aback').onclick=()=>{sPop();showMainMenu()}}
 function openPause(){if(!G||!G.running)return;PAUSED=true;const p=$('pause');p.classList.remove('hidden');
-  p.innerHTML=`<div class="pbox"><h3>Пауза</h3><button class="mb1" id="p_go"><b>▶ Продолжить</b></button><button class="mb2" id="p_jr">📓 Журнал</button><button class="mb2" id="p_q">⚙️ Графика: ${qLabel()}</button><button class="mb2" id="p_snd">${musicOn?'🔊 Звук: включён':'🔇 Звук: выключен'}</button><button class="mb2 red" id="p_exit">🚪 Выйти в меню</button><p class="pnote">При выходе прогресс текущего эпизода не сохранится</p></div>`;
+  p.innerHTML=`<div class="pbox"><h3>Пауза</h3><button class="mb1" id="p_go"><b>▶ Продолжить</b></button><button class="mb2" id="p_jr">📓 Журнал</button><button class="mb2" id="p_q">⚙️ Графика: ${qLabel()}</button><button class="mb2" id="p_snd">🔊 Звук</button><button class="mb2 red" id="p_exit">🚪 Выйти в меню</button><p class="pnote">При выходе прогресс текущего эпизода не сохранится</p></div>`;
   $('p_go').onclick=closePause;$('p_jr').onclick=()=>{closePause();if(!G.busy)openJournal()};$('p_q').onclick=()=>{cycleQ();$('p_q').textContent='⚙️ Графика: '+qLabel()};
-  $('p_snd').onclick=()=>{toggleSound();$('p_snd').textContent=musicOn?'🔊 Звук: включён':'🔇 Звук: выключен'};$('p_exit').onclick=exitToMenu}
+  $('p_snd').onclick=()=>{sPop();showSound()};$('p_exit').onclick=exitToMenu}
 function closePause(){PAUSED=false;$('pause').classList.add('hidden');lastT=performance.now()}
 function exitToMenu(){closePause();closePC();if(G){G.running=false;G.busy=false}if(D)closeDlg(true);$('dlg').classList.add('hidden');$('jr').classList.add('hidden');if(!$('mg').classList.contains('hidden')){if(mg.cleanup)mg.cleanup();mg.cleanup=null;$('mg').classList.add('hidden');$('mg').innerHTML=''}
   Object.values(NPC).forEach(n=>n.hold=false);setLoc('office');showMainMenu()}
