@@ -197,8 +197,14 @@ public class MainActivity extends Activity {
     }
 
     @Override public void onWindowFocusChanged(boolean hasFocus) { super.onWindowFocusChanged(hasFocus); if (hasFocus) hideBars(); }
-    @Override protected void onPause() { super.onPause(); if (web != null) web.onPause(); }
-    @Override protected void onResume() { super.onResume(); if (web != null) web.onResume(); }
+    @Override protected void onPause() {
+        super.onPause();
+        if (web != null) { web.evaluateJavascript("window.uptimePause&&uptimePause()", null); web.onPause(); web.pauseTimers(); }
+    }
+    @Override protected void onResume() {
+        super.onResume();
+        if (web != null) { web.resumeTimers(); web.onResume(); web.evaluateJavascript("window.uptimeResume&&uptimeResume()", null); }
+    }
     @Override public void onBackPressed() {
         if (web == null) { moveTaskToBack(true); return; }
         web.evaluateJavascript("(window.uptimeBack&&window.uptimeBack())?'1':'0'", v -> {
