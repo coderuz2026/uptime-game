@@ -391,6 +391,11 @@ button{font-family:inherit;cursor:pointer}
 .pprslot{position:absolute;left:8%;right:8%;top:10px;height:8px;border-radius:4px;background:#0d1117;z-index:2}
 .ppr{position:absolute;left:14%;right:14%;top:14px;height:8%;background:repeating-linear-gradient(#fff 0 9px,#e8edf2 9px 10px);border-radius:0 0 3px 3px;box-shadow:0 3px 6px #0006;transition:height .08s,transform .08s;transform-origin:top center}
 .ppr.out{transition:transform .5s ease-in,opacity .5s;transform:translateY(130px) rotate(8deg)!important;opacity:0}
+.bud{background:linear-gradient(180deg,#12301b,#0f2416);border:1px solid #1f6f3a;border-radius:14px;padding:10px 12px;margin-bottom:8px;font-size:14px;font-weight:700;color:#9be9a8}.bud b{color:#fff;font-size:16px}.bud small{display:block;font-size:11.5px;color:#7ee787aa;margin-top:2px;font-weight:600}
+.pcsec{font-size:11.5px;font-weight:800;color:#79c0ff;text-transform:uppercase;letter-spacing:.04em;margin:12px 2px 6px}
+.pcr.col{flex-direction:column;align-items:stretch;gap:7px}.orow{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.stg{display:grid;grid-template-columns:repeat(4,1fr);gap:4px}.stg i{font-style:normal;font-size:10px;font-weight:800;text-align:center;padding:4px 2px;border-radius:7px;background:#21262d;color:#6e7681}.stg i.ok{background:#12301b;color:#56d364}.stg i.now{background:#3b2f10;color:#ffd166}
+.obar{height:7px;border-radius:4px;background:#21262d;overflow:hidden}.obar i{display:block;height:100%;background:linear-gradient(90deg,#1f6feb,#58a6ff)}
 </style>
 </head>
 <body>
@@ -1457,11 +1462,11 @@ try{const o=JSON.parse(localStorage.getItem('uptime_save')||'null');if(o&&o.ep&&
 function saveSeason(){try{localStorage.setItem('uptime_season',JSON.stringify(SEASON))}catch(e){}}
 const prevF=n=>(SEASON.done[n]&&SEASON.done[n].F)||{};
 const prevRel=()=>{const r={};for(let i=1;i<EPN;i++)Object.assign(r,(SEASON.done[i]||{}).rel||{});return r};
-function finishEpisode(n,title,F,rel){const first=!SEASON.done[n]||!SEASON.done[n].paid;SEASON.done[n]={title,F,rel,t:Date.now(),paid:1};if(first)gainXP(150,500000);saveSeason()}
+function finishEpisode(n,title,F,rel){const first=!SEASON.done[n]||!SEASON.done[n].paid;SEASON.done[n]={title,F,rel,t:Date.now(),paid:1};if(first){PR().budget+=1500000;gainXP(150,500000);toast('Директор увеличил бюджет ИТ на 1,5 млн сум','y')}saveSeason()}
 /* dispatchers */
-function nodeFor(id){return EPS[EPN].nodeFor(id)}
-function markerFor(id){return EPS[EPN].markerFor(id)}
-function objectives(){const o=EPS[EPN].objectives();if(Object.values(PR().sk).every(v=>v===0)&&(EPN!==1||G.F.met_boss))o.unshift(['📚 Пройди первый курс за своим компьютером (серверная, слева внизу)',0]);return o}
+function nodeFor(id){const base=EPS[EPN].nodeFor(id);if(id==='boss'&&G.F.met_boss&&!G.F.ev.final&&PR().orders.some(o=>o.st==='wait'))return reqNode(base);return base}
+function markerFor(id){if(id==='boss'&&G.F.met_boss&&PR().orders.some(o=>o.st==='wait'))return 't';return EPS[EPN].markerFor(id)}
+function objectives(){const o=EPS[EPN].objectives();if(Object.values(PR().sk).every(v=>v===0)&&(EPN!==1||G.F.met_boss))o.unshift(['📚 Пройди первый курс за своим компьютером (серверная, слева внизу)',0]);PR().orders.forEach(r=>{const it=itemOf(r);o.push([r.st==='wait'?'📝 Согласовать у директора заявку: '+it.n:'📦 '+it.n+': '+stageOf(r)+', ещё '+fmtDur(r.eta-PR().clock),0])});return o}
 function checkEvents(){if(!G||G.busy||!G.running||G.F.ev.final)return;EPS[EPN].events()}
 function startFinal(){EPS[EPN].final()}
 function endingScreen(){EPS[EPN].ending();SCR='ending'}
@@ -1476,7 +1481,7 @@ function setAway(id){const n=NPC[id];n.away=true;n.loc='away';n.path=[];n.state=
 function setHome(id,h){const n=NPC[id];n.away=false;n.home=h;n.loc=h.loc;n.x=h.x;n.y=h.y;n.rot=h.rot||0;n.sy=h.sy||0;n.state=h.seat?'sit':'idle';n.curStand=h.seat?h.stand:null}
 function baseState(extraF,relKeys){const r={};relKeys.forEach(k=>r[k]=0);Object.assign(r,prevRel());relKeys.forEach(k=>{if(r[k]==null)r[k]=0});Object.keys(r).forEach(k=>{if(!relKeys.includes(k))delete r[k]});
   return {min:540,F:Object.assign({lunch:0,ev:{}},extraF),rel:r,clues:[],items:[],log:[],p:{x:96,y:268,path:[],walk:0,rot:Math.PI,vx:0,vy:0,dust:0},pending:null,running:true,busy:false,realT:0,visited:{office:1}}}
-function playEpisode(n){SCR='game';PAUSED=false;EPN=n;const s=$('screen');s.classList.add('hidden');startMusic();resetNPCs();G=EPS[n].newGame();EPS[n].setup&&EPS[n].setup();setLoc('office');ov.style.display='';setTimeout(()=>talk(EPS[n].intro),400)}
+function playEpisode(n){PR().clock+=1080;saveSeason();SCR='game';PAUSED=false;EPN=n;const s=$('screen');s.classList.add('hidden');startMusic();resetNPCs();G=EPS[n].newGame();EPS[n].setup&&EPS[n].setup();setLoc('office');ov.style.display='';setTimeout(()=>talk(EPS[n].intro),400)}
 function showSeason(){const s=$('screen');SCR='season';s.classList.remove('hidden');s.classList.add('season');
   const avail=n=>n===1||!!SEASON.done[n-1];
   s.innerHTML=`<button class="backb" id="sback">← Назад</button><div class="tag">UPTIME STUDIO представляет</div><h1>АПТАЙМ</h1><h2>Сезон 1: «Тень списания»</h2>
@@ -1758,7 +1763,7 @@ function openMG(kind,o,onWin,onLose){if(G)G.busy=true;mgEl.classList.remove('hid
   let T={crimp:['plug','Обжать кабель'],reboot:['power','Перезапуск свитча'],mash:['printer','Принтер зажевал'],phish:['mail','Письмо Лоле'],taskmgr:['monitor','Диспетчер задач'],tv:['tv','Телевизор охраны'],quiz:['book','Курс'],ipcfg:['server','Настройка адреса'],rules:['shield','Правила фаервола'],patch:['switch','Коммутация'],logs:['search','Журнал']}[kind];if(o&&o.title)T=[o.icon||T[0],o.title];T[0]=IC[T[0]]||T[0];
   mgEl.innerHTML=`<div class="mgbox" id="mgbox"><div class="mghead"><div class="ic">${T[0]}</div><div><b>Задание</b><span>${T[1]}</span></div></div><div id="mgbody"></div><div class="foot"><button class="small" id="later">↩ Отложить</button></div></div>`;
   const close=()=>{if(mg.cleanup)mg.cleanup();mg.cleanup=null;mgEl.classList.add('hidden');mgEl.innerHTML=''};
-  const win=()=>{close();sGood();{const pz=MGPAY[kind];if(pz&&!(o&&o.nopay)){PR().tasks++;gainXP(pz[0],pz[1])}}const n=NPC[lastNpc];if(n)puff(wx(n.x),2,wz(n.y),30,{c:['#ffd166','#fff','#7ee787','#f778ba'],sp:3,up:2.5,g:-6,life:1.2});onWin()};
+  const win=()=>{close();sGood();{const pz=MGPAY[kind];if(pz&&!(o&&o.nopay)){PR().tasks++;PR().budget+=40000;gainXP(Math.round(pz[0]*(1+.1*PR().small.filter(x=>x==='rj'||x==='tools').length)),pz[1])}}const n=NPC[lastNpc];if(n)puff(wx(n.x),2,wz(n.y),30,{c:['#ffd166','#fff','#7ee787','#f778ba'],sp:3,up:2.5,g:-6,life:1.2});onWin()};
   const lose=()=>{close();sBad();onLose?onLose():endBusy()};
   $('later').onclick=()=>{close();endBusy()};
   GAMES[kind]($('mgbody'),o,win,lose)}
@@ -1968,7 +1973,7 @@ function visuals(dt){
   if(cam.shake>0){cam.shake=Math.max(0,cam.shake-dt);camera.position.x+=(Math.random()-.5)*cam.shake;camera.position.y+=(Math.random()-.5)*cam.shake}
   camera.lookAt(cam.t);
 }
-let HUDC='',HUDG='';function hud(){const c=fmt(G.min);if(c!==HUDC){HUDC=c;$('clock').textContent=c}const o=objectives().find(x=>!x[1]),g=o?o[0]:'Все задачи выполнены!';if(g!==HUDG){HUDG=g;$('goaltx').textContent=g}}
+let HUDC='',HUDG='';function hud(){procTick();const c=fmt(G.min);if(c!==HUDC){HUDC=c;$('clock').textContent=c}const o=objectives().find(x=>!x[1]),g=o?o[0]:'Все задачи выполнены!';if(g!==HUDG){HUDG=g;$('goaltx').textContent=g}}
 let lastT=performance.now();
 let FR=0;
 function frame(now){requestAnimationFrame(frame);if(document.hidden)return;const dt=Math.min(.05,(now-lastT)/1000);const live=G&&G.running&&!PAUSED;
@@ -1993,10 +1998,25 @@ document.querySelectorAll('[data-ic]').forEach(e=>e.innerHTML=IC[e.dataset.ic]||
 /* ================= PROFILE · SKILLS · COURSES · SHOP · GEAR ================= */
 if(!SEASON.prof)SEASON.prof={xp:0,lvl:1,money:300000,sk:{net:0,sec:0,hw:0,sys:0},gear:[],owned:[],tasks:0};
 const PR=()=>SEASON.prof;
+{const p=SEASON.prof;if(p.budget==null)p.budget=1500000;if(!p.orders)p.orders=[];if(!p.small)p.small=[];if(p.clock==null)p.clock=0}
+const SMALL=[{id:'rj',n:'Коннекторы RJ45 и бухта кабеля',d:'+10% опыта за задачи',cost:60000,ship:180},{id:'label',n:'Маркировка кабелей и стяжки',d:'+0,2% к аптайму офиса',cost:40000,ship:180},{id:'tools',n:'Набор инструментов и тестер',d:'+10% опыта за задачи',cost:120000,ship:240},{id:'spare',n:'Запасные диски и блок питания',d:'+0,3% к аптайму офиса',cost:180000,ship:240}];
+const itemOf=r=>(r.kind==='gear'?GEAR:SMALL).find(x=>x.id===r.id);
+const fmtDur=m=>{m=Math.max(1,Math.round(m));return m>=1440?Math.floor(m/1440)+' д '+Math.floor(m%1440/60)+' ч':m>=60?Math.floor(m/60)+' ч '+(m%60)+' мин':m+' мин'};
+const stageOf=r=>r.st==='wait'?'ждёт согласования':PR().clock<r.t0+r.pay?'оплата в бухгалтерии':'доставка';
+function procTick(){const p=PR();if(G&&G.running){const d=G.min-(G._lm==null?G.min:G._lm);G._lm=G.min;if(d>0)p.clock+=d}
+  let ch=false;p.orders=p.orders.filter(r=>{if(r.st!=='ship'||p.clock<r.eta)return true;const it=itemOf(r);ch=true;if(r.kind==='gear'){p.owned.push(r.id);toast('Доставлено на склад: '+it.n+'. Установи в монтажной стойке','y')}else{p.small.push(r.id);toast('Доставлено: '+it.n+' ('+it.d+')','y')}sGood();return false});if(ch)saveSeason()}
+function shipOrder(r,it){const p=PR();p.budget-=it.cost;r.st='ship';r.t0=p.clock;r.pay=r.kind==='gear'?60:20;r.eta=r.t0+r.pay+it.ship;saveSeason()}
+function reqNode(base){const p=PR(),wait=p.orders.filter(o=>o.st==='wait'),other=()=>base?base:{who:'boss',mood:'n',text:rnd(gossipFor('boss')),next:END};
+  return {who:'boss',mood:'n',text:'Ну, что у тебя?',choices:wait.map(r=>{const it=itemOf(r);return {t:`Согласовать заявку: ${it.n} · ${fmtM(it.cost)} сум`,go:()=>({who:'boss',mood:'n',text:`${it.n} за ${fmtM(it.cost)}? Объясни, зачем это компании.`,choices:[
+      {t:it.why,go:()=>{if(p.budget<it.cost)return {who:'boss',mood:'a',text:`Звучит разумно. Но в бюджете ИТ осталось ${fmtM(p.budget)} сум. Покажи результат в работе, тогда добавлю.`,next:END};
+         if(it.cost>=900000&&p.lvl<2&&G.rel.boss<1)return {who:'boss',mood:'a',text:'Ты у нас без году неделя, а просишь почти миллион. Сначала покажи, что умеешь. Заявку пока придержу.',next:END};
+         shipOrder(r,it);logc('📝 Согласовал закупку: '+it.n);return {who:'boss',mood:'h',text:`Вот это понятно. Согласовано. Дильноза опа оплатит счёт, поставка ${fmtDur(it.ship)}. Но чтоб работало!`,act:()=>toast('Заявка согласована. Следи за доставкой на своём компьютере','g'),next:END}}},
+      {t:'Это современное enterprise-решение нового поколения',go:()=>({who:'boss',mood:'a',text:'Я ничего не понял. Приходи, когда сможешь объяснить по-человечески.',next:END})},
+      {t:'Я передумал, отзываю заявку',go:()=>{p.orders=p.orders.filter(x=>x!==r);saveSeason();return END}}]})}}).concat([{t:'По другому делу',go:other}])}}
 const SKN={net:'Сети',sec:'Безопасность',hw:'Железо',sys:'Системы'};
 const xpNeed=l=>100*l;
 const fmtM=n=>n>=1e6?(n/1e6).toFixed(1).replace('.0','').replace('.',',')+' млн':Math.round(n/1000)+' тыс';
-const upPct=()=>Math.min(99.99,95+PR().gear.length*.7+Object.values(PR().sk).reduce((a,b)=>a+b,0)*.12+Math.min(40,PR().tasks)*.03).toFixed(2).replace('.',',');
+const upPct=()=>Math.min(99.99,95+PR().gear.length*.7+Object.values(PR().sk).reduce((a,b)=>a+b,0)*.12+Math.min(40,PR().tasks)*.03+(PR().small.includes('spare')?.3:0)+(PR().small.includes('label')?.2:0)).toFixed(2).replace('.',',');
 function updProf(){const e=$('proftx');if(e)e.textContent=PR().lvl}
 function gainXP(x,m){const p=PR();p.xp+=x;p.money+=m||0;let up=false;while(p.xp>=xpNeed(p.lvl)){p.xp-=xpNeed(p.lvl);p.lvl++;up=true}
   toast(`+${x} опыта`+(m?` · +${fmtM(m)} сум`:''),'g');if(up){toast('Новый уровень: '+p.lvl+'! Открыты новые курсы','y');sGood()}saveSeason();updProf()}
@@ -2018,11 +2038,11 @@ const COURSES={
   {t:'Журналы и резервные копии',min:30,cost:150000,lvl:2,qs:[['Где искать, кто и когда печатал документ?',['В корзине','В BIOS','В журнале печати МФУ'],2],['Как проверить, что резервная копия рабочая?',['Пробно восстановить из неё','Посмотреть на размер файла','Поверить на слово'],0]]},
   {t:'Домены и права',min:45,cost:400000,lvl:4,qs:[['Принцип минимальных прав — это…',['Всем права администратора','Только доступ, нужный для работы','Никому ничего'],1],['Сотрудник уволился. Что делаем с учёткой?',['Оставляем на год','Отдаём новому сотруднику','Блокируем в тот же день'],2]]}]};
 const GEAR=[
- {id:'ups',n:'ИБП 3 кВА',d:'Серверы переживут отключение света',cost:450000,req:['hw',1],mg:['reboot',{need:1,title:'Запуск ИБП',icon:'power'}],col:'#3a4150'},
- {id:'ap',n:'Точка доступа Wi-Fi 6',d:'Гостевая сеть отдельно от рабочей',cost:600000,req:['net',1],mg:['tv',{title:'Настройка антенн',icon:'tv'}],col:'#e6edf3'},
- {id:'sw',n:'Управляемый свитч, 48 портов',d:'VLAN для отделов, сеть быстрее',cost:700000,req:['net',2],mg:['patch',{}],col:'#2ea043'},
- {id:'nas',n:'Сервер резервных копий',d:'Ночные копии 1С и документов',cost:900000,req:['sys',2],mg:['ipcfg',{}],col:'#1f6feb'},
- {id:'fw',n:'Межсетевой экран',d:'Фильтрует атаки из интернета',cost:1200000,req:['sec',2],mg:['rules',{}],col:'#da3633'}];
+ {id:'ups',ship:1440,why:'Если отключат свет, серверы и 1С не упадут и база не побьётся',n:'ИБП 3 кВА',d:'Серверы переживут отключение света',cost:450000,req:['hw',1],mg:['reboot',{need:1,title:'Запуск ИБП',icon:'power'}],col:'#3a4150'},
+ {id:'ap',ship:1440,why:'Гости будут в отдельной сети и не увидят наши документы',n:'Точка доступа Wi-Fi 6',d:'Гостевая сеть отдельно от рабочей',cost:600000,req:['net',1],mg:['tv',{title:'Настройка антенн',icon:'tv'}],col:'#e6edf3'},
+ {id:'sw',ship:1440,why:'Разделим отделы по сетям: вирус из одного не разойдётся по всем',n:'Управляемый свитч, 48 портов',d:'VLAN для отделов, сеть быстрее',cost:700000,req:['net',2],mg:['patch',{}],col:'#2ea043'},
+ {id:'nas',ship:2880,why:'Каждую ночь будет копия 1С и документов. Сломается сервер, восстановим за час',n:'Сервер резервных копий',d:'Ночные копии 1С и документов',cost:900000,req:['sys',2],mg:['ipcfg',{}],col:'#1f6feb'},
+ {id:'fw',ship:2880,why:'Он не пустит взломщиков из интернета к нашим серверам',n:'Межсетевой экран',d:'Фильтрует атаки из интернета',cost:1200000,req:['sec',2],mg:['rules',{}],col:'#da3633'}];
 /* 3D: admin desk + mount rack in the server room */
 const PCPOS={x:42,y:444},PCSTAND={x:42,y:434},MOUNT={x:285,y:392};
 const gearMesh={};
@@ -2038,24 +2058,29 @@ let AT_PC=false,PCTAB='edu',PCREMOTE=false;
 function openPC(remote){PCREMOTE=!!remote;if(G&&G.running){G.busy=true;if(!remote){AT_PC=true;G.p.path=[];G.p.x=PCPOS.x;G.p.y=PCPOS.y;G.p.rot=0}}if(remote)PCTAB='sk';else if(PCTAB==='sk')PCTAB='edu';renderPC()}
 function closePC(){$('pc').classList.add('hidden');$('pc').innerHTML='';if(AT_PC)leavePC();if(G&&G.running)G.busy=false}
 function leavePC(){AT_PC=false;if(G){G.p.x=PCSTAND.x;G.p.y=PCSTAND.y}}
-function renderPC(){const p=PR(),el=$('pc');el.classList.remove('hidden');const tabs=PCREMOTE?[['sk','Навыки']]:[['edu','Курсы'],['shop','Магазин'],['sk','Навыки']];
+function renderPC(){const p=PR(),el=$('pc');el.classList.remove('hidden');const tabs=PCREMOTE?[['sk','Навыки']]:[['edu','Курсы'],['shop','Закупки'],['sk','Навыки']];
   let h=`<div class="pcb"><div class="pch"><b>${PCREMOTE?'Мой профиль':'Рабочее место админа'}</b><button class="pcx" id="pcx">✕</button></div>
-  <div class="pcs"><span>⭐ Уровень <b>${p.lvl}</b></span><span>💰 <b>${fmtM(p.money)}</b> сум</span><span>📈 Аптайм <b>${upPct()}%</b></span></div><div class="xpb"><i style="width:${p.xp/xpNeed(p.lvl)*100}%"></i></div><small class="xpt">${p.xp} / ${xpNeed(p.lvl)} опыта до уровня ${p.lvl+1}</small>
+  <div class="pcs"><span>⭐ Уровень <b>${p.lvl}</b></span><span>💰 Зарплата <b>${fmtM(p.money)}</b></span><span>📈 Аптайм <b>${upPct()}%</b></span></div><div class="xpb"><i style="width:${p.xp/xpNeed(p.lvl)*100}%"></i></div><small class="xpt">${p.xp} / ${xpNeed(p.lvl)} опыта до уровня ${p.lvl+1}</small>
   <div class="pct">${tabs.map(([k,t])=>`<button class="${PCTAB===k?'on':''}" data-tab="${k}">${t}</button>`).join('')}</div>`;
   if(PCTAB==='edu')h+=Object.keys(COURSES).map(k=>{const lv=p.sk[k],c=COURSES[k][lv];let btn;
     if(!c)btn='<span class="pcok">Все курсы пройдены</span>';else if(p.lvl<c.lvl)btn=`<span class="pclk">Нужен уровень ${c.lvl}</span>`;else if(p.money<c.cost)btn=`<span class="pclk">Нужно ${fmtM(c.cost)} сум</span>`;else btn=`<button class="pcbtn" data-edu="${k}">Учиться</button>`;
-    return `<div class="pcr"><div><b>${SKN[k]} <em>${'●'.repeat(lv)}${'○'.repeat(3-lv)}</em></b><small>${c?`Курс «${c.t}» · ${c.min} мин · ${c.cost?fmtM(c.cost)+' сум':'бесплатно'}`:'Максимальный уровень'}</small></div>${btn}</div>`}).join('')+'<p class="pcn">Курс заканчивается коротким тестом. Навыки открывают новые задания, решения в разговорах и установку оборудования.</p>';
-  if(PCTAB==='shop')h+=GEAR.map(g=>{const inst=p.gear.includes(g.id),own=p.owned.includes(g.id);
-    return `<div class="pcr"><div><b>${g.n}</b><small>${g.d} · для установки: ${skTxt(g.req)}</small></div>${inst?'<span class="pcok">Установлено</span>':own?'<span class="pclk">Куплено. Установи в стойке</span>':p.money>=g.cost?`<button class="pcbtn y" data-buy="${g.id}">${fmtM(g.cost)}</button>`:`<span class="pclk">${fmtM(g.cost)} сум</span>`}</div>`}).join('')+'<p class="pcn">Купленное оборудование ставится в оранжевую монтажную стойку справа в серверной.</p>';
+    return `<div class="pcr"><div><b>${SKN[k]} <em>${'●'.repeat(lv)}${'○'.repeat(3-lv)}</em></b><small>${c?`Курс «${c.t}» · ${c.min} мин · ${c.cost?fmtM(c.cost)+' сум':'бесплатно'}`:'Максимальный уровень'}</small></div>${btn}</div>`}).join('')+'<p class="pcn">Курсы ты оплачиваешь из своей зарплаты. Курс заканчивается коротким тестом. Навыки открывают новые задания, решения в разговорах и установку оборудования.</p>';
+  if(PCTAB==='shop'){const ord=id=>p.orders.find(o=>o.id===id);h+=`<div class="bud">Бюджет ИТ: <b>${fmtM(p.budget)} сум</b><small>Деньги компании. Крупные покупки согласует директор.</small></div>`;
+    if(p.orders.length)h+='<div class="pcsec">Мои заявки</div>'+p.orders.map(r=>{const it=itemOf(r),w=r.st==='wait',pr=w?0:clamp((p.clock-r.t0)/(r.eta-r.t0),0,1),pp=w?0:r.pay/(r.eta-r.t0);
+      return `<div class="pcr col"><div class="orow"><b>${it.n}</b><span class="${w?'pclk':'pcok'}">${w?'Ждёт директора':'ещё '+fmtDur(r.eta-p.clock)}</span></div><div class="stg"><i class="${w?'now':'ok'}">Согласование</i><i class="${w?'':pr<pp?'now':'ok'}">Оплата</i><i class="${!w&&pr>=pp?'now':''}">Доставка</i><i>Склад</i></div><div class="obar"><i style="width:${(w?4:8+pr*92)}%"></i></div></div>`}).join('');
+    h+='<div class="pcsec">Оборудование · поставка 1–2 дня</div>'+GEAR.map(g=>{const inst=p.gear.includes(g.id),own=p.owned.includes(g.id);
+      return `<div class="pcr"><div><b>${g.n}</b><small>${g.d} · ${fmtM(g.cost)} сум · ${fmtDur(g.ship)} · установка: ${skTxt(g.req)}</small></div>${inst?'<span class="pcok">Установлено</span>':own?'<span class="pclk">На складе. Установи в стойке</span>':ord(g.id)?'<span class="pclk">Заявка подана</span>':`<button class="pcbtn y" data-req="${g.id}">Заявка</button>`}</div>`}).join('');
+    h+='<div class="pcsec">Расходники · в пределах лимита админа, 3–4 часа</div>'+SMALL.map(g=>`<div class="pcr"><div><b>${g.n}</b><small>${g.d} · ${fmtM(g.cost)} сум · ${fmtDur(g.ship)}</small></div>${p.small.includes(g.id)?'<span class="pcok">Получено</span>':ord(g.id)?'<span class="pclk">Заказано</span>':p.budget>=g.cost?`<button class="pcbtn" data-ord="${g.id}">Заказать</button>`:'<span class="pclk">Нет бюджета</span>'}</div>`).join('')+'<p class="pcn">Время доставки идёт вместе с игровым временем. Ночь между эпизодами тоже считается.</p>'}
   if(PCTAB==='sk')h+=Object.keys(SKN).map(k=>`<div class="pcr"><div><b>${SKN[k]}</b><small>${['Новичок','Базовый','Уверенный','Эксперт'][p.sk[k]]}</small></div><span class="pips">${'●'.repeat(p.sk[k])}${'○'.repeat(3-p.sk[k])}</span></div>`).join('')+
     `<div class="pcr"><div><b>Оборудование</b><small>${p.gear.length?p.gear.map(id=>GEAR.find(g=>g.id===id).n).join(', '):'Пока ничего не установлено'}</small></div><span class="pips">${p.gear.length}/${GEAR.length}</span></div><div class="pcr"><div><b>Решено задач</b></div><span class="pips">${p.tasks}</span></div>`+(PCREMOTE?'<p class="pcn">Курсы и магазин открываются за твоим компьютером: зелёный стул в серверной, слева внизу.</p>':'');
   el.innerHTML=h+'</div>';$('pcx').onclick=()=>{sPop();closePC()};
   el.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>{PCTAB=b.dataset.tab;sPop();renderPC()});
-  el.querySelectorAll('[data-buy]').forEach(b=>b.onclick=()=>{const g=GEAR.find(x=>x.id===b.dataset.buy);if(p.money<g.cost)return;p.money-=g.cost;p.owned.push(g.id);saveSeason();sGood();toast('Куплено: '+g.n+'. Установи в монтажной стойке','g');renderPC()});
+  el.querySelectorAll('[data-req]').forEach(b=>b.onclick=()=>{p.orders.push({id:b.dataset.req,kind:'gear',st:'wait'});saveSeason();sPop();toast('Заявка создана. Согласуй её у директора','b');renderPC()});
+  el.querySelectorAll('[data-ord]').forEach(b=>b.onclick=()=>{const it=SMALL.find(x=>x.id===b.dataset.ord);if(p.budget<it.cost)return;const r={id:it.id,kind:'small',st:'ship'};p.orders.push(r);shipOrder(r,it);sGood();toast('Заказано: '+it.n+'. Доставка '+fmtDur(it.ship),'g');renderPC()});
   el.querySelectorAll('[data-edu]').forEach(b=>b.onclick=()=>{const k=b.dataset.edu,c=COURSES[k][p.sk[k]];el.classList.add('hidden');lastNpc=null;
     openMG('quiz',{title:'Курс «'+c.t+'»',icon:'book',qs:c.qs,nopay:1},()=>{p.sk[k]++;p.money-=c.cost;if(G&&G.running)addTime(c.min);gainXP(30*p.sk[k],0);toast(`Навык «${SKN[k]}» теперь ${p.sk[k]}`,'y');renderPC()})})}
 function openMount(){const p=PR(),list=GEAR.filter(g=>p.owned.includes(g.id)&&!p.gear.includes(g.id));
-  if(!list.length){talk({who:'narr',text:p.gear.length>=GEAR.length?'Монтажная стойка заполнена. Красота.':'Монтажная стойка для нового оборудования. Купи его в магазине за своим компьютером (слева в серверной).',next:END});return}
+  if(!list.length){talk({who:'narr',text:p.gear.length>=GEAR.length?'Монтажная стойка заполнена. Красота.':'Монтажная стойка для нового оборудования. Подай заявку за своим компьютером (слева в серверной), согласуй у директора и дождись доставки.',next:END});return}
   const node={who:'narr',text:'Монтажная стойка. Что устанавливаем?',choices:list.map(g=>({t:'Установить: '+g.n,sk:g.req,go:()=>{setTimeout(()=>{lastNpc=null;openMG(g.mg[0],Object.assign({nopay:1},g.mg[1]),()=>{p.gear.push(g.id);p.tasks++;gearMesh[g.id].visible=true;puff(wx(MOUNT.x),1.4,wz(MOUNT.y)+.5,40,{c:['#ffd166','#fff','#7ee787'],sp:3,up:2.5,g:-6,life:1.2});gainXP(80,0);toast(g.n+' работает! Аптайм офиса '+upPct()+'%','y');endBusy()})},50);return END}})).concat([{t:'Не сейчас',go:END}])};talk(node)}
 $('prof').onclick=()=>{if(!$('pc').classList.contains('hidden')){closePC();return}if(G&&G.running&&G.busy)return;sPop();openPC(true)};updProf();
 /* new minigames */
