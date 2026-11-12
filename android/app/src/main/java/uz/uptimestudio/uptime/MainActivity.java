@@ -1,4 +1,4 @@
-package uz.defactum.uptime;
+package uz.uptimestudio.uptime;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -179,7 +179,7 @@ public class MainActivity extends Activity {
         try {
             JSONObject v = new JSONObject(new String(get(PAGES + "version.json?t=" + System.currentTimeMillis(), 4000, null), "UTF-8"));
             int webV = v.optInt("web", 0), apkV = v.optInt("apk", 0);
-            if (apkV > BuildConfig.VERSION_CODE) {
+            if (apkV > BuildConfig.VERSION_CODE && !BuildConfig.PLAY) { // в сборке для Google Play приложение обновляет только сам магазин
                 runOnUiThread(() -> new AlertDialog.Builder(this)
                         .setTitle("Новая версия АПТАЙМ")
                         .setMessage("Вышло обновление приложения. Скачать и установить?")

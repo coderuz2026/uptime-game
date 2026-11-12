@@ -5,5 +5,6 @@
 - Новый APK нужен только при изменениях в `android/`. Для выпуска APK увеличь число в `android/version.txt` и запушь: workflow «Сборка APK» соберёт и выложит релиз `v1.0.N` с `uptime.apk`.
 - Номер версии игры = число коммитов (`tools/version.py`), не трогать вручную.
 - Прогресс игроков хранится в localStorage (`uptime_season`) на origin `appassets.androidplatform.net` в приложении. Не менять формат без миграции.
+- Пакет приложения `uz.uptimestudio.uptime` (после публикации в Google Play не менять). Для Play собирается `uptime.aab` (флаг `-Pplay=true` отключает предложение скачать APK). Материалы магазина лежат в `store/`.
 - Ключ подписи: `android/keystore/` (временный, перед Google Play заменить и убрать из репозитория).
 - Коммиты на русском, коротко.

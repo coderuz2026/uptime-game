@@ -19,7 +19,7 @@ jobs:
           java-version: '17'
       - uses: gradle/actions/setup-gradle@v4
         with:
-          gradle-version: '8.9'
+          gradle-version: '8.13'
       - name: Встроить игру в APK
         run: |
           python3 tools/version.py
@@ -39,11 +39,15 @@ jobs:
           VC=$(cat android/version.txt)
           gradle -p android assembleRelease -Pvc=$VC --no-daemon
           cp android/app/build/outputs/apk/release/app-release.apk uptime.apk
+          gradle -p android bundleRelease -Pvc=$VC -Pplay=true --no-daemon
+          cp android/app/build/outputs/bundle/release/app-release.aab uptime.aab
           echo "VC=$VC" >> $GITHUB_ENV
       - uses: softprops/action-gh-release@v2
         with:
           tag_name: v1.0.${{ env.VC }}
           name: АПТАЙМ 1.0.${{ env.VC }}
-          body: Скачай uptime.apk и установи. Дальше игра обновляется сама.
-          files: uptime.apk
+          body: Скачай uptime.apk и установи. Дальше игра обновляется сама. Файл uptime.aab нужен только для загрузки в Google Play.
+          files: |
+            uptime.apk
+            uptime.aab
           make_latest: true

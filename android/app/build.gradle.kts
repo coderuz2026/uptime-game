@@ -4,14 +4,15 @@ val vc = (project.findProperty("vc") as String?)?.toInt() ?: 1
 val ksPass: String? = System.getenv("KS_PASS")
 
 android {
-    namespace = "uz.defactum.uptime"
-    compileSdk = 34
+    namespace = "uz.uptimestudio.uptime"
+    compileSdk = 36
     defaultConfig {
-        applicationId = "uz.defactum.uptime"
+        applicationId = "uz.uptimestudio.uptime"
         minSdk = 24
-        targetSdk = 34
+        targetSdk = 36
         versionCode = vc
         versionName = "1.0.$vc"
+        buildConfigField("boolean", "PLAY", (project.findProperty("play") == "true").toString())
     }
     signingConfigs {
         create("release") {
