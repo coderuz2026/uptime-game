@@ -1631,7 +1631,7 @@ function gossipFor(id){const g=EPS[EPN].gossip&&EPS[EPN].gossip[id];return g||GO
 function resetNPCs(){Object.values(NPC).forEach(n=>{if(!n.home0)n.home0=n.home;const h=n.home=n.home0;n.loc=h.loc;n.x=h.x;n.y=h.y;n.rot=h.rot||0;n.sy=h.sy||0;n.state=h.seat?'sit':'idle';n.path=[];n.hold=false;n.away=false;n.conv=null;n.lunchGo=false;n.after=null;n.timer=5+Math.random()*20;n.curStand=h.seat?h.stand:null;if(n.chat){n.chat.remove();n.chat=null}});if(NPC.lim)setAway('lim')}
 function setAway(id){const n=NPC[id];n.away=true;n.loc='away';n.path=[];n.state='idle'}
 function setHome(id,h){const n=NPC[id];n.away=false;n.home=h;n.loc=h.loc;n.x=h.x;n.y=h.y;n.rot=h.rot||0;n.sy=h.sy||0;n.state=h.seat?'sit':'idle';n.curStand=h.seat?h.stand:null}
-function baseState(extraF,relKeys){const r={};relKeys.forEach(k=>r[k]=0);Object.assign(r,prevRel());relKeys.forEach(k=>{if(r[k]==null)r[k]=0});Object.keys(r).forEach(k=>{if(!relKeys.includes(k))delete r[k]});
+function baseState(extraF,relKeys){const r={};relKeys.forEach(k=>r[k]=0);Object.assign(r,prevRel());{const rx=PR().relx||{};Object.keys(rx).forEach(k=>{if(r[k]!=null)r[k]=Math.min(3,r[k]+rx[k])})}relKeys.forEach(k=>{if(r[k]==null)r[k]=0});Object.keys(r).forEach(k=>{if(!relKeys.includes(k))delete r[k]});
   return {min:540,F:Object.assign({lunch:0,ev:{}},extraF),rel:r,clues:[],items:[],log:[],p:{x:96,y:268,path:[],walk:0,rot:Math.PI,vx:0,vy:0,dust:0},pending:null,running:true,busy:false,realT:0,visited:{office:1}}}
 /* ================= СОХРАНЕНИЕ ПОСРЕДИ ЭПИЗОДА ================= */
 let RUNT=0;
@@ -1652,7 +1652,7 @@ function showSeason(){const s=$('screen');SCR='season';s.classList.remove('hidde
   <p style="font-size:11px;color:#6e7681;margin-top:10px">🎧 лучше со звуком</p>`;
   $('sback').onclick=()=>{sPop();showMainMenu()};
   s.querySelectorAll('.epc').forEach(b=>b.onclick=()=>{const n=+b.dataset.n;if(!avail(n))return;if(n>=3&&!(SEASON.unl||{})[n]){showAd(()=>{SEASON.unl=SEASON.unl||{};SEASON.unl[n]=1;saveSeason();s.classList.remove('season');playEpisode(n)});return}sPop();s.classList.remove('season');playEpisode(n)})}
-function seasonButton(label){return `<button class="btn" id="tosea">${label||'К списку эпизодов ▶'}</button>`}
+function seasonButton(label){return `<button class="btn" id="tosea">${myCar()?'🚗':'🚌'} Рабочий день окончен. Домой ▶</button>`}
 
 /* ================= EPISODE 1 wrapper ================= */
 EPS[1]={intro:'intro',newGame:()=>newGame(),setup(){setAway('farrukh')},nodeFor:id=>ep1NodeFor(id),markerFor:id=>ep1MarkerFor(id),objectives:()=>ep1Objectives(),events:()=>ep1Events(),final:()=>ep1Final(),ending:()=>ep1Ending(),ready:()=>ep1Ready(),
@@ -1874,7 +1874,7 @@ EPS[2]={intro:'e2_intro',
   s.innerHTML=`<div class="tag">КОНЕЦ ЭПИЗОДА 2</div><h2 style="font-size:24px">${title}</h2><p>${desc}</p>
   <div class="sum"><b style="color:#79c0ff">Твои решения:</b><br>${G.log.map(l=>'• '+l).join('<br>')||'• Ты ничего особо не решал 😅'}</div>
   <div class="sum"><b style="color:#79c0ff">Отношения:</b><br>${Object.keys(G.rel).filter(id=>G.rel[id]!==0).map(id=>`${CH[id].name}: ${G.rel[id]>0?'💚'.repeat(G.rel[id]):'💔'.repeat(-G.rel[id])}`).join('<br>')||'Нейтрально со всеми'}</div>
-  <p style="color:#ffd166">🔍 Улик найдено: ${G.clues.length} · против Фарруха: ${n}</p><p style="font-size:12px">Продолжение: «Эпизод 3. Шифровальщик» 💀</p>${seasonButton()}`;$('tosea').onclick=()=>showSeason()}};
+  <p style="color:#ffd166">🔍 Улик найдено: ${G.clues.length} · против Фарруха: ${n}</p><p style="font-size:12px">Продолжение: «Эпизод 3. Шифровальщик» 💀</p>${seasonButton()}`;$('tosea').onclick=()=>showEvening(()=>showSeason())}};
 function e2Outro(){const f=F(),n=evF(),seq=[];
   if(f.accuse==='far'){
     seq.push({who:'farrukh',mood:'a',text:'Я? Я был в Дубае! Бахтиёр, вы что, поверите новенькому?'});
@@ -2096,7 +2096,7 @@ EPS[3]={intro:'e3_intro',
   s.innerHTML=`<div class="tag">КОНЕЦ ЭПИЗОДА 3</div><h2 style="font-size:24px">${title}</h2><p>${desc}</p>
   <div class="sum"><b style="color:#79c0ff">Твои решения:</b><br>${G.log.map(l=>'• '+l).join('<br>')||'• Ты ничего особо не решал 😅'}</div>
   <div class="sum"><b style="color:#79c0ff">Отношения:</b><br>${Object.keys(G.rel).filter(id=>G.rel[id]!==0).map(id=>`${CH[id].name}: ${G.rel[id]>0?'💚'.repeat(G.rel[id]):'💔'.repeat(-G.rel[id])}`).join('<br>')||'Нейтрально со всеми'}</div>
-  <p style="color:#ffd166">🔍 Улик найдено: ${G.clues.length} · про взлом: ${n}</p><p style="font-size:12px">Продолжение: «Эпизод 4. Аудит» 🧳</p>${seasonButton()}`;$('tosea').onclick=()=>showSeason()}};
+  <p style="color:#ffd166">🔍 Улик найдено: ${G.clues.length} · про взлом: ${n}</p><p style="font-size:12px">Продолжение: «Эпизод 4. Аудит» 🧳</p>${seasonButton()}`;$('tosea').onclick=()=>showEvening(()=>showSeason(),true)}};
 
 /* ================= ЭПИЗОД 4: АУДИТ ================= */
 Object.assign(CLUES,{
@@ -2296,7 +2296,7 @@ EPS[4]={intro:'e4_intro',
   s.innerHTML=`<div class="tag">КОНЕЦ ЭПИЗОДА 4</div><h2 style="font-size:24px">${title}</h2><p>${desc}</p>
   <div class="sum"><b style="color:#79c0ff">Твои решения:</b><br>${G.log.map(l=>'• '+l).join('<br>')||'• Ты ничего особо не решал 😅'}</div>
   <div class="sum"><b style="color:#79c0ff">Отношения:</b><br>${Object.keys(G.rel).filter(id=>G.rel[id]!==0).map(id=>`${CH[id].name}: ${G.rel[id]>0?'💚'.repeat(G.rel[id]):'💔'.repeat(-G.rel[id])}`).join('<br>')||'Нейтрально со всеми'}</div>
-  <p style="color:#ffd166">📋 Оценка аудита: ${sc} из 8</p><p style="font-size:12px">Продолжение: «Эпизод 5. Свет погас» 🌡️</p>${seasonButton()}`;$('tosea').onclick=()=>showSeason()}};
+  <p style="color:#ffd166">📋 Оценка аудита: ${sc} из 8</p><p style="font-size:12px">Продолжение: «Эпизод 5. Свет погас» 🌡️</p>${seasonButton()}`;$('tosea').onclick=()=>showEvening(()=>showSeason())}};
 
 /* ---------- dialogue engine ---------- */
 const dlgEl=$('dlg');let D=null;
@@ -2449,7 +2449,7 @@ function ep1Ending(){G.running=false;ov.style.display='none';const f=F(),q=G.q;
   <div class="sum"><b style="color:#79c0ff">Твои решения:</b><br>${G.log.map(l=>'• '+l).join('<br>')||'• Ты ничего особо не решал 😅'}</div>
   <div class="sum"><b style="color:#79c0ff">Отношения:</b><br>${Object.keys(G.rel).filter(id=>G.rel[id]!==0).map(id=>`${CH[id].name}: ${G.rel[id]>0?'💚'.repeat(G.rel[id]):'💔'.repeat(-G.rel[id])}`).join('<br>')||'Нейтрально со всеми'}</div>
   <p style="color:#ffd166">🔍 Улик найдено: ${G.clues.length} / ${Object.keys(CLUES).length} · 🗺️ Локаций: ${Object.keys(G.visited).length} / 4</p><p style="font-size:12px">Дальше: «Эпизод 2. Кто подписал списание?» 👀</p>
-  ${seasonButton('Сохранить и продолжить ▶')}`;finishEpisode(1,title,{res:f.res,res2:f.res2,bribe:f.bribe,gul:f.gul,bobTV:f.bobTV,tim:f.tim,rogue:f.rogue,q},G.rel);$('tosea').onclick=()=>showSeason()}
+  ${seasonButton('Сохранить и продолжить ▶')}`;finishEpisode(1,title,{res:f.res,res2:f.res2,bribe:f.bribe,gul:f.gul,bobTV:f.bobTV,tim:f.tim,rogue:f.rogue,q},G.rel);$('tosea').onclick=()=>showEvening(()=>showSeason())}
 
 /* ---------- input ---------- */
 const ray=new THREE.Raycaster(),floorP=new THREE.Plane(new THREE.Vector3(0,1,0),0),hit=new THREE.Vector3();
@@ -2796,6 +2796,8 @@ const ACH=[
  ['tk5','📋','Заявка закрыта','Закрой 5 заявок коллег',p=>p.cnt.tk>=5],
  ['tk25','🏅','Служба поддержки','Закрой 25 заявок коллег',p=>p.cnt.tk>=25],
  ['lunch6','🍲','Свой человек','Пообедай в чайхане с каждым из шести коллег',p=>p.lunch&&Object.keys(p.lunch).length>=6],
+ ['car','🚗','На своих колёсах','Купи машину',p=>p.mk&&(p.mk.own.includes('car1')||p.mk.own.includes('car2'))],
+ ['out3','🪩','Душа компании','Трижды сходи куда-нибудь с коллегами на выходных',p=>p.out>=3],
  ['learn4','📚','Вечный студент','Пройди по курсу в каждом навыке',p=>Object.values(p.sk).every(v=>v>=1)],
  ['master','🎓','Профи','Прокачай любой навык до максимума',p=>Object.values(p.sk).some(v=>v>=3)],
  ['gear3','🗄️','Своя серверная','Установи 3 единицы оборудования',p=>p.gear.length>=3],
@@ -2837,10 +2839,12 @@ const MKT=[
  {id:'book2',cat:'use',ic:'📗',n:'Книга «Linux за 21 день»',d:'Сразу +140 опыта',cost:220000,ship:240,xp:140},
  {id:'cake',cat:'food',ic:'🎂',n:'Торт на весь офис',d:'+1 к отношениям со всеми коллегами. Раз за эпизод',cost:150000,ship:60,rep:1},
  {id:'samsa',cat:'food',ic:'🥟',n:'Самса с доставкой, 10 штук',d:'Горячая. Половину съедят коллеги',cost:60000,ship:45,rep:1},
+ {id:'car1',cat:'auto',ic:'🚗',n:'Малолитражка, б/у, 2012 год',d:'Домой на своей машине вместо автобуса. Красная, с характером',cost:4500000,ship:60},
+ {id:'car2',cat:'auto',ic:'🚙',n:'Новый белый седан',d:'Кондиционер, тишина и запах нового салона',cost:18000000,ship:120},
  {id:'tank',cat:'fun',ic:'🚜',n:'Танк Т-72, б/у, самовывоз',d:'На маркете есть всё',cost:9990000000,ship:9999},
  {id:'dream',cat:'fun',ic:'🖥️',n:'Сервер мечты, 2 ТБ оперативной памяти',d:'Директор бы не согласовал',cost:890000000,ship:9999},
  {id:'island',cat:'fun',ic:'🏝️',n:'Остров без пользователей',d:'Никаких заявок. Никогда',cost:75000000000,ship:9999}];
-const MKCAT=[['all','Всё'],['wear','Одежда'],['desk','Для стола'],['use','Полезное'],['food','Еда и подарки'],['fun','Разное']];
+const MKCAT=[['all','Всё'],['wear','Одежда'],['desk','Для стола'],['use','Полезное'],['food','Еда и подарки'],['auto','Авто'],['fun','Разное']];
 function MKS(){const p=PR();if(!p.mk)p.mk={own:[],ord:[],shirt:null,hat:null};return p.mk}
 const mkOwn=id=>MKS().own.includes(id);
 let PHTAB='shop',PHCAT='all';
@@ -2869,6 +2873,33 @@ function renderPhone(){const p=PR(),m=MKS(),el=$('ph'),ob=el.querySelector('.pcb
   $('phx').onclick=()=>{sPop();closePhone()};el.querySelectorAll('[data-t]').forEach(b=>b.onclick=()=>{sPop();PHTAB=b.dataset.t;renderPhone()});el.querySelectorAll('[data-c]').forEach(b=>b.onclick=()=>{sPop();PHCAT=b.dataset.c;renderPhone()});
   el.querySelectorAll('[data-buy]').forEach(b=>b.onclick=()=>{const it=MKT.find(x=>x.id===b.dataset.buy);if(!it||p.money<it.cost)return;p.money-=it.cost;m.ord.push({id:it.id,eta:p.clock+it.ship});saveSeason();sGood();toast('🛒 Заказано: '+it.n+' · привезут через '+fmtDur(it.ship),'g');renderPhone()});
   el.querySelectorAll('[data-wear]').forEach(b=>b.onclick=()=>{const [k,id]=b.dataset.wear.split(':');m[k]=id||null;dressAdmin();saveSeason();sPop();renderPhone()})}
+/* ================= ПОСЛЕ РАБОТЫ: ДОРОГА ДОМОЙ, ВЕЧЕР, ВЫХОДНЫЕ ================= */
+const myCar=()=>mkOwn('car2')?'car2':mkOwn('car1')?'car1':null;
+function rideSVG(car){const col=car==='car2'?'#e6edf3':'#d9432f';
+  const veh=car?`<g class="veh"><path d="M6 44Q8 30 26 28L40 14Q44 10 52 10H92Q100 10 106 16L120 28Q146 30 150 40V52H6Z" fill="${col}"/><path d="M44 16H70V28H32Z M76 16H96Q100 16 110 28H76Z" fill="#9fd0ff"/><circle cx="38" cy="54" r="11" fill="#16181c"/><circle cx="38" cy="54" r="5" fill="#8b949e"/><circle cx="120" cy="54" r="11" fill="#16181c"/><circle cx="120" cy="54" r="5" fill="#8b949e"/><rect x="142" y="36" width="8" height="6" rx="2" fill="#ffd166"/></g>`
+   :`<g class="veh"><rect x="0" y="0" width="190" height="56" rx="10" fill="#2ea043"/><rect x="0" y="34" width="190" height="8" fill="#f4f6fa"/><g fill="#9fd0ff"><rect x="10" y="8" width="26" height="20" rx="3"/><rect x="42" y="8" width="26" height="20" rx="3"/><rect x="74" y="8" width="26" height="20" rx="3"/><rect x="106" y="8" width="26" height="20" rx="3"/><rect x="146" y="8" width="36" height="22" rx="3"/></g><g fill="#3a2415"><circle cx="23" cy="20" r="5"/><circle cx="55" cy="20" r="5"/><circle cx="87" cy="20" r="5"/><circle cx="119" cy="20" r="5"/></g><circle cx="119" cy="20" r="5" fill="#2f9e5a"/><rect x="138" y="10" width="6" height="40" fill="#1f7a33"/><text x="164" y="24" font-size="11" font-weight="900" fill="#0d1117" text-anchor="middle" font-family="sans-serif">67</text><circle cx="40" cy="58" r="11" fill="#16181c"/><circle cx="40" cy="58" r="5" fill="#8b949e"/><circle cx="150" cy="58" r="11" fill="#16181c"/><circle cx="150" cy="58" r="5" fill="#8b949e"/><rect x="184" y="38" width="6" height="7" rx="2" fill="#ffd166"/></g>`;
+  let b='';for(let i=0;i<14;i++){const w=22+(i*37)%26,hh=40+(i*53)%70,x=i*30-10;b+=`<rect x="${x}" y="${150-hh}" width="${w}" height="${hh}" fill="${i%2?'#1a2540':'#141d33'}"/>`;for(let k=0;k<Math.floor(hh/14);k++)for(let j=0;j<2;j++)if((i+k+j)%3)b+=`<rect x="${x+4+j*9}" y="${156-hh+k*13}" width="5" height="6" fill="#ffd166" opacity="${.35+((i*k+j)%5)*.13}"/>`}
+  return `<svg viewBox="0 0 360 220" style="width:100%;max-width:420px;border-radius:16px;display:block" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="sky${++AVN}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1b1445"/><stop offset=".6" stop-color="#b0503a"/><stop offset="1" stop-color="#f0a04b"/></linearGradient></defs>
+  <style>.veh{animation:drv 3.6s linear infinite}@keyframes drv{0%{transform:translate(-200px,${car?128:122}px)}100%{transform:translate(380px,${car?128:122}px)}}.ln{animation:ln .5s linear infinite}@keyframes ln{to{transform:translateX(-40px)}}</style>
+  <rect width="360" height="220" fill="url(#sky${AVN})"/><circle cx="290" cy="118" r="26" fill="#ffd166" opacity=".9"/>${b}<rect y="150" width="360" height="70" fill="#22262e"/><g class="ln">${Array.from({length:12},(_,i)=>`<rect x="${i*40}" y="196" width="22" height="4" fill="#f4f6fa" opacity=".7"/>`).join('')}</g>
+  ${car?'':'<rect x="52" y="96" width="4" height="56" fill="#8b949e"/><rect x="40" y="90" width="28" height="18" rx="3" fill="#1f6feb"/><text x="54" y="103" font-size="10" font-weight="900" fill="#fff" text-anchor="middle" font-family="sans-serif">A</text>'}${veh}</svg>`}
+function showEvening(next,weekend){SCR='ending';const p=PR(),s=$('screen'),car=myCar();p.days=(p.days||0)+1;if(weekend==null)weekend=p.days%5===0;s.classList.remove('hidden','menu','season');
+  const lines=car?['Своя машина. Пробка на кольце, зато с музыкой и без чужих локтей.','Двадцать минут, и ты дома. Радио играет что-то из девяностых.','Паркуешься у подъезда. Сосед уважительно кивает.']:['Автобус №67. Час пик. Чей-то локоть, чья-то сумка и водитель, который тормозит как будто впервые.','Ты едешь стоя и считаешь остановки. На третьей освобождается место. Его занимает бабушка с арбузом.','Автобус ломается за две остановки до дома. Дальше пешком.'];
+  if(car)gainXP(15,0);
+  s.innerHTML=`<div class="tag">18:30 · ДОРОГА ДОМОЙ</div>${rideSVG(car)}<p style="max-width:420px">${rnd(lines)}</p><p style="font-size:12px;color:#8b949e;max-width:420px">${car?'На машине ты приезжаешь раньше и лучше отдыхаешь: +15 опыта.':'Своя машина есть на маркете в телефоне, раздел «Авто». С ней дорога быстрее.'}</p><button class="btn" id="ev1">${weekend?'Впереди выходные ▶':'Домой ▶'}</button>`;saveSeason();
+  $('ev1').onclick=()=>{sPop();weekend?showWeekend(next):showHome(next)}}
+function showHome(next){const s=$('screen');
+  s.innerHTML=`<div class="tag">ВЕЧЕР ДОМА</div><div style="font-size:54px;line-height:1">🏠</div><h2 style="font-size:22px">Ты дома</h2><p style="max-width:420px">Чайник, плов из холодильника, тишина. Никто не говорит «у меня ничего не работает». Чем займёшься?</p>
+  <div class="mbtns" style="max-width:420px;width:100%"><button class="mb2" data-h="sleep">😴 Лечь пораньше · +20 опыта</button><button class="mb2" data-h="study">📚 Посидеть над учебником · +35 опыта</button><button class="mb2" data-h="tv">📺 Сериал до двух ночи · просто хорошо</button></div>`;
+  s.querySelectorAll('[data-h]').forEach(b=>b.onclick=()=>{sPop();const k=b.dataset.h;if(k==='sleep')gainXP(20,0);if(k==='study')gainXP(35,0);toast(k==='sleep'?'Выспался. Завтра будешь огурцом':k==='study'?'Две главы про VLAN. Почти не уснул':'Ещё одна серия. И ещё одна. Утро будет тяжёлым','g');saveSeason();next()})}
+const WKND={disco:{ic:'🪩',n:'Дискотека',cost:150000,who:['timur','malika','lola'],t:'Суббота, полночь. Тимур танцует так, будто продаёт танец. Малика снимает это на телефон. Лола кричит тебе в ухо: «А ты нормальный, оказывается!»'},
+ bar:{ic:'🎤',n:'Бар с караоке',cost:100000,who:['sardor','nigora','rustam'],t:'Караоке. Нигора поёт так, что бармен просит повторить. Сардор молча заказывает всем лимонад. Рустам берёт микрофон и объявляет: «Эта песня посвящается серверу, который мы потеряли».'}};
+function showWeekend(next){const p=PR(),s=$('screen');
+  s.innerHTML=`<div class="tag">ВЫХОДНЫЕ</div><div style="font-size:54px;line-height:1">🎉</div><h2 style="font-size:22px">Суббота. Куда пойдём?</h2><p style="max-width:420px">Коллеги зовут отдохнуть. Платишь из своих. У тебя ${fmtM(p.money)} сум.</p>
+  <div class="mbtns" style="max-width:420px;width:100%">${Object.entries(WKND).map(([k,w])=>`<button class="mb2" data-w="${k}" ${p.money<w.cost?'disabled style="opacity:.5"':''}>${w.ic} ${w.n} с коллегами · ${fmtM(w.cost)} сум<br><small style="font-weight:600;color:#8b949e">${w.who.map(id=>CH[id].name).join(', ')}</small></button>`).join('')}<button class="mb2" data-w="home">🏠 Остаться дома и выспаться · +40 опыта</button></div>`;
+  s.querySelectorAll('[data-w]').forEach(b=>b.onclick=()=>{sPop();const k=b.dataset.w;if(k==='home'){gainXP(40,0);toast('Два дня тишины. Лучшие выходные','g');saveSeason();next();return}
+    const w=WKND[k];if(p.money<w.cost)return;p.money-=w.cost;p.relx=p.relx||{};w.who.forEach(id=>p.relx[id]=Math.min(2,(p.relx[id]||0)+1));p.out=(p.out||0)+1;gainXP(25,0);saveSeason();
+    s.innerHTML=`<div class="tag">${w.n.toUpperCase()}</div><div style="font-size:60px;line-height:1">${w.ic}</div><p style="max-width:420px">${w.t}</p><div class="sum">${w.who.map(id=>CH[id].name+': 💚 +1 к отношениям').join('<br>')}<br><span style="color:#8b949e">−${fmtM(w.cost)} сум · +25 опыта</span></div><button class="btn" id="ev2">В понедельник на работу ▶</button>`;$('ev2').onclick=()=>{sPop();next()}})}
 /* ================= ОБЕД С КОЛЛЕГОЙ В ЧАЙХАНЕ ================= */
 const LTALK={
  dilnoza:['Садись, болам. Ешь, ты худой как квартальный отчёт в январе. Вот скажи: почему компьютер всегда ломается именно в день сдачи отчёта?',['Он чувствует ваш страх, Дильноза опа','Потому что в этот день вы нажимаете всё сразу'],'Вой, шутник! А ведь правда… Ладно. В следующий раз позову тебя за день до отчёта. Бери лепёшку.'],
@@ -2910,7 +2941,7 @@ EPS[0]={intro:'fs_intro',
  events(){const f=G.F,e=f.ev,m=G.min;if(!e.lunch&&m>=720){e.lunch=1;f.lunch=1;talk('lunchEv');return}if(e.lunch===1&&m>=780){e.lunch=2;f.lunch=0;toast('🏢 Обед окончен, все возвращаются в офис','b')}if(m>=1080&&!e.final)startFinal()},
  final(){if(G.busy){G.pendingFinal=true;return}G.F.ev.final=1;endingScreen()},
  ending(){G.running=false;ov.style.display='none';const n=G.tkDone||0,s=$('screen'),pb=PR().best||0,rec=n>pb;if(rec)PR().best=n;s.classList.remove('hidden');saveSeason();
-  s.innerHTML=`<div class="tag">СМЕНА ОКОНЧЕНА</div><h2 style="font-size:24px">${n>=8?'🏆 Герой офиса':n>=4?'👍 Хорошая смена':'☕ Тихий день'}</h2><p>Закрыто заявок: <b style="color:#ffd166">${n}</b>${rec&&n?' · 🎉 новый рекорд!':pb?' · рекорд: '+pb:''}</p><div class="sum">За каждую заявку ты получил опыт и премию. Заявки идут в задания дня и достижения.</div>${seasonButton('В меню ▶')}`;$('tosea').onclick=()=>showMainMenu()}};
+  s.innerHTML=`<div class="tag">СМЕНА ОКОНЧЕНА</div><h2 style="font-size:24px">${n>=8?'🏆 Герой офиса':n>=4?'👍 Хорошая смена':'☕ Тихий день'}</h2><p>Закрыто заявок: <b style="color:#ffd166">${n}</b>${rec&&n?' · 🎉 новый рекорд!':pb?' · рекорд: '+pb:''}</p><div class="sum">За каждую заявку ты получил опыт и премию. Заявки идут в задания дня и достижения.</div>${seasonButton('В меню ▶')}`;$('tosea').onclick=()=>showEvening(()=>showMainMenu())}};
 function showMainMenu(){SCR='main';PAUSED=false;$('pause').classList.add('hidden');const s=$('screen');s.classList.remove('hidden','season');s.classList.add('menu');
   const n=nextEp(),e=EPLIST.find(x=>x.n===n),started=Object.keys(SEASON.done).length>0,run=loadRun();
   s.innerHTML=`<div class="tag">UPTIME STUDIO представляет</div><h1 class="mlogo">АПТАЙМ</h1><h2>Сезон 1: «Тень списания»</h2>
