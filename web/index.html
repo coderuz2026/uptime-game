@@ -26,6 +26,8 @@ html,body{margin:0;height:100%;height:100dvh;background:#0b0f17;color:#e6edf3;fo
 .mk .ic.t{background:linear-gradient(#79c0ff,#1f6feb);color:#fff;animation:bob 1s ease-in-out infinite alternate}
 .mk .ic.c{background:#f6f8fa;color:#333;width:28px;height:28px;font-size:13px;opacity:.85;margin-top:-38px}
 .mk .ic.d{background:linear-gradient(#2ea043,#1a7f37);color:#fff;width:32px;height:32px;font-size:15px;margin-top:-40px}
+#phb{position:absolute;right:10px;bottom:10px;z-index:5;width:50px;height:50px;border-radius:16px;border:1px solid #30363d;background:#161b22ee;font-size:24px;box-shadow:0 4px 14px #0009;display:none}#phb.on{display:block}
+#ph{position:absolute;inset:0;z-index:28;background:rgba(4,6,10,.78);display:flex;align-items:flex-end;justify-content:center;animation:fi .2s}#ph.hidden{display:none}.phb{border:2px solid #2b3545;border-bottom:none}
 #locname{position:absolute;left:8px;bottom:8px;z-index:4;font-size:11px;font-weight:800;background:#0d1117cc;border:1px solid #30363d;padding:4px 9px;border-radius:9px;pointer-events:none;color:#c9d1d9}
 input[type=range]{accent-color:#2ea043}
 .mk .ic.s{background:linear-gradient(#a371f7,#6e40c9);color:#fff;animation:bob 1s ease-in-out infinite alternate}
@@ -431,6 +433,8 @@ button{font-family:inherit;cursor:pointer}
     <div id="screen" class="hidden"></div>
     <div id="pause" class="hidden"></div>
     <div id="pc" class="hidden"></div>
+    <div id="ph" class="hidden"></div>
+    <button id="phb" aria-label="Телефон">📱</button>
     <div id="adov" class="hidden"></div>
     <div id="load">ЗАГРУЗКА...</div>
   </div>
@@ -1127,7 +1131,7 @@ function startMusic(){const a=actx();if(!a||musicStarted)return;musicStarted=tru
 const FEM=['nigora','dilnoza','lola','malika','gulya','kamila','lim'],AVC={};
 let AVN=0;function avatarSVG(id,mood='n'){return avatarTpl(id,mood).replace(/@@/g,'u'+(++AVN))}
 function avatarTpl(id,mood){const key=id+mood;if(AVC[key])return AVC[key];
-  const c=id==='me'?{skin:'#f1c29a',hair:'#2b1d14',style:'short',shirt:'#2f9e5a',bg:'#14532d',headset:1}:CH[id];if(!c)return '';
+  const c=id==='me'?(()=>{const m=MKS(),sh=m.shirt&&MKT.find(x=>x.id===m.shirt),ht=m.hat&&MKT.find(x=>x.id===m.hat);return {skin:'#f1c29a',hair:'#2b1d14',style:'short',shirt:sh?sh.shirt:'#2f9e5a',bg:'#14532d',headset:ht?0:1,hat:ht?ht.hat:undefined}})():CH[id];if(!c)return '';
   const fem=FEM.includes(id),sk=c.skin,skD=shade(sk,-.16),skL=shade(sk,.18),hr=c.hair,hrD=shade(hr,-.3),hrL=shade(hr,.22),sh=c.shirt,shD=shade(sh,-.28),shL=shade(sh,.2),st=c.style,u='@@';
   const old=['boss','bobur','hamid','gulya','dilnoza'].includes(id);
   let s=`<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><defs><radialGradient id="b${u}" cx="50%" cy="38%" r="75%"><stop offset="0" stop-color="${shade(c.bg||'#1f3a2a',.34)}"/><stop offset="1" stop-color="${shade(c.bg||'#1f3a2a',-.25)}"/></radialGradient><linearGradient id="f${u}" x1="0" x2="1"><stop offset="0" stop-color="${skL}"/><stop offset=".55" stop-color="${sk}"/><stop offset="1" stop-color="${skD}"/></linearGradient><linearGradient id="t${u}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${shL}"/><stop offset="1" stop-color="${shD}"/></linearGradient></defs><rect width="100" height="100" fill="url(#b${u})"/><circle cx="50" cy="44" r="38" fill="#fff" opacity=".06"/>`;
@@ -2332,7 +2336,7 @@ function openMG(kind,o,onWin,onLose){if(G)G.busy=true;mgEl.classList.remove('hid
   let T={crimp:['plug','Обжать кабель'],reboot:['power','Перезапуск свитча'],mash:['printer','Принтер зажевал'],phish:['mail','Письмо Лоле'],taskmgr:['monitor','Диспетчер задач'],tv:['tv','Телевизор охраны'],quiz:['book','Курс'],ipcfg:['server','Настройка адреса'],rules:['shield','Правила фаервола'],patch:['switch','Коммутация'],logs:['search','Журнал']}[kind];if(o&&o.title)T=[o.icon||T[0],o.title];T[0]=IC[T[0]]||T[0];
   mgEl.innerHTML=`<div class="mgbox" id="mgbox"><div class="mghead"><div class="ic">${T[0]}</div><div><b>Задание</b><span>${T[1]}</span></div></div><div id="mgbody"></div><div class="foot"><button class="small" id="later">↩ Отложить</button></div></div>`;
   const close=()=>{if(mg.cleanup)mg.cleanup();mg.cleanup=null;mgEl.classList.add('hidden');mgEl.innerHTML=''};
-  const win=()=>{close();sGood();bump('mg');if(kind==='crimp')bump('crimp');{const pz=MGPAY[kind];if(pz&&!(o&&o.nopay)){PR().tasks++;PR().budget+=40000;gainXP(Math.round(pz[0]*(1+.1*PR().small.filter(x=>x==='rj'||x==='tools').length)),pz[1])}}const n=NPC[lastNpc];if(n)puff(wx(n.x),2,wz(n.y),30,{c:['#ffd166','#fff','#7ee787','#f778ba'],sp:3,up:2.5,g:-6,life:1.2});onWin()};
+  const win=()=>{close();sGood();bump('mg');if(kind==='crimp')bump('crimp');{const pz=MGPAY[kind];if(pz&&!(o&&o.nopay)){PR().tasks++;PR().budget+=40000;gainXP(Math.round(pz[0]*(1+.1*PR().small.filter(x=>x==='rj'||x==='tools').length+(mkOwn('phones')?.1:0))),pz[1])}}const n=NPC[lastNpc];if(n)puff(wx(n.x),2,wz(n.y),30,{c:['#ffd166','#fff','#7ee787','#f778ba'],sp:3,up:2.5,g:-6,life:1.2});onWin()};
   const lose=()=>{close();sBad();onLose?onLose():endBusy()};
   $('later').onclick=()=>{close();endBusy()};
   GAMES[kind]($('mgbody'),o,win,lose)}
@@ -2512,7 +2516,7 @@ function update(dt){ambTick(dt);
   {const n=NPC.bobur;if(n.radio>0)n.radio-=dt;RADIOT-=dt;if(RADIOT<=0){RADIOT=14+Math.random()*14;if(n.loc===LOC&&!n.hold&&!n.away&&!G.busy){sayBubble(n,rnd(RADIOL));n.chatT=4;n.radio=3;sRadio()}}}
   if(!G.busy){G.realT+=dt;if(G.realT>2.4){G.realT=0;G.min+=1}}
   const p=G.p;p.vx=p.vy=0;
-  if(!G.busy&&p.path.length){const n=p.path[0],dx=n.x-p.x,dy=n.y-p.y,d=Math.hypot(dx,dy),sp=105*dt;p.rot=Math.atan2(dx,dy);
+  if(!G.busy&&p.path.length){const n=p.path[0],dx=n.x-p.x,dy=n.y-p.y,d=Math.hypot(dx,dy),sp=(mkOwn('sneakers')?121:105)*dt;p.rot=Math.atan2(dx,dy);
     if(d<=sp){p.x=n.x;p.y=n.y;p.path.shift();if(!p.path.length)arrive()}else{p.x+=dx/d*sp;p.y+=dy/d*sp;p.vx=dx/d*105;p.vy=dy/d*105}
     p.walk+=dt*11;p.dust-=dt;if(p.dust<=0){p.dust=.12;puff(wx(p.x),.05,wz(p.y),1,{c:'#8a7a6a',sp:.3,up:.4,g:0,life:.5,k:.5})}}
   else p.walk=0;
@@ -2584,7 +2588,7 @@ const TUTS=[['👆','Коснись пола, и герой пойдёт туд�
 let TUTON=false;function showTut(){TUTON=true;G.busy=true;let i=0;const el=document.createElement('div');el.style.cssText='position:fixed;inset:0;z-index:60;background:#000a;display:flex;align-items:center;justify-content:center;padding:24px';document.body.appendChild(el);
   const draw=()=>{el.innerHTML=`<div style="max-width:320px;width:100%;background:#161b22;border:1px solid #30363d;border-radius:18px;padding:22px 20px;text-align:center;box-shadow:0 12px 40px #000a"><div style="font-size:44px;line-height:1">${TUTS[i][0]}</div><p style="font-size:16px;line-height:1.45;margin:14px 0 6px;color:#e6edf3">${TUTS[i][1]}</p><div style="font-size:12px;color:#8b949e;margin-bottom:14px">${i+1} из ${TUTS.length}</div><button class="btn" id="tutn">${i<TUTS.length-1?'Дальше':'Понятно, играем!'}</button>${i<TUTS.length-1?'<div id="tuts" style="margin-top:12px;font-size:13px;color:#8b949e">Пропустить</div>':''}</div>`;
     const done=()=>{el.remove();TUTON=false;if(G)G.busy=false;try{localStorage.setItem('uptime_tut','1')}catch(e){}};$('tutn').onclick=()=>{sPop();if(++i>=TUTS.length)done();else draw()};const sk=$('tuts');if(sk)sk.onclick=done};draw()}
-let HUDC='',HUDG='';function hud(){procTick();metaCheck();if(performance.now()-RUNT>4000){RUNT=performance.now();saveRun()}if(!TUTON&&G&&G.running&&!G.busy&&SCR==='game'&&!localStorage.getItem('uptime_tut'))showTut();const c=fmt(G.min);if(c!==HUDC){HUDC=c;$('clock').textContent=c}const o=objectives().find(x=>!x[1]),g=o?o[0]:'Все задачи выполнены!';if(g!==HUDG){HUDG=g;$('goaltx').textContent=g}}
+let HUDC='',HUDG='';function hud(){procTick();{const b=$('phb'),on=!!(G&&G.running&&!G.busy&&SCR==='game');if(b._on!==on){b._on=on;b.classList.toggle('on',on)}}metaCheck();if(performance.now()-RUNT>4000){RUNT=performance.now();saveRun()}if(!TUTON&&G&&G.running&&!G.busy&&SCR==='game'&&!localStorage.getItem('uptime_tut'))showTut();const c=fmt(G.min);if(c!==HUDC){HUDC=c;$('clock').textContent=c}const o=objectives().find(x=>!x[1]),g=o?o[0]:'Все задачи выполнены!';if(g!==HUDG){HUDG=g;$('goaltx').textContent=g}}
 let lastT=performance.now();
 let FR=0;
 function frame(now){requestAnimationFrame(frame);if(document.hidden)return;const dt=Math.min(.05,(now-lastT)/1000);const live=G&&G.running&&!PAUSED;
@@ -2614,7 +2618,7 @@ const SMALL=[{id:'rj',n:'Коннекторы RJ45 и бухта кабеля',d
 const itemOf=r=>(r.kind==='gear'?GEAR:SMALL).find(x=>x.id===r.id);
 const fmtDur=m=>{m=Math.max(1,Math.round(m));return m>=1440?Math.floor(m/1440)+' д '+Math.floor(m%1440/60)+' ч':m>=60?Math.floor(m/60)+' ч '+(m%60)+' мин':m+' мин'};
 const stageOf=r=>r.st==='wait'?'ждёт согласования':PR().clock<r.t0+r.pay?'оплата в бухгалтерии':'доставка';
-function procTick(){const p=PR();if(G&&G.running){const d=G.min-(G._lm==null?G.min:G._lm);G._lm=G.min;if(d>0)p.clock+=d}
+function procTick(){mkTick();const p=PR();if(G&&G.running){const d=G.min-(G._lm==null?G.min:G._lm);G._lm=G.min;if(d>0)p.clock+=d}
   let ch=false;p.orders=p.orders.filter(r=>{if(r.st!=='ship'||p.clock<r.eta)return true;const it=itemOf(r);ch=true;if(r.kind==='gear'){p.owned.push(r.id);toast('Доставлено на склад: '+it.n+'. Установи в монтажной стойке','y')}else{p.small.push(r.id);toast('Доставлено: '+it.n+' ('+it.d+')','y')}sGood();return false});if(ch)saveSeason()}
 function shipOrder(r,it){const p=PR();p.budget-=it.cost;r.st='ship';r.t0=p.clock;r.pay=r.kind==='gear'?60:20;r.eta=r.t0+r.pay+it.ship;saveSeason()}
 function reqNode(base){const p=PR(),wait=p.orders.filter(o=>o.st==='wait'),other=()=>base?base:{who:'boss',mood:'n',text:rnd(gossipFor('boss')),next:END};
@@ -2661,12 +2665,17 @@ const GEAR=[
  {id:'fw2',after:'fw',ship:2880,why:'Она заметит взломщика в сети в первые минуты, а не через неделю',n:'Система обнаружения вторжений',d:'Улучшение: тревога при взломе в первые минуты',cost:2000000,req:['sec',3],mg:['rules',{}],col:'#ff7b72'}];
 /* 3D: admin desk + mount rack in the server room */
 const PCPOS={x:42,y:444},PCSTAND={x:42,y:434},MOUNT={x:285,y:392};
-const gearMesh={};
+const gearMesh={},deskMesh={};
 {const P=LOCS.office.group,x=wx(42),z=wz(462),wd=M('#c9a26b'),dk=M('#1b1f27'),mt=M('#57606a');
   box(1.9,.08,.8,wd,x,.78,z,P);[[-.85,-.32],[.85,-.32],[-.85,.32],[.85,.32]].forEach(([a,b])=>box(.06,.76,.06,mt,x+a,.38,z+b,P));
   box(.9,.56,.05,dk,x,1.3,z+.12,P);const sc=new THREE.Mesh(new THREE.PlaneGeometry(.82,.48),emis('#3fb950',1.4));sc.rotation.y=Math.PI;sc.position.set(x,1.3,z+.09);P.add(sc);box(.08,.3,.06,dk,x,.98,z+.12,P);box(.6,.03,.2,dk,x,.83,z-.15,P);
   box(.3,.5,.5,dk,x+.72,1.07,z+.05,P);cyl(.07,.06,.16,M('#f0883e'),x-.7,.9,z-.1,P);
   const cg=new THREE.Group();cg.position.set(wx(PCPOS.x),0,wz(PCPOS.y));P.add(cg);makeChair(cg,M('#2f9e5a'));
+  {const own=((SEASON.prof||{}).mk||{}).own||[],mkg=(id,f)=>{const u=new THREE.Group();u.position.set(x,.82,z);P.add(u);f(u);u.visible=own.includes(id);u.traverse(o=>{o.userData.dyn=1});deskMesh[id]=u};
+   mkg('cactus',u=>{cyl(.07,.055,.1,M('#b5651d'),-.45,.05,.2,u,10);const c=add(new THREE.CapsuleGeometry(.045,.12,4,8),M('#2ea043'),-.45,.2,.2,u);sph(.03,M('#2ea043'),-.39,.2,.2,u,6);sph(.02,M('#ff7b72'),-.45,.31,.2,u,6)});
+   mkg('duck',u=>{sph(.06,M('#ffd33d'),.35,.06,-.25,u,10);sph(.04,M('#ffd33d'),.35,.13,-.27,u,10);box(.03,.012,.03,M('#f0883e'),.35,.125,-.31,u,false)});
+   mkg('fig',u=>{const b=add(new THREE.CapsuleGeometry(.045,.07,4,8),M('#16181c'),-.2,.09,.25,u);sph(.035,M('#f4f6fa'),-.2,.08,.225,u,8).scale.set(.8,1.1,.5);sph(.035,M('#16181c'),-.2,.18,.25,u,8);box(.02,.01,.02,M('#f0883e'),-.2,.175,.215,u,false)});
+   mkg('rgb',u=>{[['#ff5a4d',-.7],['#ffd33d',-.35],['#3dff7a',0],['#58a6ff',.35],['#d2a8ff',.7]].forEach(([c,o])=>box(.33,.02,.03,emis(c,2.6),o,.005,.36,u,false))})}
   const mx=wx(MOUNT.x),mz=wz(MOUNT.y),fr=M('#2a2f3a');[[-.55,-.4],[.55,-.4],[-.55,.4],[.55,.4]].forEach(([a,b])=>box(.07,2.3,.07,fr,mx+a,1.15,mz+b,P));box(1.2,.07,.9,fr,mx,2.3,mz,P);box(1.2,.07,.9,fr,mx,.06,mz,P);
   box(1,.16,.02,emis('#f0883e',1.2),mx,2.42,mz+.42,P,false);
   GEAR.forEach((g,i)=>{const u=new THREE.Group(),sl=g.after?GEAR.findIndex(b=>b.id===g.after):i;u.position.set(mx,.28+sl*.4,mz);P.add(u);if(g.after){box(1.05,.07,.83,M(g.col),0,.16,0,u);box(.3,.04,.02,emis('#ffd166',3),.3,.16,.42,u,false);for(let k=0;k<3;k++)box(.04,.04,.02,emis('#3dff7a',3),-.4+k*.09,.16,.42,u,false)}else{box(1.02,.3,.8,M(g.col),0,0,0,u);box(.9,.05,.02,M('#0d1117'),0,.06,.41,u,false);for(let k=0;k<4;k++)box(.05,.05,.02,emis(k%2?'#3dff7a':'#58a6ff',3),-.36+k*.12,-.06,.41,u,false)}u.visible=PR().gear.includes(g.id);gearMesh[g.id]=u})}
@@ -2788,6 +2797,56 @@ function showAch(){SCR='about';const s=$('screen'),p=MT();s.classList.remove('me
   <p style="font-size:12px;color:#8b949e;margin:4px 0 14px">🔥 Дней подряд: ${p.streak}. Задания обновляются каждый день.</p>
   <h2>Достижения ${Object.keys(p.ach).length}/${ACH.length}</h2>${ACH.map(a=>{const ok=p.ach[a[0]];return `<div class="sum" style="display:flex;align-items:center;gap:10px;margin:6px 0;opacity:${ok?1:.55};${ok?'border-color:#f5c54288':''}"><span style="font-size:24px;filter:${ok?'none':'grayscale(1)'}">${a[1]}</span><div style="flex:1;text-align:left"><b>${a[2]}</b><br><small style="color:#8b949e">${a[3]}</small></div><span style="font-size:20px">${ok?'🏆':'🔒'}</span></div>`}).join('')}`;
   $('aback').onclick=()=>{sPop();showMainMenu()}}
+/* ================= ТЕЛЕФОН: МАРКЕТПЛЕЙС ЗА СВОИ ДЕНЬГИ ================= */
+const MKT=[
+ {id:'sh_black',cat:'wear',ic:'🧥',n:'Чёрное худи «sudo»',d:'Классика админа',cost:180000,ship:150,shirt:'#22262e'},
+ {id:'sh_white',cat:'wear',ic:'👔',n:'Белая рубашка',d:'Для встреч с директором и аудиторами',cost:150000,ship:150,shirt:'#e6edf3'},
+ {id:'sh_red',cat:'wear',ic:'👕',n:'Красная толстовка',d:'Тебя видно через весь офис',cost:170000,ship:150,shirt:'#c93c3c'},
+ {id:'sh_blue',cat:'wear',ic:'👕',n:'Футболка «А вы пробовали выключить и включить?»',d:'Отвечает на половину заявок',cost:120000,ship:150,shirt:'#2f6fed'},
+ {id:'hat_cap',cat:'wear',ic:'🧢',n:'Кепка',d:'Для выходов во двор',cost:90000,ship:120,hat:'cap'},
+ {id:'hat_doppi',cat:'wear',ic:'🎩',n:'Тюбетейка',d:'Подарок от души самому себе',cost:110000,ship:120,hat:'doppi'},
+ {id:'cactus',cat:'desk',ic:'🌵',n:'Кактус на стол',d:'Говорят, поглощает излучение. Не поглощает, но красивый',cost:40000,ship:90},
+ {id:'duck',cat:'desk',ic:'🦆',n:'Резиновая уточка для отладки',d:'Объясни ей проблему, и решение найдётся',cost:35000,ship:90},
+ {id:'fig',cat:'desk',ic:'🐧',n:'Фигурка пингвина',d:'Охраняет твой стол',cost:70000,ship:120},
+ {id:'rgb',cat:'desk',ic:'🌈',n:'RGB-подсветка стола',d:'Плюс сто к скорости. По ощущениям',cost:160000,ship:180},
+ {id:'sneakers',cat:'use',ic:'👟',n:'Удобные кроссовки',d:'Ты ходишь на 15% быстрее',cost:450000,ship:180},
+ {id:'phones',cat:'use',ic:'🎧',n:'Наушники с шумоподавлением',d:'+10% опыта за задачи: никто не отвлекает',cost:600000,ship:180},
+ {id:'book1',cat:'use',ic:'📘',n:'Книга «Сети без слёз»',d:'Сразу +120 опыта',cost:200000,ship:240,xp:120},
+ {id:'book2',cat:'use',ic:'📗',n:'Книга «Linux за 21 день»',d:'Сразу +140 опыта',cost:220000,ship:240,xp:140},
+ {id:'cake',cat:'food',ic:'🎂',n:'Торт на весь офис',d:'+1 к отношениям со всеми коллегами. Раз за эпизод',cost:150000,ship:60,rep:1},
+ {id:'samsa',cat:'food',ic:'🥟',n:'Самса с доставкой, 10 штук',d:'Горячая. Половину съедят коллеги',cost:60000,ship:45,rep:1},
+ {id:'tank',cat:'fun',ic:'🚜',n:'Танк Т-72, б/у, самовывоз',d:'На маркете есть всё',cost:9990000000,ship:9999},
+ {id:'dream',cat:'fun',ic:'🖥️',n:'Сервер мечты, 2 ТБ оперативной памяти',d:'Директор бы не согласовал',cost:890000000,ship:9999},
+ {id:'island',cat:'fun',ic:'🏝️',n:'Остров без пользователей',d:'Никаких заявок. Никогда',cost:75000000000,ship:9999}];
+const MKCAT=[['all','Всё'],['wear','Одежда'],['desk','Для стола'],['use','Полезное'],['food','Еда и подарки'],['fun','Разное']];
+function MKS(){const p=PR();if(!p.mk)p.mk={own:[],ord:[],shirt:null,hat:null};return p.mk}
+const mkOwn=id=>MKS().own.includes(id);
+let PHTAB='shop',PHCAT='all';
+function dressAdmin(){const m=MKS(),sh=m.shirt&&MKT.find(x=>x.id===m.shirt),ht=m.hat&&MKT.find(x=>x.id===m.hat),cfg={shirt:sh?sh.shirt:'#2f9e5a',hair:'#2b1d14',badge:true,headset:!ht,hat:ht?ht.hat:undefined};
+  const old=admin.g,nc=makeChar(cfg);nc.g.position.copy(old.position);nc.g.rotation.copy(old.rotation);nc.g.visible=old.visible;scene.remove(old);scene.add(nc.g);Object.assign(admin,nc);
+  const tb=box(.22,.15,.1,M('#9f1d28',{roughness:.4}),0,-.36,.06,admin.armR.elbow);tb.userData.dyn=1;Object.keys(AVC).forEach(k=>{if(k.startsWith('me'))delete AVC[k]})}
+function mkApply(it){const m=MKS();if(!it.rep&&!m.own.includes(it.id))m.own.push(it.id);
+  if(it.shirt){m.shirt=it.id;dressAdmin()}if(it.hat){m.hat=it.id;dressAdmin()}if(deskMesh[it.id])deskMesh[it.id].visible=true;if(it.xp)gainXP(it.xp,0);
+  if(it.id==='cake'&&G){if(!G.cake){G.cake=1;['nigora','boss','dilnoza','lola','timur','malika','sardor','gulya','rustam'].forEach(k=>{if(G.rel[k]!=null&&NPC[k]&&!NPC[k].away)G.rel[k]=Math.min(3,G.rel[k]+1)});logc('Угостил офис тортом');toast('🎂 Офис ест торт. Все тебя немного больше любят','g')}else toast('🎂 Второй торт за день. Съели, но уже без восторга','b')}
+  if(it.id==='samsa')toast('🥟 Самса разошлась за три минуты. Тебе досталась одна','g')}
+function mkTick(){const p=PR(),m=p.mk;if(!m||!m.ord.length||!G||!G.running||G.busy)return;const r=m.ord.find(o=>p.clock>=o.eta);if(!r)return;m.ord.splice(m.ord.indexOf(r),1);const it=MKT.find(x=>x.id===r.id);if(!it)return;
+  toast('📦 Курьер привёз: '+it.n,'y');sGood();mkApply(it);saveSeason()}
+function openPhone(){if(!G||!G.running||G.busy)return;G.busy=true;G.p.path=[];sPop();renderPhone()}
+function closePhone(){const el=$('ph');el.classList.add('hidden');el.innerHTML='';if(G&&G.running)G.busy=false}
+function renderPhone(){const p=PR(),m=MKS(),el=$('ph'),ob=el.querySelector('.pcb'),st=ob?ob.scrollTop:0,key=PHTAB+PHCAT,same=el._k===key;el.classList.remove('hidden');
+  let h=`<div class="pcb phb"><div class="pch"><b>🛒 Bozor</b><button class="pcx" id="phx">✕</button></div><div class="pcr" style="background:#12261a;border-color:#1f5a33"><div><b>Твои деньги: ${fmtM(p.money)} сум</b><small>Зарплата и премии. Это личные покупки, директор не нужен</small></div></div>
+  <div class="pct"><button data-t="shop" class="${PHTAB==='shop'?'on':''}">Каталог</button><button data-t="ord" class="${PHTAB==='ord'?'on':''}">Заказы${m.ord.length?' · '+m.ord.length:''}</button><button data-t="my" class="${PHTAB==='my'?'on':''}">Моё</button></div>`;
+  if(PHTAB==='shop'){h+=`<div style="display:flex;gap:6px;overflow-x:auto;padding-bottom:8px;margin-bottom:4px">${MKCAT.map(([k,t])=>`<button data-c="${k}" style="flex:none;border:1px solid ${PHCAT===k?'#3fb950':'#2b3545'};background:${PHCAT===k?'#16321f':'#161d29'};color:${PHCAT===k?'#7ee787':'#9aa7b4'};border-radius:999px;padding:6px 12px;font:800 12.5px Inter,system-ui,sans-serif">${t}</button>`).join('')}</div>`+
+    MKT.filter(it=>PHCAT==='all'||it.cat===PHCAT).map(it=>{const own=m.own.includes(it.id),ord=m.ord.some(o=>o.id===it.id),can=p.money>=it.cost;
+      return `<div class="pcr"><div style="font-size:26px;flex:none;width:34px;text-align:center">${it.ic}</div><div style="flex:1"><b>${it.n}</b><small>${it.d} · ${fmtM(it.cost)} сум${it.ship<9000?' · доставка '+fmtDur(it.ship):''}</small></div>${own?'<span class="pcok">Куплено</span>':ord?'<span class="pclk">В пути</span>':can?`<button class="pcbtn" data-buy="${it.id}">Купить</button>`:'<span class="pclk">Не хватает</span>'}</div>`}).join('')}
+  if(PHTAB==='ord')h+=m.ord.length?m.ord.map(o=>{const it=MKT.find(x=>x.id===o.id),pr=clamp(1-(o.eta-p.clock)/it.ship,0,1);return `<div class="pcr" style="display:block"><b>${it.ic} ${it.n}</b><small style="display:block;margin:3px 0 6px">${pr>=1?'Курьер уже у двери':'Курьер в пути · осталось '+fmtDur(o.eta-p.clock)}</small><div style="height:8px;border-radius:4px;background:#21262d;overflow:hidden"><i style="display:block;height:100%;width:${Math.round(pr*100)}%;background:linear-gradient(90deg,#2ea043,#56d364)"></i></div></div>`}).join('')+'<p class="pcn">Время доставки идёт вместе с игровым временем.</p>':'<p class="pcn">Заказов в пути нет. Загляни в каталог.</p>';
+  if(PHTAB==='my'){const wear=MKT.filter(it=>m.own.includes(it.id)&&(it.shirt||it.hat)),other=MKT.filter(it=>m.own.includes(it.id)&&!it.shirt&&!it.hat);
+    h+='<div class="pcsec">Гардероб</div>'+(wear.length?`<div class="pcr"><div><b>👕 Зелёная рубашка админа</b><small>Стандартная форма</small></div>${!m.shirt?'<span class="pcok">Надето</span>':'<button class="pcbtn" data-wear="shirt:">Надеть</button>'}</div>`+wear.map(it=>{const on=it.shirt?m.shirt===it.id:m.hat===it.id;return `<div class="pcr"><div><b>${it.ic} ${it.n}</b></div>${on?(it.hat?`<button class="pcbtn y" data-wear="hat:">Снять</button>`:'<span class="pcok">Надето</span>'):`<button class="pcbtn" data-wear="${it.shirt?'shirt':'hat'}:${it.id}">Надеть</button>`}</div>`}).join(''):'<p class="pcn">Одежды пока нет. Она в каталоге, раздел «Одежда».</p>')+
+      '<div class="pcsec">Мои вещи</div>'+(other.length?other.map(it=>`<div class="pcr"><div><b>${it.ic} ${it.n}</b><small>${it.d}</small></div></div>`).join(''):'<p class="pcn">Пока пусто.</p>')}
+  el.innerHTML=h+'</div>';{const nb=el.querySelector('.pcb');if(nb&&same)nb.scrollTop=st;el._k=key}
+  $('phx').onclick=()=>{sPop();closePhone()};el.querySelectorAll('[data-t]').forEach(b=>b.onclick=()=>{sPop();PHTAB=b.dataset.t;renderPhone()});el.querySelectorAll('[data-c]').forEach(b=>b.onclick=()=>{sPop();PHCAT=b.dataset.c;renderPhone()});
+  el.querySelectorAll('[data-buy]').forEach(b=>b.onclick=()=>{const it=MKT.find(x=>x.id===b.dataset.buy);if(!it||p.money<it.cost)return;p.money-=it.cost;m.ord.push({id:it.id,eta:p.clock+it.ship});saveSeason();sGood();toast('🛒 Заказано: '+it.n+' · привезут через '+fmtDur(it.ship),'g');renderPhone()});
+  el.querySelectorAll('[data-wear]').forEach(b=>b.onclick=()=>{const [k,id]=b.dataset.wear.split(':');m[k]=id||null;dressAdmin();saveSeason();sPop();renderPhone()})}
 /* ================= ОБЕД С КОЛЛЕГОЙ В ЧАЙХАНЕ ================= */
 const LTALK={
  dilnoza:['Садись, болам. Ешь, ты худой как квартальный отчёт в январе. Вот скажи: почему компьютер всегда ломается именно в день сдачи отчёта?',['Он чувствует ваш страх, Дильноза опа','Потому что в этот день вы нажимаете всё сразу'],'Вой, шутник! А ведь правда… Ладно. В следующий раз позову тебя за день до отчёта. Бери лепёшку.'],
@@ -2858,7 +2917,7 @@ function openPause(){if(!G||!G.running)return;PAUSED=true;const p=$('pause');p.c
   $('p_go').onclick=closePause;$('p_jr').onclick=()=>{closePause();if(!G.busy)openJournal()};$('p_q').onclick=()=>{cycleQ();$('p_q').textContent='⚙️ Графика: '+qLabel()};
   $('p_snd').onclick=()=>{sPop();showSound()};$('p_exit').onclick=exitToMenu}
 function closePause(){PAUSED=false;$('pause').classList.add('hidden');lastT=performance.now()}
-function exitToMenu(){saveRun();closePause();closePC();if(G){G.running=false;G.busy=false}if(D)closeDlg(true);$('dlg').classList.add('hidden');$('jr').classList.add('hidden');if(!$('mg').classList.contains('hidden')){if(mg.cleanup)mg.cleanup();mg.cleanup=null;$('mg').classList.add('hidden');$('mg').innerHTML=''}
+function exitToMenu(){saveRun();closePause();closePC();closePhone();if(G){G.running=false;G.busy=false}if(D)closeDlg(true);$('dlg').classList.add('hidden');$('jr').classList.add('hidden');if(!$('mg').classList.contains('hidden')){if(mg.cleanup)mg.cleanup();mg.cleanup=null;$('mg').classList.add('hidden');$('mg').innerHTML=''}
   Object.values(NPC).forEach(n=>n.hold=false);setLoc('office');showMainMenu()}
 $('menubtn').onclick=()=>{if(G&&G.running){sPop();PAUSED?closePause():openPause()}else showMainMenu()};
 window.uptimeBack=function(){
@@ -2866,6 +2925,7 @@ window.uptimeBack=function(){
   if(!$('mg').classList.contains('hidden')){const l=$('later');if(l){l.click();return true}}
   if(!$('jr').classList.contains('hidden')){const c=$('jclose');if(c)c.click();return true}
   if(!$('pc').classList.contains('hidden')){closePC();return true}
+  if(!$('ph').classList.contains('hidden')){closePhone();return true}
   if(!$('pause').classList.contains('hidden')){closePause();return true}
   if(G&&G.running){if(!$('dlg').classList.contains('hidden'))return true;openPause();return true}
   if(SCR==='season'||SCR==='about'){showMainMenu();return true}
@@ -2877,6 +2937,7 @@ function splash(){const lines=['> ping turan.uz','64 bytes: time=12 ms','> syste
   const done=()=>{const sp=$('splash');sp.classList.add('out');setTimeout(()=>sp.remove(),650);showMainMenu()};
   setTimeout(()=>{step()},120)}
 fetch('version.json').then(r=>r.json()).then(v=>{window.UPTIME_V=v.web;const e=document.querySelector('.mver');if(e)e.textContent='версия '+v.web}).catch(()=>{});
+$('phb').onclick=()=>openPhone();try{if(MKS().shirt||MKS().hat)dressAdmin()}catch(e){}
 applyQ(false);splash();
 
 
