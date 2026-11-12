@@ -898,6 +898,7 @@ const CH={
   jasur:{name:'Жасур',role:'Директор «Ташкент Лоджистик»',skin:'#d9a27a',hair:'#1b1d29',style:'short',shirt:'#d2a8ff',tie:1,bg:'#3a2a5a'},
   kamila:{name:'Камила',role:'Секретарь соседей',skin:'#f1c29a',hair:'#e3b341',style:'long',shirt:'#ff7b72',bg:'#5a2a2a'},
   farrukh:{name:'Фаррух Рашидович',role:'Финансовый директор',skin:'#d9a27a',hair:'#2a2a2a',style:'short',shirt:'#3b4252',pants:'#2e3440',tie:1,glasses:1,bg:'#2a3a3a'},
+  lim:{name:'Лим Вэй Лин',role:'Аудитор, Сингапур',skin:'#f3cfa6',hair:'#16161d',style:'bun',shirt:'#e6edf3',glasses:1,bg:'#12403a'},
   hamid:{name:'Хамид-ака',role:'Ошпаз чайханы',skin:'#c98e66',hair:'#f0f6fc',style:'bald',beard:1,shirt:'#f0f6fc',pants:'#30363d',hat:'doppi',bg:'#5a4012'},
 };
 const deskHome=i=>{const [dx,dy]=DESKS[i];return {loc:'office',x:dx-6,y:dy+26,rot:Math.PI,seat:true,sy:0,stand:{x:dx+32,y:dy+36}}};
@@ -905,7 +906,7 @@ const HOMES={dilnoza:deskHome(0),lola:deskHome(1),timur:deskHome(2),nigora:deskH
   boss:{loc:'office',x:300,y:248,rot:0,seat:true,sy:0,stand:{x:300,y:300}},gulya:{loc:'office',x:60,y:150,seat:false},
   rustam:{loc:'yard',x:288,y:372,rot:-.3,seat:true,sy:.04,stand:{x:328,y:384}},bobur:{loc:'hall',x:250,y:282,rot:0,seat:true,sy:0,stand:{x:250,y:338}},
   kamila:{loc:'nb',x:110,y:290,rot:0,seat:true,sy:0,stand:{x:110,y:342}},jasur:{loc:'nb',x:240,y:182,rot:0,seat:true,sy:0,stand:{x:240,y:240}},
-  hamid:{loc:'yard',x:100,y:174,rot:Math.PI,seat:false},farrukh:{loc:'office',x:238,y:300,rot:.6,seat:false}};
+  hamid:{loc:'yard',x:100,y:174,rot:Math.PI,seat:false},farrukh:{loc:'office',x:238,y:300,rot:.6,seat:false},lim:{loc:'office',x:268,y:304,rot:Math.PI,seat:false}};
 const IDLE={office:[{x:121,y:172},{x:140,y:238},{x:200,y:274},{x:100,y:232},{x:236,y:112},{x:30,y:130},{x:330,y:140},{x:260,y:210}],
   hall:[{x:320,y:232},{x:150,y:300},{x:200,y:250}],nb:[{x:80,y:140},{x:200,y:140},{x:280,y:250}],yard:[{x:100,y:174},{x:130,y:166},{x:84,y:196},{x:150,y:160}]};
 const ROAM=[{x:30,y:130},{x:130,y:120},{x:240,y:120},{x:330,y:150},{x:240,y:220},{x:110,y:240},{x:60,y:300},{x:290,y:300},{x:185,y:350},{x:100,y:465},{x:300,y:470},{x:40,y:400}];
@@ -1045,7 +1046,7 @@ document.addEventListener('visibilitychange',()=>document.hidden?uptimePause():u
 function sRadio(){const a=actx();if(!a||a.state!=='running')return;try{const n=a.sampleRate*.4,bf=a.createBuffer(1,n,a.sampleRate),d=bf.getChannelData(0);for(let i=0;i<n;i++)d[i]=(Math.random()*2-1)*(i%900<600?1:.3);
   const src=a.createBufferSource();src.buffer=bf;const f=a.createBiquadFilter();f.type='bandpass';f.frequency.value=1700;f.Q.value=1.6;const g=a.createGain();g.gain.value=.07;src.connect(f);f.connect(g);g.connect(bus('s'));src.start();setTimeout(()=>beep(1250,.09,'square',.03),420)}catch(e){}}
 const VOICE={};
-function voiceOf(id){if(!VOICE[id]){let h=7;for(const ch of id)h=(h*31+ch.charCodeAt(0))%9973;const fem=['nigora','dilnoza','lola','malika','gulya','kamila'].includes(id),old=['boss','bobur','hamid','gulya','dilnoza','farrukh'].includes(id);VOICE[id]={f:(fem?215:122)+h%36-(old?12:0),fs:fem?1.15:1,h}}return VOICE[id]}
+function voiceOf(id){if(!VOICE[id]){let h=7;for(const ch of id)h=(h*31+ch.charCodeAt(0))%9973;const fem=['nigora','dilnoza','lola','malika','gulya','kamila','lim'].includes(id),old=['boss','bobur','hamid','gulya','dilnoza','farrukh'].includes(id);VOICE[id]={f:(fem?215:122)+h%36-(old?12:0),fs:fem?1.15:1,h}}return VOICE[id]}
 /* «симлиш»: слова из слогов (согласная+гласная), пульс голоса → 3 формантных резонатора с плавными переходами */
 const PHV={a:[760,1250,2600],o:[520,900,2500],u:[330,850,2400],i:[300,2250,3000],e:[480,1900,2600]},
   PHC={m:[250,1100,2300,.055,.4],n:[250,1600,2500,.05,.4],l:[360,1150,2700,.045,.65],w:[300,700,2200,.05,.65],j:[280,2200,2900,.05,.65],b:[200,800,2300,.04,.07,1],d:[200,1700,2600,.04,.07,1],g:[200,2100,2400,.045,.07,1],s:[300,1800,2600,.065,0,2],h:[500,1500,2500,.045,0,3]};
@@ -1099,7 +1100,7 @@ function startMusic(){const a=actx();if(!a||musicStarted)return;musicStarted=tru
 /* ================= PORTRAITS ================= */
 /* ================= АВАТАРЫ: рисованные портреты с эмоциями ================= */
 const shade=(h,k)=>{const n=parseInt(h.slice(1),16),f=c=>Math.max(0,Math.min(255,Math.round(k<0?c*(1+k):c+(255-c)*k)));return '#'+[n>>16,n>>8&255,n&255].map(c=>f(c).toString(16).padStart(2,'0')).join('')};
-const FEM=['nigora','dilnoza','lola','malika','gulya','kamila'],AVC={};
+const FEM=['nigora','dilnoza','lola','malika','gulya','kamila','lim'],AVC={};
 function avatarSVG(id,mood='n'){const key=id+mood;if(AVC[key])return AVC[key];
   const c=id==='me'?{skin:'#f1c29a',hair:'#2b1d14',style:'short',shirt:'#2f9e5a',bg:'#14532d',headset:1}:CH[id];if(!c)return '';
   const fem=FEM.includes(id),sk=c.skin,skD=shade(sk,-.16),skL=shade(sk,.18),hr=c.hair,hrD=shade(hr,-.3),hrL=shade(hr,.22),sh=c.shirt,shD=shade(sh,-.28),shL=shade(sh,.2),st=c.style,u=id.replace(/\W/g,'')+mood;
@@ -1572,7 +1573,7 @@ const EPLIST=[
  {n:1,t:'День первый',d:'Первый день сисадмином. Пропадают ноутбуки, прошлый админ оклеветан, а в 15:00 звонок с инвесторами.'},
  {n:2,t:'Кто подписал списание?',d:'Анонимное письмо, поддельные акты и финдиректор, который «был в Дубае». Кто врёт?'},
  {n:3,t:'Шифровальщик',d:'Пятница, 17:58. Все экраны гаснут, на них череп и таймер. Платить или спасать?'},
- {n:4,t:'Аудит',d:'Из Сингапура прилетает аудитор. Одна ошибка — и сделка сорвётся.',soon:1},
+ {n:4,t:'Аудит',d:'Из Сингапура прилетает аудитор. Одна ошибка — и сделка сорвётся.'},
  {n:5,t:'Свет погас',d:'Жара, блэкаут и чужой человек в серверной, пока камеры не работают.',soon:1},
  {n:6,t:'Двойная игра',d:'«Бит Сервис», Жасур и ловушка для того, кто всё это начал.',soon:1},
  {n:7,t:'Аптайм',d:'Финал сезона. Подписание сделки и ответ за каждое твоё решение.',soon:1}];
@@ -1596,7 +1597,7 @@ function hotNode(h){const o=EPS[EPN].hot&&EPS[EPN].hot[h.id];if(o)return o.node(
 function hotHidden(h){return EPS[EPN].hotHidden?EPS[EPN].hotHidden(h):false}
 function gossipFor(id){const g=EPS[EPN].gossip&&EPS[EPN].gossip[id];return g||GOSSIP[id]||['…']}
 /* NPC placement */
-function resetNPCs(){Object.values(NPC).forEach(n=>{if(!n.home0)n.home0=n.home;const h=n.home=n.home0;n.loc=h.loc;n.x=h.x;n.y=h.y;n.rot=h.rot||0;n.sy=h.sy||0;n.state=h.seat?'sit':'idle';n.path=[];n.hold=false;n.away=false;n.conv=null;n.lunchGo=false;n.after=null;n.timer=5+Math.random()*20;n.curStand=h.seat?h.stand:null;if(n.chat){n.chat.remove();n.chat=null}})}
+function resetNPCs(){Object.values(NPC).forEach(n=>{if(!n.home0)n.home0=n.home;const h=n.home=n.home0;n.loc=h.loc;n.x=h.x;n.y=h.y;n.rot=h.rot||0;n.sy=h.sy||0;n.state=h.seat?'sit':'idle';n.path=[];n.hold=false;n.away=false;n.conv=null;n.lunchGo=false;n.after=null;n.timer=5+Math.random()*20;n.curStand=h.seat?h.stand:null;if(n.chat){n.chat.remove();n.chat=null}});if(NPC.lim)setAway('lim')}
 function setAway(id){const n=NPC[id];n.away=true;n.loc='away';n.path=[];n.state='idle'}
 function setHome(id,h){const n=NPC[id];n.away=false;n.home=h;n.loc=h.loc;n.x=h.x;n.y=h.y;n.rot=h.rot||0;n.sy=h.sy||0;n.state=h.seat?'sit':'idle';n.curStand=h.seat?h.stand:null}
 function baseState(extraF,relKeys){const r={};relKeys.forEach(k=>r[k]=0);Object.assign(r,prevRel());relKeys.forEach(k=>{if(r[k]==null)r[k]=0});Object.keys(r).forEach(k=>{if(!relKeys.includes(k))delete r[k]});
@@ -2066,6 +2067,204 @@ EPS[3]={intro:'e3_intro',
   <div class="sum"><b style="color:#79c0ff">Отношения:</b><br>${Object.keys(G.rel).filter(id=>G.rel[id]!==0).map(id=>`${CH[id].name}: ${G.rel[id]>0?'💚'.repeat(G.rel[id]):'💔'.repeat(-G.rel[id])}`).join('<br>')||'Нейтрально со всеми'}</div>
   <p style="color:#ffd166">🔍 Улик найдено: ${G.clues.length} · про взлом: ${n}</p><p style="font-size:12px">Продолжение: «Эпизод 4. Аудит» 🧳</p>${seasonButton()}`;$('tosea').onclick=()=>showSeason()}};
 
+/* ================= ЭПИЗОД 4: АУДИТ ================= */
+Object.assign(CLUES,{
+ e4_rec:'Запись на диктофон: Фаррух предлагает пять миллионов за «правильные» ответы аудитору',
+ e4_dinner:'Хамид-ака: в четверг Фаррух долго шептался в чайхане с Жасуром, директором соседей',
+ e4_acc:'Учётка «bit_support» была активна до понедельника. Теперь отключена'});
+const E4HOME_LIM={loc:'office',x:268,y:304,rot:Math.PI,seat:false};
+const e4Rep=()=>['bkR','accR','pwR','srvR','incR'].filter(k=>F()[k]).length;
+const e4Score=()=>{const f=F();return (f.sBk||0)+(f.sAcc||0)+(f.sPw||0)+(f.sSrv||0)+(f.sInc||0)};
+const e4P3=()=>F().p3||{};
+Object.assign(DLG,{
+ e4_intro:{who:'narr',text:'Понедельник, 09:00. Женщина с чемоданом и бейджем «Audit · Singapore» уже сидит в кабинете директора. Перед ней блокнот, в блокноте пять строчек. Напротив каждой пока пусто.',next:'e4_intro2'},
+ e4_intro2:{who:'narr',text:'От её отчёта зависит сделка с инвесторами. Подойди к ней и узнай, что она хочет проверить.',next:END},
+ e4_lim1:N('lim','n','Доброе утро. Лим Вэй Лин, аудит. Русский я учила в Москве, так что говорите свободно. У меня один день и пять вопросов: резервные копии, доступы, пароли, серверная и пятничный инцидент. В 17:00 я пишу отчёт.',{choices:[
+   {t:'Спрашивайте. Скрывать нам нечего',rel:{lim:1},act:()=>F().met_boss=1,go:'e4_lim2'},
+   {t:'Может, сначала чаю? Самса ещё горячая',act:()=>F().met_boss=1,go:'e4_limTea'},
+   {t:'Директор просил показывать только хорошее',rel:{lim:1},act:()=>{F().met_boss=1;logc('Сразу сказал аудитору, что директор просил приукрасить')},go:'e4_limHon'}]}),
+ e4_limTea:N('lim','h','После отчёта, с удовольствием. Сначала работа.',{next:'e4_lim2'}),
+ e4_limHon:N('lim','h','Ценю прямоту. Так говорят в каждой компании, но вслух признаются редко.',{next:'e4_lim2'}),
+ e4_lim2:N('lim','n','Одно правило. Честный минус в отчёте — это рабочий момент, его исправляют. Ложь — это конец проверки. Готовьтесь и приходите по каждому пункту, когда будет что показать.',{next:END}),
+ e4_limM:N('lim','n',()=>'Слушаю. Проверено пунктов: '+e4Rep()+' из 5.',{choices:[
+   {t:'Резервные копии',if:()=>!F().bkR,go:()=>PR().gear.includes('nas')?'e4_bkNas':'e4_bkAsk'},
+   {t:'Доступы и учётные записи',if:()=>!F().accR&&F().accDone,go:'e4_accOK'},
+   {t:'Пароли сотрудников',if:()=>!F().pwR&&F().pw,go:()=>F().pw==='fix'?'e4_pwOK':'e4_pwBad'},
+   {t:'Серверная',if:()=>!F().srvR&&(F().mop||F().lock),go:()=>F().mop&&F().lock?'e4_srvOK':'e4_srvHalf'},
+   {t:'Пятничный инцидент',if:()=>!F().incR,go:'e4_incAsk'},
+   {t:'Это всё, что я могу показать',if:()=>e4Rep()>=3,act:()=>{G.pendingFinal=true},go:END},
+   {t:'Я ещё готовлюсь',go:END}]}),
+ e4_bkNas:N('lim','h','Отдельный сервер копий, отдельная сеть, копия каждую ночь, журнал за месяц. И в пятницу он вас спас? Хорошо. Очень хорошо.',{act:()=>{F().bkR=1;F().sBk=2;logc('Показал аудитору рабочий сервер копий')},next:END}),
+ e4_bkAsk:N('lim','n','Итак, резервные копии. Где они хранятся и как часто делаются?',{choices:[
+   {t:'Честно: постоянных копий нет. Вот регламент, который мы вводим с сегодняшнего дня',if:()=>!!F().reg,act:()=>{F().bkR=1;F().sBk=1;logc('Честно признал, что копий не было, и показал регламент')},go:'e4_bkReg'},
+   {t:'Честно: постоянных копий нет',if:()=>!F().reg,act:()=>{F().bkR=1;F().sBk=0;logc('Честно признал, что копий нет')},go:'e4_bkNone'},
+   {t:'Копии есть, каждую ночь, на сервере',act:()=>{F().bkR=1;F().sBk=-2;F().lies=(F().lies||0)+1;logc('Соврал аудитору про резервные копии')},go:'e4_bkLie'},
+   {t:'Вернусь к этому позже',go:END}]}),
+ e4_bkReg:N('lim','n','Копий не было, но есть ответственный, расписание и место хранения. Это минус, который уже исправляют. Записываю: «в работе».',{next:END}),
+ e4_bkNone:N('lim','s','Благодарю за честность. Но без плана это просто дыра. Записываю: «отсутствует».',{next:END}),
+ e4_bkLie:N('lim','a','Прекрасно. Тогда восстановите мне, пожалуйста, вчерашнюю версию любого файла. Прямо сейчас… Нет? Я так и думала. Записываю: «недостоверные сведения».',{next:END}),
+ e4_accOK:N('lim','h','Учётка подрядчика с правами администратора была активна три дня после взлома, и вы сами её нашли и отключили. Плохо, что была. Хорошо, что нашли. Записываю: «устранено».',{act:()=>{F().accR=1;F().sAcc=2;logc('Показал аудитору отключённую учётку «bit_support»')},next:END}),
+ e4_pwOK:N('lim','h','Я прошла по офису. Ни одного стикера с паролем, у менеджера по продажам стоит менеджер паролей. Его кто-то научил. Записываю: «в порядке».',{act:()=>{F().pwR=1;F().sPw=1},next:END}),
+ e4_pwBad:N('lim','a','Я прошла по офису. Стикер с паролем лежит под клавиатурой у менеджера по продажам. Его кто-то туда спрятал, причём сегодня: клей свежий. Записываю: «сокрытие».',{act:()=>{F().pwR=1;F().sPw=-1;F().lies=(F().lies||0)+1;logc('Аудитор нашла спрятанный стикер с паролем')},next:END}),
+ e4_srvOK:N('lim','h',()=>'Дверь заперта, журнал посещений заведён, посторонних вещей нет.'+(PR().gear.includes('ups')?' И бесперебойник на месте. ':' Бесперебойника нет, это я отмечу отдельно. ')+'Записываю: «в порядке».',{act:()=>{F().srvR=1;F().sSrv=1},next:END}),
+ e4_srvHalf:N('lim','n',()=>F().mop?'Швабры в серверной больше нет, но дверь открыта настежь. Заходи кто хочет. Записываю: «частично».':'Дверь заперта. Но за стойкой стоит ведро со шваброй. Вода рядом с сервером? Записываю: «частично».',{act:()=>{F().srvR=1;F().sSrv=0},next:END}),
+ e4_incAsk:N('lim','n','В пятницу вечером у вас что-то произошло. Расскажите своими словами.',{choices:[
+   {t:'Шифровальщик. Вошли через учётку подрядчика «Бит Сервис», вот журнал входов',if:()=>e4P3().told===1||e4P3().ev3>=3,act:()=>{F().incR=1;F().sInc=2;logc('Рассказал аудитору всю правду про взлом, с доказательствами')},go:'e4_incFull'},
+   {t:'Шифровальщик. Как он попал внутрь, мы пока не знаем',act:()=>{F().incR=1;F().sInc=1;logc('Честно рассказал аудитору про шифровальщик')},go:'e4_incHonest'},
+   {t:'Сотрудница отдела кадров открыла заражённое письмо',rel:{lola:-2},act:()=>{F().incR=1;F().sInc=-1;logc('Свалил взлом на Лолу перед аудитором')},go:'e4_incLola'},
+   {t:'Ничего серьёзного. Скачок напряжения',act:()=>{F().incR=1;F().sInc=-2;F().lies=(F().lies||0)+1;logc('Соврал аудитору про пятничный инцидент')},go:'e4_incLie'},
+   {t:'Вернусь к этому позже',go:END}]}),
+ e4_incFull:N('lim','o',()=>'Вход подрядчика за семнадцать минут до атаки… Это не случайность. Это уже не аудит, это расследование.'+(e4P3().paid?' И выкуп, который ушёл со счёта, я тоже вижу. Он будет отдельной строкой.':' И вы не заплатили ни тийина. Редкий случай.'),{act:()=>{if(e4P3().paid)F().sInc-=1},next:END}),
+ e4_incHonest:N('lim','n',()=>'Спасибо, что не стали придумывать.'+(e4P3().paid?' Выкуп я вижу в выписке, он пойдёт отдельной строкой.':'')+' Но «не знаем, как вошли» означает, что могут войти снова. Записываю: «расследование не завершено».',{act:()=>{if(e4P3().paid)F().sInc-=1},next:END}),
+ e4_incLola:N('lim','a','Я говорила с вашим отделом кадров утром. Антивирус удалил то письмо за четыре часа до атаки. Вы либо не разобрались, либо ищете виноватого. Записываю оба варианта.',{next:END}),
+ e4_incLie:N('lim','a',()=>'Скачок напряжения.'+(e4P3().paid?' Который стоил компании двести миллионов сум в криптовалюте?':' После которого ваш секретарь два часа объясняла клиентам про «технический сбой»?')+' Я же просила: не лгите. Записываю: «недостоверные сведения».',{next:END}),
+ e4_limTip:N('lim','n','Вопрос не для протокола. Кто-то сообщает конкурентам условия вашей сделки раньше, чем их узнают инвесторы. С кем из соседей по зданию дружит ваш финансовый директор?',{choices:[
+   {t:'В четверг он долго сидел в чайхане с Жасуром, директором соседей',if:()=>has('e4_dinner'),rel:{lim:1},act:()=>{F().tipAsked=1;F().tip=1;logc('Рассказал аудитору про встречу Фарруха с Жасуром')},go:'e4_limTip2'},
+   {t:'Не знаю. Но выясню',act:()=>F().tipAsked=1,go:'e4_limTip3'},
+   {t:'Это не моё дело',act:()=>F().tipAsked=1,go:END}]}),
+ e4_limTip2:N('lim','o','«Ташкент Лоджистик»… Это они подали встречное предложение инвесторам на прошлой неделе. Спасибо. Этого разговора не было.',{next:END}),
+ e4_limTip3:N('lim','n','Спросите тех, кто видит всех и кого никто не замечает. Повара, охранника, уборщицу.',{next:END}),
+ e4_boss1:N('boss','a','Она уже здесь! Покажи ей только хорошее, слышишь? Только хорошее! Что тебе от меня нужно?',{choices:[
+   {t:'Ключ от серверной. Её нужно запирать',act:()=>{F().bossT=1;F().key=1;addItem('e4_key')},go:'e4_bossKey'},
+   {t:'Я буду говорить ей правду',act:()=>F().bossT=1,go:'e4_bossTruth'}]}),
+ e4_bossKey:N('boss','n','Ключ? Он где-то был… Вот. Мы её никогда не запирали, там же Гуля швабру держит.',{next:END}),
+ e4_bossTruth:N('boss','s','Правду… Ладно. Только правду тоже можно сказать аккуратно. И возьми ключ от серверной, она спросит.',{act:()=>{F().key=1;addItem('e4_key')},next:END}),
+ e4_rack:{who:'narr',text:()=>{const f=F();return 'Серверная. '+(f.accDone?'Лишние учётки отключены. ':'Список учётных записей ты ещё не проверял. ')+(f.lock?'Дверь запирается, журнал посещений висит на стене.':f.key?'Ключ у тебя, но дверь пока открыта.':'Дверь открыта настежь, ключа нет.')+(f.mop?'':' За стойкой стоит ведро со шваброй.')},choices:[
+   {t:'Проверить список учётных записей',if:()=>!F().accDone,mg:['logs',{title:'Учётные записи сервера',icon:'search',hint:'Найди учётку, которую нужно <b>отключить немедленно</b>.',cols:['Учётка','Права','Последний вход'],rows:[['admin','администратор','сегодня, 08:52'],['dilnoza','бухгалтерия','сегодня, 09:05'],['bit_support','администратор','пятница, 17:41'],['nigora','пользователь','сегодня, 08:58'],['lola','кадры','сегодня, 09:01']],ans:2},'e4_accDone']},
+   {t:'Запереть серверную и завести журнал посещений',if:()=>F().key&&!F().lock,act:()=>{F().lock=1;addTime(10);logc('Запер серверную и завёл журнал посещений')},go:'e4_lock'},
+   {t:'Вынести ведро и швабру самому',if:()=>!F().mop,act:()=>{F().mop=1;F().mopSelf=1;addTime(15)},go:'e4_mopSelf'},
+   {t:'Уйти',go:END}]},
+ e4_accDone:{who:'narr',text:'«bit_support», права администратора, последний вход: пятница, 17:41. Она до сих пор активна! Ты отключаешь её и меняешь пароли администраторов.',act:()=>{F().accDone=1;addClue('e4_acc');addTime(10)},next:END},
+ e4_lock:{who:'narr',text:'Щёлк. На двери теперь замок, на стене лист: «Журнал посещений серверной. Дата, время, кто, зачем». Первая запись твоя.',next:END},
+ e4_mopSelf:{who:'narr',text:'Ты выносишь ведро и швабру в кладовку. Гуля опа будет искать их полдня и узнает, кто это сделал.',act:()=>rel('gulya',-1),next:END},
+ e4_gul1:N('gulya','n','Вой, что за женщина с чемоданом? Опять проверка?',{choices:[
+   {t:'Гуля опа, швабру из серверной надо убрать. Вода рядом с серверами — беда',go:()=>G.rel.gulya<0?'e4_gulNo':'e4_gulOK'},
+   {t:'Вы кого-нибудь из наших видели с соседями?',if:()=>F().tipAsked&&!has('e4_dinner'),go:'e4_gulTip'},
+   {t:'Аудитор. Работайте спокойно',act:()=>F().gul4=1,go:END}]}),
+ e4_gulOK:N('gulya','h','А куда же её? В кладовку? Ладно, болам, раз для дела. Сейчас унесу.',{act:()=>{F().gul4=1;F().mop=1;rel('gulya',1)},next:END}),
+ e4_gulNo:N('gulya','a','Двадцать лет она там стоит и никому не мешала! Не унесу.',{choices:[{t:'Гуля опа, пожалуйста. Мне без вас не справиться',rel:{gulya:1},go:'e4_gulOK'},{t:'Тогда унесу сам',act:()=>F().gul4=1,go:END}]}),
+ e4_gulTip:N('gulya','n','Я полы мою, а не за людьми смотрю. Ты Хамид-аку спроси, в чайхане. У него все обедают, и все при нём болтают.',{next:END}),
+ e4_tim1:N('timur','n','О, брат! Видал аудиторшу? Строгая. Хорошо, что у меня всё чисто.',{choices:[
+   {t:'Тимур, а что это за жёлтая бумажка на мониторе?',go:'e4_tim2'},
+   {t:'Молодец',act:()=>F().tim4=1,go:END}]}),
+ e4_tim2:N('timur','o','Это? Пароль. «Timur2024!». А что? Я же его иначе забуду!',{choices:[
+   {t:'Снимай. Сейчас поставлю тебе менеджер паролей и покажу, как им пользоваться',rel:{timur:1},act:()=>{F().tim4=1;F().pw='fix';addTime(15);logc('Убрал стикер с паролем и научил Тимура менеджеру паролей')},go:'e4_timFix'},
+   {t:'Спрячь под клавиатуру, пока она не ушла',act:()=>{F().tim4=1;F().pw='hide';logc('Велел Тимуру спрятать стикер с паролем')},go:'e4_timHide'},
+   {t:'Потом разберёмся',go:END}]}),
+ e4_timFix:N('timur','h','Один пароль вместо двадцати? И он сам подставляет? Брат, почему мне раньше никто не показал!',{next:END}),
+ e4_timHide:N('timur','n','Под клавиатуру. Понял. Могила.',{next:END}),
+ e4_reg1:N('dilnoza','n','Болам, эта женщина уже спросила у меня про копии. Я сказала: спросите админа.',{choices:[
+   {t:'Давайте оформим вашу флешку как регламент: кто, когда и куда копирует',if:()=>!PR().gear.includes('nas'),rel:{dilnoza:1},act:()=>{F().reg4=1;F().reg=1;addTime(20);logc('Оформил с Дильнозой опой регламент резервных копий')},go:'e4_reg2'},
+   {t:'Правильно сказали',act:()=>F().reg4=1,go:END}]}),
+ e4_reg2:N('dilnoza','h','Расписание, ответственный, сейф… Сорок лет работаю, первый раз вижу, чтобы админ бумагу написал сам. Подпишу.',{next:END}),
+ e4_regN:N('nigora','n','Аудитор спрашивала про копии. Бухгалтерии сейчас некому ответить… Что ей сказать?',{choices:[
+   {t:'Давай оформим регламент: кто, когда и куда копирует. Ответственной будешь ты',if:()=>!PR().gear.includes('nas'),rel:{nigora:1},act:()=>{F().reg4=1;F().reg=1;addTime(20);logc('Оформил с Нигорой регламент резервных копий')},go:'e4_regN2'},
+   {t:'Отправляй ко мне',act:()=>F().reg4=1,go:END}]}),
+ e4_regN2:N('nigora','h','Я? Ответственная за копии? Ого. Напишу маме.',{next:END}),
+ e4_far1:N('farrukh','n','На два слова. Скажешь ей, что копии были всегда, а пятница — просто сбой электричества. Премия пять миллионов. Сегодня, наличными.',{choices:[
+   {t:'Нет',rel:{farrukh:-1},act:()=>{F().far4=1;logc('Отказался от денег Фарруха')},go:'e4_farNo'},
+   {t:'Повторите, пожалуйста, я не расслышал (включить диктофон)',act:()=>{F().far4=1;F().rec=1;addClue('e4_rec');logc('Записал предложение Фарруха на диктофон')},go:'e4_farRec'},
+   {t:'Беру',rel:{farrukh:1},act:()=>{F().far4=1;F().bribe=1;PR().money+=5000000;saveSeason();logc('Взял пять миллионов у Фарруха')},go:'e4_farYes'}]}),
+ e4_farNo:N('farrukh','a','Принципиальный. Принципиальные у нас долго не работают, молодой человек.',{next:END}),
+ e4_farRec:N('farrukh','n','Я сказал: пять миллионов за то, что копии были всегда, а пятница была сбоем. Думай до обеда.',{next:END}),
+ e4_farYes:N('farrukh','h','Вот и умница. Конверт в верхнем ящике твоего стола. И помни, что ты теперь сказал.',{next:END}),
+ e4_farCall:{who:'narr',text:'Звонок. Фаррух Рашидович, отстранённый, но не успокоившийся: «Скажешь ей, что копии были всегда, а пятница — просто сбой. Пять миллионов переведу сегодня же».',choices:[
+   {t:'Нет',act:()=>{F().far4=1;logc('Отказался от денег Фарруха')},go:END},
+   {t:'Включить запись разговора',act:()=>{F().far4=1;F().rec=1;addClue('e4_rec');logc('Записал предложение Фарруха')},go:END},
+   {t:'Договорились',act:()=>{F().far4=1;F().bribe=1;PR().money+=5000000;saveSeason();logc('Взял пять миллионов у Фарруха')},go:END}]},
+ e4_ham1:N('hamid','h','О, админ! Садись, плов свежий. Что такой хмурый, проверка?',{choices:[
+   {t:'Хамид-ака, наш Фаррух Рашидович у вас обедает? С кем?',act:()=>{F().ham4=1;addClue('e4_dinner')},go:'e4_ham2'},
+   {t:'Проверка. Потом зайду',go:END}]}),
+ e4_ham2:N('hamid','n','В четверг сидел. С соседом вашим, Жасуром. Долго шептались, бумаги какие-то смотрели. Плов не доели. Кто не доедает плов, тому я не верю.',{next:END}),
+ e4_rus1:N('rustam','n','Аудит? Запомни одно: аудиторы прощают дыры и не прощают враньё. И отключи учётку «bit_support», если она ещё жива. Я бы начал с неё.',{act:()=>F().rus4=1,next:END}),
+ e4_half:N('lim','n',()=>'Половина дня прошла. У меня заполнено строк: '+e4Rep()+' из 5. Пустая строка в отчёте читается как «не предъявлено».',{next:END}),
+ e4_warn:N('lim','n','Через полчаса я закрываю блокнот.',{next:END}),
+});
+Object.assign(ITEMS,{e4_key:'🔑 Ключ от серверной'});
+function e4Verdict(){const f=F(),sc=e4Score()-(f.accDone?0:1),lies=f.lies||0;return f.bribe&&lies>0?'acc':lies>=2||sc<2?'red':sc>=6&&!lies?'green':'yellow'}
+function e4Outro(){const f=F(),v=e4Verdict(),seq=[];
+  seq.push({who:'lim',mood:'n',text:'Отчёт. Копии: '+({2:'в порядке',1:'в работе',0:'отсутствуют','-2':'недостоверные сведения'}[f.sBk]||'не предъявлено')+'. Доступы: '+(f.accR?'устранено':f.accDone?'не предъявлено':'активна учётка подрядчика')+'. Пароли: '+(f.sPw===1?'в порядке':f.sPw===-1?'сокрытие':'не предъявлено')+'. Серверная: '+(f.sSrv===1?'в порядке':f.srvR?'частично':'не предъявлено')+'. Инцидент: '+(f.sInc>=2?'раскрыт':f.sInc>=0&&f.incR?'расследование не завершено':f.incR?'недостоверные сведения':'не предъявлено')+'.'});
+  if(v==='green')seq.push({who:'lim',mood:'h',text:'Итог: зелёный. У вас были дыры, и вы их не прятали. Я рекомендую сделку.'},{who:'boss',mood:'h',text:'Зелёный?! Я же говорил: показывай только хорошее! …Что значит «он показывал всё»?'});
+  else if(v==='yellow')seq.push({who:'lim',mood:'n',text:'Итог: жёлтый. Сделка возможна, но с условиями и повторной проверкой через месяц.'},{who:'boss',mood:'s',text:'Месяц… Ладно. Месяц мы продержимся. Продержимся ведь?'});
+  else if(v==='acc')seq.push({who:'lim',mood:'a',text:'Итог: красный. И отдельная строка: «системный администратор давал заведомо ложные сведения». С вашей фамилией.'},{who:'narr',text:'Конверт Фарруха лежит в верхнем ящике твоего стола. Он вдруг кажется очень тяжёлым.'});
+  else seq.push({who:'lim',mood:'a',text:'Итог: красный. Я не могу рекомендовать сделку компании, которая '+((f.lies||0)>=2?'лжёт аудитору.':'не знает, что у неё происходит.')},{who:'boss',mood:'s',text:'Красный… Это конец?'},{who:'lim',mood:'n',text:'Это пауза. Конец будет, если через месяц ничего не изменится.'});
+  if(f.rec)seq.push({who:'narr',text:'Ты кладёшь на стол телефон и включаешь запись. Голос Фарруха: «…пять миллионов за то, что копии были всегда». Госпожа Лим слушает до конца и убирает телефон в свой чемодан.'});
+  if(f.tip)seq.push({who:'lim',mood:'n',text:'И спасибо за чайхану. Посмотрите.'},{who:'narr',text:'Она показывает фотографию на телефоне: Фаррух и Жасур за столиком у Хамид-аки. Между ними папка с логотипом инвесторов. 📸'});
+  else seq.push({who:'narr',text:'Уходя, госпожа Лим задерживается у окна и долго смотрит на вывеску соседей: «Ташкент Лоджистик». Потом что-то пишет в блокнот.'});
+  seq.push({who:'narr',text:'Вечером приходит рассылка от управляющей компании: «Во вторник ожидается +45. Возможны веерные отключения электричества. Просим выключать кондиционеры». Серверная об этом ещё не знает. 🌡️'});
+  for(let i=0;i<seq.length-1;i++)seq[i].next=seq[i+1];seq[seq.length-1].next=END;G.afterFinal=true;return seq[0]}
+EPS[4]={intro:'e4_intro',
+ newGame(){const p3=prevF(3),p2=prevF(2);return baseState({p2:Object.assign({},p2),p3:Object.assign({},p3),rb:(p3.rb||p2.rb)?1:0,met_boss:0,lies:0},
+   ['nigora','boss','dilnoza','lola','timur','malika','sardor','gulya','rustam','bobur','jasur','kamila','hamid','farrukh','lim'])},
+ setup(){const f=G.F;if(f.rb){setAway('sardor');setHome('rustam',deskOf(5))}else setAway('rustam');
+  if(f.p2.farSusp)setAway('farrukh');else setHome('farrukh',E2HOME_FAR);if(f.p2.dilFired)setAway('dilnoza');setHome('lim',E4HOME_LIM)},
+ nodeFor(id){const f=F();
+  if(id==='lim')return !f.met_boss?'e4_lim1':(e4Rep()>=3&&!f.tipAsked)?'e4_limTip':'e4_limM';
+  if(!f.met_boss)return null;
+  if(id==='boss')return !f.bossT?'e4_boss1':null;
+  if(id==='gulya')return (!f.gul4||(!f.mop&&!f.srvR)||(f.tipAsked&&!has('e4_dinner')&&!f.gulTipD))?'e4_gul1':null;
+  if(id==='timur')return !f.tim4?'e4_tim1':null;
+  if(id==='dilnoza')return !f.reg4?'e4_reg1':null;
+  if(id==='nigora')return f.p2.dilFired&&!f.reg4?'e4_regN':null;
+  if(id==='farrukh')return !f.far4?'e4_far1':null;
+  if(id==='hamid')return !f.ham4?'e4_ham1':null;
+  if(id==='rustam')return !f.rus4?'e4_rus1':null;
+  return null},
+ markerFor(id){const f=F();
+  if(id==='lim')return !f.met_boss?'q':(f.accDone&&!f.accR)||(f.pw&&!f.pwR)||((f.mop||f.lock)&&!f.srvR)||(f.reg&&!f.bkR)||(PR().gear.includes('nas')&&!f.bkR)?'t':e4Rep()>=3?'t':'';
+  if(!f.met_boss)return '';
+  if(id==='boss')return !f.bossT?'q':'';
+  if(id==='gulya')return !f.mop&&!f.srvR?'q':'';
+  if(id==='timur')return !f.tim4&&!f.pwR?'s':'';
+  if(id==='dilnoza')return !f.reg4&&!f.bkR&&!PR().gear.includes('nas')?'q':'';
+  if(id==='nigora')return f.p2.dilFired&&!f.reg4&&!f.bkR&&!PR().gear.includes('nas')?'q':'';
+  if(id==='farrukh')return !f.far4?'q':'';
+  if(id==='hamid')return f.tipAsked&&!f.ham4?'s':'';
+  if(id==='rustam')return !f.rus4?'q':'';
+  return ''},
+ hot:{rack:{icon:()=>!F().met_boss?'':(!F().accDone||(F().key&&!F().lock))?'q':'',node:()=>'e4_rack'}},
+ hotHidden:h=>!h.door&&!h.common&&h.id!=='rack',
+ gossip:{boss:['Только хорошее. Только хорошее…','Зачем я согласился на аудит?'],
+   dilnoza:['Она спросила про проводки за март. За март!','Вой, давление…'],
+   nigora:['Она пьёт только воду. Без газа. Комнатной температуры.','Я ей три раза предложила чай.'],
+   lola:['Она знает про моё письмо. Она всё знает.','Я теперь каждое вложение проверяю дважды.'],
+   timur:['Строгая женщина. Мне нравится.','Брат, а менеджер паролей пароль сам не забудет?'],
+   malika:['Интересно, какой у них в Сингапуре дизайн отчётов?','Макет я теперь храню в трёх местах.'],
+   rustam:['Дыры прощают. Враньё — нет.','Журнал посещений серверной. Давно пора.'],
+   farrukh:['Умные люди договариваются.','До пяти ещё есть время передумать.'],
+   gulya:['Чемодан у неё тяжёлый, я двигала.','Швабра, видите ли, им мешает.'],
+   sardor:['На складе у меня порядок. Теперь.','Пусть проверяет. Я чист. Почти.'],
+   bobur:['Иностранка. Пропуск оформил как положено.','Журнал у меня всегда в порядке, сынок.'],
+   hamid:['Плов надо доедать.','Кто шепчется за едой, тот что-то прячет.'],
+   lim:['Я слушаю.','Время идёт.']},
+ events(){const f=F(),m=G.min,e=f.ev;
+  if(!e.far&&m>=630&&f.met_boss&&f.p2.farSusp&&!f.far4){e.far=1;talk('e4_farCall');return}
+  if(!e.half&&m>=780&&f.met_boss){e.half=1;talk('e4_half','lim');return}
+  if(!e.warn&&m>=990&&f.met_boss){e.warn=1;talk('e4_warn','lim');return}
+  if(m>=1020&&!e.final){startFinal();return}},
+ objectives(){const f=F(),o=[];
+  if(!f.met_boss){o.push(['Поговорить с аудитором (кабинет директора)',0]);return o}
+  o.push([PR().gear.includes('nas')?'Копии: показать аудитору сервер копий':f.reg?'Копии: показать регламент аудитору':'Копии: оформить регламент с бухгалтерией',!!f.bkR]);
+  o.push([f.accDone?'Доступы: показать результат аудитору':'Доступы: проверить учётки (стойка в серверной)',!!f.accR]);
+  o.push([f.pw?'Пароли: доложить аудитору':'Пароли: присмотрись к монитору Тимура',!!f.pwR]);
+  o.push([f.mop&&f.lock?'Серверная: показать аудитору':'Серверная: убрать швабру и запереть дверь',!!f.srvR]);
+  o.push(['Инцидент: рассказать, что было в пятницу',!!f.incR]);
+  o.push(['Сдать всё аудитору до 17:00',0]);return o},
+ final(){if(G.busy){G.pendingFinal=true;return}const f=F();f.ev.final=1;G.busy=true;const fade=$('fade');fade.style.opacity=1;
+  setTimeout(()=>{setLoc('office');G.p.x=268;G.p.y=332;G.p.path=[];const b=NPC.boss;sitAt(b,b.home.x,b.home.y,0,0,b.home.stand);b.hold=true;NPC.lim.hold=true;if(NPC.farrukh.loc==='office'){const fr=NPC.farrukh;fr.x=318;fr.y=304;fr.hold=true}fade.style.opacity=0;cam.tt.set(wx(270),.8,wz(290));cam.td=baseDist*.45;
+   G.busy=false;talk(e4Outro(),'lim')},700)},
+ ending(){const f=F(),v=e4Verdict(),sc=e4Score()-(f.accDone?0:1);G.running=false;ov.style.display='none';
+  const [title,desc]={green:['🟢 Зелёный отчёт','Аудитор рекомендует сделку. Ты не прятал дыры, а закрывал их, и это оказалось важнее красивой картинки.'],
+   yellow:['🟡 Жёлтый отчёт','Сделка возможна, но с условиями и повторной проверкой через месяц. Есть что исправлять.'],
+   red:['🔴 Красный отчёт','Сделка поставлена на паузу. Аудитор не получила то, что хотела увидеть: честные ответы и порядок.'],
+   acc:['🧾 Соучастник','Пять миллионов в ящике стола и твоя фамилия в отчёте аудитора. Фаррух тебя уже не знает.']}[v];
+  finishEpisode(4,title,{verdict:v,score:sc,lies:f.lies||0,bribe:f.bribe?1:0,rec:f.rec?1:0,tip:f.tip?1:0,rb:f.rb,dinner:has('e4_dinner')?1:0},G.rel);
+  const s=$('screen');s.classList.remove('hidden');
+  s.innerHTML=`<div class="tag">КОНЕЦ ЭПИЗОДА 4</div><h2 style="font-size:24px">${title}</h2><p>${desc}</p>
+  <div class="sum"><b style="color:#79c0ff">Твои решения:</b><br>${G.log.map(l=>'• '+l).join('<br>')||'• Ты ничего особо не решал 😅'}</div>
+  <div class="sum"><b style="color:#79c0ff">Отношения:</b><br>${Object.keys(G.rel).filter(id=>G.rel[id]!==0).map(id=>`${CH[id].name}: ${G.rel[id]>0?'💚'.repeat(G.rel[id]):'💔'.repeat(-G.rel[id])}`).join('<br>')||'Нейтрально со всеми'}</div>
+  <p style="color:#ffd166">📋 Оценка аудита: ${sc} из 8</p><p style="font-size:12px">Продолжение: «Эпизод 5. Свет погас» 🌡️</p>${seasonButton()}`;$('tosea').onclick=()=>showSeason()}};
+
 /* ---------- dialogue engine ---------- */
 const dlgEl=$('dlg');let D=null;
 function talk(nodeOrId,npcId){const node=typeof nodeOrId==='string'?DLG[nodeOrId]:nodeOrId;if(!node)return;G.busy=true;if(npcId&&NPC[npcId]){NPC[npcId].hold=true;bump('talk')}D={npc:npcId};show(node)}
@@ -2524,6 +2723,7 @@ function bump(k){const p=MT();p.cnt[k]=(p.cnt[k]||0)+1;if(p.dq.c[k]!=null)p.dq.c
 const ACH=[
  ['ep1','🎬','Первый день','Пройди эпизод 1',p=>!!SEASON.done[1]],
  ['ep3','📺','Сериал затянул','Пройди три эпизода',p=>[1,2,3].every(n=>SEASON.done[n])],
+ ['green','🟢','Честный админ','Получи зелёный отчёт аудитора',p=>{const d=SEASON.done[4];return !!d&&d.F&&d.F.verdict==='green'}],
  ['nopay','🛡️','Ни тийина','Переживи шифровальщик без выкупа',p=>{const d=SEASON.done[3];return !!d&&d.F&&d.F.restored&&!d.F.paid}],
  ['crimp5','🔌','Золотые руки','Обожми 5 кабелей',p=>p.cnt.crimp>=5],
  ['mg20','🧩','Мастер на все руки','Выиграй 20 мини-игр',p=>p.cnt.mg>=20],
