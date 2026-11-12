@@ -1495,7 +1495,7 @@ const EPS={};let EPN=1;
 const EPLIST=[
  {n:1,t:'День первый',d:'Первый день сисадмином. Пропадают ноутбуки, прошлый админ оклеветан, а в 15:00 звонок с инвесторами.'},
  {n:2,t:'Кто подписал списание?',d:'Анонимное письмо, поддельные акты и финдиректор, который «был в Дубае». Кто врёт?'},
- {n:3,t:'Шифровальщик',d:'Пятница, 17:58. Все экраны гаснут, на них череп и таймер. Платить или спасать?',soon:1},
+ {n:3,t:'Шифровальщик',d:'Пятница, 17:58. Все экраны гаснут, на них череп и таймер. Платить или спасать?'},
  {n:4,t:'Аудит',d:'Из Сингапура прилетает аудитор. Одна ошибка — и сделка сорвётся.',soon:1},
  {n:5,t:'Свет погас',d:'Жара, блэкаут и чужой человек в серверной, пока камеры не работают.',soon:1},
  {n:6,t:'Двойная игра',d:'«Бит Сервис», Жасур и ловушка для того, кто всё это начал.',soon:1},
@@ -1772,6 +1772,215 @@ function e2Outro(){const f=F(),n=evF(),seq=[];
   seq.push({who:'narr',text:'Пятница, 17:58. Ты уже надеваешь куртку, когда все экраны в офисе одновременно гаснут. А потом загораются красным: череп и таймер 48:00:00. 💀'});
   for(let i=0;i<seq.length-1;i++)seq[i].next=seq[i+1];seq[seq.length-1].next=END;G.afterFinal=true;return seq[0]}
 
+/* ================= ЭПИЗОД 3: ШИФРОВАЛЬЩИК ================= */
+Object.assign(CLUES,{
+ e3_note:'Записка вымогателей: 200 млн сум за 48 часов. В тексте названа папка «Туран_Сделка»: её имя знали только свои',
+ e3_lola:'Лола открыла «Резюме.pdf.exe», но антивирус удалил файл ещё в 14:10. Ложный след',
+ e3_usb:'Флешка Тимура чистая: он заряжал от неё телефон. Ложный след',
+ e3_rdp:'Журнал сервера: вход по удалённому доступу в 17:41 под учёткой «bit_support»',
+ e3_bitacc:'Учётку «bit_support» завели для «Бит Сервиса» по заявке Фарруха Рашидовича',
+ e3_ip:'Вход шёл не из-за границы: адрес ташкентский, офис «Бит Сервиса»',
+ e3_gul:'Гуля опа видела в 17:30 в коридоре парня в куртке «Бит Сервис» с ноутбуком',
+ e3_bob:'Журнал пропусков: 17:25, гость к Фарруху Рашидовичу, фирма «Бит Сервис»',
+ e3_mid:'«Проверенный посредник» Фарруха — это тот же «Бит Сервис»'});
+Object.assign(ITEMS,{e3_dflash:'💾 Флешка Дильнозы опы: выгрузка 1С за среду',e3_rdisk:'💽 Внешний диск Рустама: копия двухнедельной давности'});
+const EV3=['e3_rdp','e3_bitacc','e3_ip','e3_gul','e3_bob','e3_mid'];
+const ev3=()=>G.clues.filter(c=>EV3.includes(c)).length;
+const e3Iso=()=>{const f=F();f.iso=G.min<=1110?1:2;logc(f.iso===1?'Быстро отрезал сеть: часть данных уцелела':'Отрезал сеть с опозданием')};
+const e3Src=()=>F().bk==='nas'?'сервера копий (сегодня, 03:00)':F().bk==='dil'?'флешки Дильнозы опы (среда)':'диска Рустама (две недели назад)';
+Object.assign(DLG,{
+ e3_intro:{who:'narr',text:'Пятница, 17:58. Все экраны в офисе горят красным: череп и таймер 48:00:00. «Ваши файлы зашифрованы. 200 000 000 сум. Не выключайте компьютеры». 💀',next:'e3_intro2'},
+ e3_intro2:{who:'narr',text:()=>PR().gear.includes('sw')?'Хорошая новость: новый свитч делит отделы по сетям, и зараза пока сидит в бухгалтерии и на сервере. Плохая: она ползёт дальше.':'Сеть в офисе одна на всех, и шифровальщик идёт по ней от компьютера к компьютеру. Прямо сейчас.',next:'e3_intro3'},
+ e3_intro3:{who:'narr',text:'Каждая минута — это новые потерянные файлы. Сначала останови заразу в серверной. Потом ищи копию и того, кто открыл дверь.',next:END},
+ e3_boss1:N('boss','a','Что это такое?! В понедельник прилетает аудитор из Сингапура! Сделай что-нибудь, сейчас же!',{choices:[
+   {t:'Сначала отрезаю сеть. Разговоры потом',rel:{boss:1},act:()=>F().met_boss=1,go:END},
+   {t:'Перезагрузим все компьютеры, и пройдёт',act:()=>{F().met_boss=1;F().reb=1;addTime(15);logc('Перезагрузил компьютеры: шифровальщик добил ещё часть файлов')},go:'e3_bossReb'},
+   {t:'Может, проще заплатить?',act:()=>F().met_boss=1,go:'e3_bossPay0'}]}),
+ e3_bossReb:{who:'narr',text:'Компьютеры перезагружаются… и шифровальщик стартует вместе с ними, уже с правами системы. Счётчик на экране прыгает вверх. Зря.',next:END},
+ e3_bossPay0:N('boss','o','Двести миллионов?! Это четверть сделки! Сначала скажи мне, есть ли другой выход. Потом будем считать.',{next:END}),
+ e3_rack0:{who:'narr',text:'Серверная. Свитч мигает как новогодняя ёлка: шифровальщик прямо сейчас ходит по сети.',choices:[
+   {t:'Выдернуть аплинк и кабель сервера',act:()=>{e3Iso();addTime(3)},go:'e3_iso'},
+   {t:'Закрыть всё правилами на фаерволе',if:()=>PR().gear.includes('fw'),mg:['rules',{},'e3_isoFw']},
+   {t:'Сначала посмотреть, что происходит',act:()=>addTime(12),go:'e3_rackWait'}]},
+ e3_rackWait:{who:'narr',text:'Ты смотришь на графики. Красиво. Пока ты смотришь, зашифровано ещё четыре тысячи файлов. Режь сеть!',next:'e3_rack0'},
+ e3_iso:{who:'narr',text:()=>F().iso===1?'Щёлк. Щёлк. Сеть мертва, и зараза заперта там, где была. Ты успел: почта и архив кадров уцелели.':'Щёлк. Сеть мертва. Но поздно: шифровальщик уже прошёлся по почте и архиву кадров.',next:END},
+ e3_isoFw:{who:'narr',text:'Фаервол режет всё лишнее. Зараза заперта, а в журнале остаются адреса, с которых к вам стучались. Пригодится.',act:()=>{e3Iso();F().fwlog=1},next:END},
+ e3_rackM:{who:'narr',text:()=>{const f=F();return 'Сервер. '+(f.clean?'Шифровальщик убит. ':'Процесс шифровальщика ещё работает. ')+(f.restored?'Данные восстановлены.':f.bk?'Копия найдена: с '+e3Src()+'.':f.bkNeed?'Рабочей копии пока нет.':'Копии ты ещё не проверял.')},choices:[
+   {t:'Завершить процесс шифровальщика',if:()=>!F().clean,mg:['taskmgr',{mode:'ransom'},'e3_cleanOK']},
+   {t:'Проверить резервные копии',if:()=>!F().bk&&!F().bkNeed,go:()=>PR().gear.includes('nas')?'e3_bkNas':'e3_bkNone'},
+   {t:'Восстановить данные из копии',if:()=>F().bk&&!F().restored,go:()=>F().clean?'e3_restGo':'e3_restBad'},
+   {t:'Открыть журнал входов на сервер',if:()=>!has('e3_rdp'),mg:['logs',{title:'Журнал входов, пятница',icon:'search',hint:'Кто зашёл на сервер <b>удалённо</b> перед атакой?',cols:['Время','Учётка','Откуда'],rows:[['16:05','dilnoza','dilnoza-pc'],['16:48','lola','lola-pc'],['17:12','admin','консоль'],['17:41','bit_support','удалённо (RDP)'],['17:44','nigora','nigora-pc']],ans:3},'e3_rdpOK']},
+   {t:'Проследить, откуда был вход',if:()=>has('e3_rdp')&&!has('e3_ip')&&!!F().fwlog,go:'e3_ipOK'},
+   {t:'Проследить, откуда был вход',if:()=>has('e3_rdp')&&!has('e3_ip')&&!F().fwlog,sk:['sec',2],go:'e3_ipOK'},
+   {t:'Уйти',go:END}]},
+ e3_cleanOK:{who:'narr',text:'WannaPay.exe завершён, автозапуск вычищен. Теперь к серверу можно подключать копию: её никто не сожрёт.',act:()=>{F().clean=1;addTime(10)},next:END},
+ e3_bkNas:{who:'narr',text:'Сервер копий стоит в отдельной сети, и шифровальщик до него не добрался. Последняя копия: сегодня, 03:00. Вот за это его и покупали.',act:()=>{F().bk='nas';logc('Сервер копий спас данные')},next:END},
+ e3_bkNone:{who:'narr',text:'«Резервная копия» — это папка на том же диске. Она зашифрована вместе со всем остальным. Нужна копия, которая лежала отдельно. Спроси людей: вдруг кто-то делал свою.',act:()=>F().bkNeed=1,next:END},
+ e3_restGo:{who:'narr',text:()=>{const f=F(),d=(f.bk==='nas'?60:f.bk==='dil'?90:120)-(NPC.rustam.loc==='office'?30:0);f.restored=1;addTime(d);logc('Восстановил данные с '+e3Src());
+   return 'Полоска ползёт… '+fmtDur(d)+' спустя 1С открывается. '+(f.bk==='nas'?'Потеряна только сегодняшняя пятница.':f.bk==='dil'?'База за среду. Два дня Дильнозе опе придётся вбить заново.':'Данные двухнедельной давности. Две недели работы придётся восстанавливать руками.')+(NPC.rustam.loc==='office'?' Рустам помог, и вышло быстрее.':'')},next:END},
+ e3_restBad:{who:'narr',text:()=>{const f=F();if(f.bk==='nas'){addTime(40);logc('Подключил копию при живом шифровальщике, потерял 40 минут');return 'Ты запускаешь восстановление… и файлы тут же получают расширение .locked. Шифровальщик ещё жив! Ты успеваешь оборвать связь: сервер копий цел, но 40 минут потеряно. Сначала убей процесс.'}
+   const was=f.bk;f[was==='dil'?'usedDil':'usedRus']=1;f.bk='';f.bkNeed=1;logc('Подключил копию при живом шифровальщике: копия уничтожена');
+   return 'Ты подключаешь '+(was==='dil'?'флешку':'диск')+'… и файлы на '+(was==='dil'?'ней':'нём')+' один за другим получают расширение .locked. Шифровальщик ещё жив. Копия уничтожена. Сначала нужно было убить процесс.'},next:END},
+ e3_rdpOK:{who:'narr',text:'17:41, учётка «bit_support», вход по удалённому доступу. Через семнадцать минут всё стало красным. Шифровальщик не «прилетел по почте»: его запустили руками.',act:()=>{addClue('e3_rdp');addTime(8)},next:END},
+ e3_ipOK:{who:'narr',text:'Ты пробиваешь адрес. Никакой заграницы: ташкентский провайдер, договор на ООО «Бит Сервис». Те самые, кому «списывали» технику.',act:()=>{addClue('e3_ip');addTime(10)},next:END},
+ e3_note:{who:'narr',text:'Принтер лист за листом печатает записку вымогателей. «…включая папку Туран_Сделка». Откуда чужим знать, как у вас называется папка со сделкой?',act:()=>addClue('e3_note'),next:END},
+ e3_dilpc:{who:'narr',text:()=>F().restored?'1С снова открыта на «Остатках». Как будто ничего и не было.':'Красный экран, череп и таймер. Мышка не слушается.',next:END},
+ e3_lol1:N('lola','s','Это я… Это всё я! Утром пришло резюме, я открыла, а там файл «Резюме.pdf.exe». Меня уволят, да?',{choices:[
+   {t:'Покажи это письмо',mg:['phish',{},'e3_lolOK','e3_lolNo']},
+   {t:'Лола, это ты всех заразила!',rel:{lola:-2},act:()=>{F().lol=1;F().blameLola=1;logc('Обвинил Лолу, не проверив')},go:'e3_lolBlame'},
+   {t:'Потом. Сначала тушим пожар',act:()=>F().lol=1,go:END}]}),
+ e3_lolOK:N('lola','h','Правда?.. То есть антивирус удалил его ещё днём? Ой, я сейчас заплачу. Спасибо!',{act:()=>{F().lol=1;addClue('e3_lola');rel('lola',1)},next:END}),
+ e3_lolNo:N('lola','s','Я ничего не понимаю в этих письмах… Давайте потом, мне страшно.',{act:()=>F().lol=1,next:END}),
+ e3_lolBlame:N('lola','s','Я… я не хотела…',{next:END}),
+ e3_lol2:N('lola','n','Заявка на учётку «bit_support»? Сейчас… Вот. Месяц назад, «для техподдержки 1С». Подпись: Фаррух Рашидович.',{act:()=>addClue('e3_bitacc'),next:END}),
+ e3_tim1:N('timur','o','Брат, клянусь, я только флешку воткнул! Клиент дал. Это же не из-за неё, а?',{choices:[
+   {t:'Дай сюда, проверю',act:()=>{F().tim=1;addClue('e3_usb');addTime(5)},go:'e3_timOK'},
+   {t:'Тимур, опять ты?!',rel:{timur:-1},act:()=>F().tim=1,go:END}]}),
+ e3_timOK:N('timur','h','Чистая? Я от неё вообще-то телефон заряжал. Фух. А то я уже чемодан мысленно собрал.',{act:()=>rel('timur',1),next:END}),
+ e3_mal1:N('malika','a','Мой макет для инвесторов! Три недели работы! Скажи, что он не пропал!',{choices:[
+   {t:'Ты его где-нибудь ещё хранила?',act:()=>{F().mal=1;F().malCloud=1},go:'e3_malOK'},
+   {t:'Не до макетов сейчас',rel:{malika:-1},act:()=>F().mal=1,go:END}]}),
+ e3_malOK:N('malika','h','В облаке! Вчерашняя версия лежит в облаке! Ты гений, что спросил. С меня самса 🥟',{act:()=>rel('malika',1),next:END}),
+ e3_dil1:N('dilnoza','s','Болам, 1С не открывается! У меня квартальный отчёт, у меня аудитор в понедельник! Вой, сердце…',{choices:[
+   {t:'Дильноза опа, мы всё вернём. Сядьте, выпейте чаю',rel:{dilnoza:1},act:()=>F().dil3=1,go:END},
+   {t:'Не трогайте компьютер и ничего не выключайте',act:()=>F().dil3=1,go:END}]}),
+ e3_dilBk:N('dilnoza','n','Копия? Своя?',{choices:[{t:'Вы случайно не выгружали базу куда-нибудь сами?',go:()=>G.rel.dilnoza<0?'e3_dilBk2':'e3_dilBk1'}]}),
+ e3_dilBk1:N('dilnoza','h','Выгружала! Каждую среду, на флешку. Рустам научил: «опа, не верьте серверам». Вот она, в сумке, рядом с валидолом.',{act:()=>{addItem('e3_dflash');F().bk='dil';F().bkNeed=0;logc('Дильноза опа дала свою флешку с копией')},next:END}),
+ e3_dilBk2:N('dilnoza','a','После всего, что было?.. Ладно. Не ради тебя, ради фирмы. Держи. И верни в целости.',{act:()=>{addItem('e3_dflash');F().bk='dil';F().bkNeed=0;addTime(15)},next:END}),
+ e3_gul1:N('gulya','n','Вой, опять всё красное! Я ничего не трогала, сразу говорю!',{choices:[
+   {t:'Гуля опа, вы сегодня чужих в коридоре не видели?',go:()=>prevF(1).gul==='bad'&&G.rel.gulya<=0?'e3_gulNo':'e3_gulOK'},
+   {t:'Верю. Работайте спокойно',act:()=>F().gul3=1,go:END}]}),
+ e3_gulOK:N('gulya','o','Видела! В полшестого. Молодой, в куртке, на спине написано «Бит Сервис». Сидел на подоконнике с ноутбуком и всё в телефон смотрел.',{act:()=>{F().gul3=1;addClue('e3_gul')},next:END}),
+ e3_gulNo:N('gulya','a','А с тобой я разговаривать не обязана. Ты на меня в первый день кричал.',{choices:[
+   {t:'Простите меня, Гуля опа. Был неправ',rel:{gulya:1},go:'e3_gulOK'},{t:'Как хотите',act:()=>F().gul3=1,go:END}]}),
+ e3_bob1:N('bobur','n','Шум у вас, сынок, на весь этаж. Чего надо? Журнал? Смотри, пятница вся тут.',{choices:[
+   {t:'Изучить журнал пропусков',mg:['logs',{title:'Журнал пропусков, пятница',icon:'book',hint:'Найди <b>гостя</b>, который пришёл незадолго до атаки.',cols:['Время','Кто','К кому'],rows:[['09:02','Курьер, почта','ресепшн'],['11:30','Клиент, ООО «Сарбон»','Тимур'],['14:15','Доставка воды','ресепшн'],['17:25','Гость, «Бит Сервис»','Фаррух Р.'],['17:50','Курьер, еда','Малика']],ans:3},'e3_bobOK']},
+   {t:'Позже',go:END}]}),
+ e3_bobOK:N('bobur','o','«Бит Сервис»? А, этот. Сказал, принтер чинить. Только принтер у вас, я слышал, и так печатает.',{act:()=>{F().bob3=1;addClue('e3_bob');rel('bobur',1)},next:END}),
+ e3_nig1:N('nigora','o','Телефон разрывается! Клиенты спрашивают, почему не приходят счета. Что мне говорить?',{choices:[
+   {t:'Правду: технический сбой, работаем, данные клиентов целы',rel:{nigora:1},act:()=>F().nig3=1,go:END},
+   {t:'Говори, что всё в порядке',act:()=>{F().nig3=1;F().lie=1;logc('Велел Нигоре говорить клиентам, что всё в порядке')},go:END}]}),
+ e3_nigCall:N('nigora','n','Чем помочь?',{choices:[
+   {t:'У тебя остался номер Рустама?',act:()=>{F().rusCame=1;addTime(40);setHome('rustam',{loc:'office',x:196,y:440,rot:Math.PI,seat:false})},go:'e3_nigCall2'},
+   {t:'Пока ничем',go:END}]}),
+ e3_nigCall2:N('nigora','h','Конечно остался… Алло, Рустам? Да. Да, опять. Он сказал: «Еду. Ничего не трогайте». Он уже в серверной будет ждать.',{next:END}),
+ e3_rus1:N('rustam','n','Классика. Только такие штуки сами не приходят: кто-то зашёл и запустил руками. Смотри журнал входов на сервере. И запомни: сначала убей процесс, потом подключай копию. Иначе он и копию сожрёт.',{act:()=>F().rus3=1,next:END}),
+ e3_rusM:N('rustam','n','Ну что, брат, чем помочь?',{choices:[
+   {t:'У тебя не осталось старой копии?',if:()=>F().bkNeed&&!F().bk&&!F().usedRus,act:()=>{addItem('e3_rdisk');F().bk='rus';F().bkNeed=0;logc('Рустам принёс старый диск с копией')},go:'e3_rusBk'},
+   {t:'Помоги убить шифровальщик на сервере',if:()=>!F().clean,act:()=>{F().clean=1;addTime(20)},go:'e3_rusClean'},
+   {t:'Что за учётка «bit_support»?',if:()=>has('e3_rdp')&&!has('e3_bitacc'),act:()=>addClue('e3_bitacc'),go:'e3_rusAcc'},
+   {t:'Пока справляюсь',go:END}]}),
+ e3_rusBk:N('rustam','h','Есть внешний диск. Делал копию за день до того, как меня выгнали. Две недели назад. Старьё, но лучше, чем ничего.',{next:END}),
+ e3_rusClean:N('rustam','n','Смотри и учись. Диспетчер, автозапуск, планировщик… Всё. Чисто. Теперь можно подключать копию.',{next:END}),
+ e3_rusAcc:N('rustam','a','Эту учётку меня заставил завести Фаррух. «Для техподдержки 1С, фирма Бит Сервис». Я был против: удалённый доступ с правами админа! Через неделю меня и убрали.',{next:END}),
+ e3_far1:N('farrukh','n','Не паникуйте, молодой человек. У меня есть посредник, который решает такие вопросы. Заплатим сто пятьдесят вместо двухсот, и к утру всё заработает.',{choices:[
+   {t:'Кто этот посредник?',act:()=>{F().far3=1;addClue('e3_mid')},go:'e3_far2'},
+   {t:'С вымогателями не договариваются',rel:{farrukh:-1},act:()=>F().far3=1,go:END},
+   {t:'Звучит разумно',rel:{farrukh:1},act:()=>{F().far3=1;F().farAgree=1;logc('Поддержал идею Фарруха с посредником')},go:END}]}),
+ e3_far2:N('farrukh','h','Надёжная фирма. ООО «Бит Сервис». Они уже помогали нам с техникой.',{next:END}),
+ e3_farCall:{who:'narr',text:'Звонок с незнакомого номера. Фаррух Рашидович: он отстранён, но откуда-то уже всё знает. «Передай Бахтиёру: есть посредник, „Бит Сервис“. Сто пятьдесят вместо двухсот, и к утру всё работает».',act:()=>{F().far3=1;addClue('e3_mid')},next:END},
+ e3_spread:{who:'narr',text:'🚨 19:00. Сеть всё ещё включена, и шифровальщик добрался до почты и архива кадров. Режь сеть в серверной!',next:END},
+ e3_warn:N('boss','a','Десять вечера! В одиннадцать я должен знать, что отвечать Сингапуру. Заканчивай.',{next:END}),
+ e3_bossD:N('boss','a','Ну?! Что у нас?',{choices:[
+   {t:'Доложить: работа закончена',if:()=>F().restored||F().pay==='pay'||F().pay==='mid',act:()=>{G.pendingFinal=true},go:END},
+   {t:'Копия есть. Восстановлю сам, платить не надо',if:()=>!!F().bk&&!F().pay,rel:{boss:1},act:()=>{F().pay='no';logc('Отказался платить выкуп: есть копия')},go:'e3_bossNo'},
+   {t:'Копии нет. Но платить нельзя: гарантий никаких',if:()=>!F().bk&&!F().pay,act:()=>{F().pay='no';logc('Отказался платить выкуп без копии')},go:'e3_bossNo2'},
+   {t:'Платим вымогателям',if:()=>!F().pay&&!F().restored,act:()=>{F().pay='pay';addTime(30);logc('Уговорил директора заплатить выкуп')},go:'e3_bossPay'},
+   {t:'Платим через посредника Фарруха',if:()=>!F().pay&&!F().restored&&has('e3_mid'),act:()=>{F().pay='mid';addTime(30);logc('Заплатили через «посредника»')},go:'e3_bossMid'},
+   {t:'Мне нужно ещё время',go:END}]}),
+ e3_bossNo:N('boss','h','Вот это разговор. Действуй. И найди мне того, кто это устроил.',{next:END}),
+ e3_bossNo2:N('boss','s','Тогда ищи копию. Где хочешь. У тебя время до одиннадцати.',{next:END}),
+ e3_bossPay:N('boss','s','Двести миллионов… Ладно. Перевожу. Если ключ не придёт, я не знаю, что сделаю.',{next:END}),
+ e3_bossMid:N('boss','n','Фаррух ручается? Хорошо. Сто пятьдесят так сто пятьдесят. Звони этому «Бит Сервису».',{next:END}),
+});
+function e3Outro(){const f=F(),n=ev3(),seq=[];
+  if(f.told===1){seq.push({who:'narr',text:'Ты выкладываешь по порядку: '+[has('e3_rdp')&&'вход под «bit_support» в 17:41',has('e3_bitacc')&&'заявку на учётку с подписью Фарруха',has('e3_ip')&&'адрес офиса «Бит Сервиса»',has('e3_bob')&&'гостя в журнале пропусков',has('e3_gul')&&'слова Гули опы',has('e3_mid')&&'«посредника» с тем же названием'].filter(Boolean).join(', ')+'.'},
+    {who:'boss',mood:'o',text:'То есть нас заперли… и тут же предложили продать ключ? Свои же?'},
+    NPC.farrukh.loc==='office'?{who:'farrukh',mood:'a',text:'Это домыслы. «Бит Сервис» — подрядчик. А аудитор в понедельник задаст вопросы не мне, а вашему админу.'}:{who:'boss',mood:'a',text:'Фаррух. Опять Фаррух. В понедельник я лично положу это на стол аудитору.'})}
+  else if(f.told===-1)seq.push({who:'boss',mood:'a',text:'Лола?! Из-за одного письма?'},{who:'lola',mood:'s',text:'Я напишу заявление…'},{who:'narr',text:'Настоящий вход на сервер так и остался в журнале, который никто не открыл.'});
+  if(f.restored&&f.pay!=='pay'&&f.pay!=='mid')seq.push({who:'boss',mood:'h',text:f.bk==='rus'?'Работает. Две недели потеряли, но работает. И ни тийина этим бандитам.':'Работает! И ни тийина этим бандитам. Молодец.'});
+  else if(f.pay==='mid')seq.push({who:'narr',text:'Ключ от «посредника» приходит через одиннадцать минут. Подозрительно быстро. Сто пятьдесят миллионов ушли на счёт «Бит Сервиса».'});
+  else if(f.pay==='pay')seq.push({who:'narr',text:'Ключ приходит под утро. Открывается две трети файлов. Остальные так и остались с расширением .locked, а кошелёк вымогателей уже пуст.'});
+  else seq.push({who:'boss',mood:'s',text:'Одиннадцать. Данных нет. Что я скажу Сингапуру…'});
+  seq.push({who:'narr',text:'Понедельник, 09:00. В дверях стоит женщина с чемоданом и бейджем «Audit · Singapore». Она смотрит на часы, потом на тебя. «Вы администратор? Начнём с резервных копий». 🧳'});
+  for(let i=0;i<seq.length-1;i++)seq[i].next=seq[i+1];seq[seq.length-1].next=END;G.afterFinal=true;return seq[0]}
+const E3HOT={rack:1,printer:1,dilpc:1};
+EPS[3]={intro:'e3_intro',
+ newGame(){const p2=prevF(2),g=baseState({p1:Object.assign({},prevF(1)),p2:Object.assign({},p2),rb:p2.rb?1:0,iso:0,clean:0,bk:'',bkNeed:0,restored:0,pay:'',told:0,met_boss:0,lol:0,tim:0,mal:0,dil3:0,gul3:0,bob3:0,nig3:0,rus3:0,far3:0,rusCame:0,fwlog:0},
+   ['nigora','boss','dilnoza','lola','timur','malika','sardor','gulya','rustam','bobur','jasur','kamila','hamid','farrukh']);g.min=1078;return g},
+ setup(){const f=G.F;if(f.rb){setAway('sardor');setHome('rustam',deskOf(5))}else setAway('rustam');
+  if(f.p2.farSusp)setAway('farrukh');else setHome('farrukh',E2HOME_FAR);if(f.p2.dilFired)setAway('dilnoza')},
+ nodeFor(id){const f=F();
+  if(id==='boss')return !f.met_boss?'e3_boss1':f.iso?'e3_bossD':null;
+  if(id==='lola')return !f.lol?'e3_lol1':(has('e3_rdp')&&!has('e3_bitacc'))?'e3_lol2':null;
+  if(id==='timur')return !f.tim?'e3_tim1':null;
+  if(id==='malika')return !f.mal?'e3_mal1':null;
+  if(id==='dilnoza')return !f.dil3?'e3_dil1':(f.bkNeed&&!f.bk&&!f.usedDil)?'e3_dilBk':null;
+  if(id==='gulya')return !f.gul3?'e3_gul1':null;
+  if(id==='bobur')return !f.bob3?'e3_bob1':null;
+  if(id==='nigora')return !f.nig3?'e3_nig1':(!f.rb&&!f.rusCame&&f.iso)?'e3_nigCall':null;
+  if(id==='rustam')return !f.rus3?'e3_rus1':((f.bkNeed&&!f.bk&&!f.usedRus)||!f.clean||(has('e3_rdp')&&!has('e3_bitacc')))?'e3_rusM':null;
+  if(id==='farrukh')return !f.far3?'e3_far1':null;
+  return null},
+ markerFor(id){const f=F();
+  if(id==='boss')return !f.met_boss?'q':(f.iso&&(f.restored||f.pay==='pay'||f.pay==='mid'))?'t':(f.iso&&!f.pay)?'q':'';
+  if(id==='lola')return !f.lol?'q':(has('e3_rdp')&&!has('e3_bitacc'))?'s':'';
+  if(id==='timur')return !f.tim?'q':'';if(id==='malika')return !f.mal?'q':'';
+  if(id==='dilnoza')return !f.dil3?'q':(f.bkNeed&&!f.bk&&!f.usedDil)?'s':'';
+  if(id==='gulya')return !f.gul3&&f.iso?'s':'';if(id==='bobur')return !f.bob3&&f.iso?'s':'';
+  if(id==='nigora')return !f.nig3?'q':(!f.rb&&!f.rusCame&&f.iso&&f.bkNeed&&!f.bk)?'s':'';
+  if(id==='rustam')return !f.rus3?'q':(f.bkNeed&&!f.bk&&!f.usedRus)?'s':'';
+  if(id==='farrukh')return !f.far3?'q':'';
+  return ''},
+ hot:{
+  rack:{icon:()=>!F().iso?'q':(!F().clean||(F().bk&&!F().restored)||(!F().bk&&!F().bkNeed))?'q':(!has('e3_rdp')||(!has('e3_ip')&&(F().fwlog||PR().sk.sec>=2)))?'s':'',node:()=>F().iso?'e3_rackM':'e3_rack0'},
+  printer:{icon:()=>!has('e3_note')?'s':'',node:()=>!has('e3_note')?'e3_note':{who:'narr',text:'Принтер допечатал записку и затих. Бумага кончилась.',next:END}},
+  dilpc:{icon:()=>'',node:()=>'e3_dilpc'}},
+ hotHidden:h=>!h.door&&!h.common&&!E3HOT[h.id],
+ gossip:{boss:['Двести миллионов… Двести!','Только бы Сингапур не узнал раньше понедельника.'],
+   dilnoza:['Вой, сердце… Где мой валидол?','Сорок лет работаю, такого не видела.'],
+   nigora:['Клиенты звонят и звонят…','Я всем говорю: работаем.'],
+   lola:['Я больше никогда не открою ни одно письмо.','Можно я домой? Нет? Ладно.'],
+   timur:['Брат, ты справишься. Я в тебя верю. Наверное.','Пятница, вечер… У меня столик заказан был.'],
+   malika:['Облако — лучшее, что придумало человечество.','Спасай нас, админ.'],
+   rustam:['Сначала процесс, потом копия. Запомнил?','Я же им говорил: закройте удалённый доступ.'],
+   farrukh:['Гордость стоит дорого, молодой человек.','Посредник ждёт. Время идёт.'],
+   gulya:['Вой, шайтан-машины…','Я только пол помою и уйду.'],
+   sardor:['Я тут ни при чём. Честно.','Коробки хотя бы никто не шифрует.'],
+   bobur:['Пятница, а вы всё работаете.','Журнал у меня в порядке, сынок.']},
+ events(){const f=F(),m=G.min,e=f.ev;
+  if(!e.spread&&m>=1140&&!f.iso){e.spread=1;talk('e3_spread');return}
+  if(!e.far&&m>=1125&&f.iso&&f.p2.farSusp&&!f.far3){e.far=1;talk('e3_farCall');return}
+  if(!e.warn&&m>=1320&&f.met_boss){e.warn=1;talk('e3_warn','boss');return}
+  if(m>=1380&&!e.final){startFinal();return}},
+ objectives(){const f=F(),o=[];
+  if(!f.iso){o.push(['🚨 Останови заразу: отключи сеть в серверной (стойка)',0]);return o}
+  o.push(['Убить процесс шифровальщика на сервере',!!f.clean]);
+  o.push([f.bkNeed&&!f.bk?'Найти копию, которая лежала отдельно. Спроси людей':'Найти рабочую резервную копию (серверная)',!!f.bk]);
+  o.push(['Восстановить данные из копии',!!f.restored]);
+  o.push([`🕵️ Выяснить, как они вошли: ${Math.min(ev3(),3)}/3`,ev3()>=3]);
+  o.push([f.pay?'Доложить директору до 23:00':'Решить с директором: платить или нет',0]);
+  return o},
+ final(){if(G.busy){G.pendingFinal=true;return}const f=F();f.ev.final=1;G.busy=true;const fade=$('fade');fade.style.opacity=1;
+  setTimeout(()=>{setLoc('office');G.p.x=262;G.p.y=300;G.p.path=[];const b=NPC.boss;sitAt(b,b.home.x,b.home.y,0,0,b.home.stand);b.hold=true;if(NPC.farrukh.loc==='office'){const fr=NPC.farrukh;fr.x=318;fr.y=304;fr.hold=true}fade.style.opacity=0;cam.tt.set(wx(290),.8,wz(275));cam.td=baseDist*.45;
+   G.busy=false;talk({who:'boss',mood:'a',text:'Итак. Что я говорю в понедельник аудитору? Как они вообще вошли?',choices:[
+    {t:'Через учётку «Бит Сервиса». Её завёл Фаррух Рашидович',if:()=>ev3()>=3,go:()=>{f.told=1;logc('Доказал, что вход был через «Бит Сервис»');return e3Outro()}},
+    {t:'Лола открыла заражённое письмо',if:()=>!has('e3_lola'),go:()=>{f.told=-1;logc('Свалил всё на Лолу');return e3Outro()}},
+    {t:'Пока не знаю. Главное, что разобрались',go:()=>{f.told=0;return e3Outro()}}]},'boss')},700)},
+ ending(){const f=F();G.running=false;ov.style.display='none';const n=ev3(),paid=f.pay==='pay'||f.pay==='mid';let title,desc;
+  if(f.pay==='mid'){title='🤝 Посредник';desc='Сто пятьдесят миллионов ушли в «Бит Сервис». Тем, кто вас и запер. Фаррух доволен.'}
+  else if(f.pay==='pay'){title='💸 Выкуп';desc='Двести миллионов за две трети файлов. И вымогатели теперь знают, что вы платите.'}
+  else if(f.restored&&f.bk!=='rus'&&f.told===1){title='🛡️ Чистая работа';desc='Данные спасены, ни тийина бандитам, и у директора на столе лежит цепочка: «Бит Сервис» → Фаррух.'}
+  else if(f.restored&&f.bk==='rus'){title='💾 Две недели назад';desc='Старый диск Рустама спас фирму. Две недели работы придётся вбивать руками, зато без выкупа.'}
+  else if(f.restored){title='🔧 Спасатель';desc='Данные на месте и без выкупа. Но тот, кто открыл дверь, так и остался в тени.'}
+  else{title='☠️ Понедельник без данных';desc='Ни копии, ни ключа. Аудитора встретят красные экраны.'}
+  finishEpisode(3,title,{restored:f.restored,bk:f.bk,pay:f.pay,paid:paid?1:0,ev3:n,told:f.told,iso:f.iso,blameLola:f.blameLola?1:0,lie:f.lie?1:0,farAgree:f.farAgree?1:0,rb:f.rb,rusCame:f.rusCame},G.rel);
+  const s=$('screen');s.classList.remove('hidden');
+  s.innerHTML=`<div class="tag">КОНЕЦ ЭПИЗОДА 3</div><h2 style="font-size:24px">${title}</h2><p>${desc}</p>
+  <div class="sum"><b style="color:#79c0ff">Твои решения:</b><br>${G.log.map(l=>'• '+l).join('<br>')||'• Ты ничего особо не решал 😅'}</div>
+  <div class="sum"><b style="color:#79c0ff">Отношения:</b><br>${Object.keys(G.rel).filter(id=>G.rel[id]!==0).map(id=>`${CH[id].name}: ${G.rel[id]>0?'💚'.repeat(G.rel[id]):'💔'.repeat(-G.rel[id])}`).join('<br>')||'Нейтрально со всеми'}</div>
+  <p style="color:#ffd166">🔍 Улик найдено: ${G.clues.length} · про взлом: ${n}</p><p style="font-size:12px">Продолжение: «Эпизод 4. Аудит» 🧳</p>${seasonButton()}`;$('tosea').onclick=()=>showSeason()}};
+
 /* ---------- dialogue engine ---------- */
 const dlgEl=$('dlg');let D=null;
 function talk(nodeOrId,npcId){const node=typeof nodeOrId==='string'?DLG[nodeOrId]:nodeOrId;if(!node)return;G.busy=true;if(npcId&&NPC[npcId])NPC[npcId].hold=true;D={npc:npcId};show(node)}
@@ -1948,7 +2157,7 @@ function tapAt(e){
   ray.setFromCamera(new THREE.Vector2((e.clientX-r.left)/r.width*2-1,-((e.clientY-r.top)/r.height)*2+1),camera);
   if(!ray.ray.intersectPlane(floorP,hit))return;const x=hit.x*S+180,y=hit.z*S+240;
   let best=null,bd=24;for(const n of Object.values(NPC)){if(n.loc!==LOC)continue;const d=Math.hypot(x-n.x,y-n.y);if(d<bd){bd=d;best={npc:n.id}}}
-  if(!best)for(const h of HOT){if(h.loc!==LOC)continue;const d=Math.hypot(x-h.x,y-h.y);if(d<(h.door?30:26)){best={hot:h};break}}
+  if(!best)for(const h of HOT){if(h.loc!==LOC||hotHidden(h))continue;const d=Math.hypot(x-h.x,y-h.y);if(d<(h.door?30:26)){best={hot:h};break}}
   if(best){interact(best);return}
   if(G.pending?.npc)NPC[G.pending.npc].hold=false;G.pending=null;G.p.path=astar(G.p.x,G.p.y,clamp(x,14,346),clamp(y,40,474),LOC,true);puff(wx(x),.1,wz(y),8,{c:'#ffd166',sp:1.5,life:.4,g:0})}
 function arrive(){const t=G.pending;G.pending=null;if(!t)return;
@@ -2047,7 +2256,11 @@ function visuals(dt){
   if(cam.shake>0){cam.shake=Math.max(0,cam.shake-dt);camera.position.x+=(Math.random()-.5)*cam.shake;camera.position.y+=(Math.random()-.5)*cam.shake}
   camera.lookAt(cam.t);
 }
-let HUDC='',HUDG='';function hud(){procTick();const c=fmt(G.min);if(c!==HUDC){HUDC=c;$('clock').textContent=c}const o=objectives().find(x=>!x[1]),g=o?o[0]:'Все задачи выполнены!';if(g!==HUDG){HUDG=g;$('goaltx').textContent=g}}
+const TUTS=[['👆','Коснись пола, и герой пойдёт туда.'],['🖐️','Проведи пальцем, чтобы двигать камеру. Двумя пальцами приближай и отдаляй.'],['❗','Жёлтый значок над человеком — у него есть дело. Коснись значка, чтобы подойти и поговорить.'],['🎯','Текущая цель написана сверху. Кнопка с книгой — журнал: все цели, улики и вещи.'],['🖥️','Твой компьютер стоит в серверной, слева внизу. Там курсы, закупки и навыки.']];
+let TUTON=false;function showTut(){TUTON=true;G.busy=true;let i=0;const el=document.createElement('div');el.style.cssText='position:fixed;inset:0;z-index:60;background:#000a;display:flex;align-items:center;justify-content:center;padding:24px';document.body.appendChild(el);
+  const draw=()=>{el.innerHTML=`<div style="max-width:320px;width:100%;background:#161b22;border:1px solid #30363d;border-radius:18px;padding:22px 20px;text-align:center;box-shadow:0 12px 40px #000a"><div style="font-size:44px;line-height:1">${TUTS[i][0]}</div><p style="font-size:16px;line-height:1.45;margin:14px 0 6px;color:#e6edf3">${TUTS[i][1]}</p><div style="font-size:12px;color:#8b949e;margin-bottom:14px">${i+1} из ${TUTS.length}</div><button class="btn" id="tutn">${i<TUTS.length-1?'Дальше':'Понятно, играем!'}</button>${i<TUTS.length-1?'<div id="tuts" style="margin-top:12px;font-size:13px;color:#8b949e">Пропустить</div>':''}</div>`;
+    const done=()=>{el.remove();TUTON=false;if(G)G.busy=false;try{localStorage.setItem('uptime_tut','1')}catch(e){}};$('tutn').onclick=()=>{sPop();if(++i>=TUTS.length)done();else draw()};const sk=$('tuts');if(sk)sk.onclick=done};draw()}
+let HUDC='',HUDG='';function hud(){procTick();if(!TUTON&&G&&G.running&&!G.busy&&SCR==='game'&&!localStorage.getItem('uptime_tut'))showTut();const c=fmt(G.min);if(c!==HUDC){HUDC=c;$('clock').textContent=c}const o=objectives().find(x=>!x[1]),g=o?o[0]:'Все задачи выполнены!';if(g!==HUDG){HUDG=g;$('goaltx').textContent=g}}
 let lastT=performance.now();
 let FR=0;
 function frame(now){requestAnimationFrame(frame);if(document.hidden)return;const dt=Math.min(.05,(now-lastT)/1000);const live=G&&G.running&&!PAUSED;
