@@ -339,16 +339,44 @@ button{font-family:inherit;cursor:pointer}
 .epc.done .epn{background:linear-gradient(180deg,#d29922,#9e6a03);box-shadow:0 3px 0 #6b4a02}.epc.done small{color:#e3b341}
 .epc.lock{opacity:.5;cursor:default}.epc.lock .epn{background:#30363d;box-shadow:none;color:#8b949e}.epc.lock small{color:#8b949e}
 .tm .tr.lg span{font-size:12.5px;font-family:ui-monospace,Menlo,monospace}
+
+#splash{position:fixed;inset:0;z-index:100;background:radial-gradient(ellipse at 50% 40%,#0f2a1a,#05080c 70%);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;transition:opacity .6s,transform .6s;font-family:Inter,system-ui,sans-serif}
+#splash.out{opacity:0;transform:scale(1.08);pointer-events:none}
+.sp-glow{position:absolute;width:260px;height:260px;border-radius:50%;background:radial-gradient(circle,#2ea04355,transparent 70%);animation:spg 2.4s ease-in-out infinite}
+@keyframes spg{50%{transform:scale(1.25);opacity:.6}}
+.sp-logo{position:relative;font-size:46px;font-weight:900;letter-spacing:4px;color:#7ee787;text-shadow:0 0 22px #2ea043,4px 4px 0 #0b3d17;animation:spl .9s cubic-bezier(.2,1.4,.4,1) both}
+@keyframes spl{from{transform:scale(.3) rotate(-8deg);opacity:0}}
+.sp-sub{position:relative;font-size:11px;font-weight:800;letter-spacing:4px;color:#79c0ff;animation:fi .8s .3s both}
+.sp-term{position:relative;width:250px;min-height:112px;margin-top:14px;font:600 12px ui-monospace,Menlo,monospace;color:#56d364;text-align:left;line-height:1.55}
+.sp-term div{animation:fi .25s both}
+.sp-bar{position:relative;width:250px;height:6px;border-radius:3px;background:#1b2430;overflow:hidden}.sp-bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,#2ea043,#7ee787);transition:width .25s}
+#screen.menu{justify-content:center}
+.mlogo{font-size:40px!important;animation:spl .7s cubic-bezier(.2,1.4,.4,1) both}
+.mbtns{display:flex;flex-direction:column;gap:9px;width:100%;max-width:300px;margin-top:18px}
+.mb1,.mb2{border:none;border-radius:16px;font-family:Inter,system-ui,sans-serif;cursor:pointer;transition:transform .1s}
+.mb1:active,.mb2:active{transform:scale(.97)}
+.mb1{padding:14px;background:linear-gradient(180deg,#3fb950,#238636);color:#fff;box-shadow:0 5px 0 #0f5323,0 10px 24px #2ea04344;display:flex;flex-direction:column;align-items:center;gap:2px;animation:pulse2 2s ease-in-out infinite}
+.mb1 b{font-size:19px;font-weight:900}.mb1 small{font-size:12px;font-weight:700;opacity:.9}
+@keyframes pulse2{50%{box-shadow:0 5px 0 #0f5323,0 10px 34px #2ea04388}}
+.mb2{padding:12px;background:#161d29;border:1px solid #2b3545;color:#e6edf3;font-size:15px;font-weight:800;box-shadow:0 3px 0 #0a0e14}
+.mb2.red{color:#ff7b72}
+.mver{font-size:11px;color:#6e7681;margin-top:14px}
+.backb{position:absolute;top:10px;left:10px;border:1px solid #30363d;background:#161b22cc;color:#e6edf3;border-radius:12px;padding:8px 12px;font:800 13px Inter,system-ui,sans-serif;z-index:3}
+#pause{position:absolute;inset:0;z-index:30;background:rgba(4,6,10,.72);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;animation:fi .2s}
+#pause.hidden{display:none}
+.pbox{width:86%;max-width:320px;background:#0f141c;border:1px solid #2b3545;border-radius:20px;padding:18px;display:flex;flex-direction:column;gap:9px;font-family:Inter,system-ui,sans-serif}
+.pbox h3{margin:0 0 4px;text-align:center;color:#e6edf3;font-size:20px}.pnote{margin:4px 0 0;font-size:11px;color:#6e7681;text-align:center}
 </style>
 </head>
 <body>
+<div id="splash"><div class="sp-glow"></div><div class="sp-logo">АПТАЙМ</div><div class="sp-sub">DEFACTUM GAMES</div><div class="sp-term" id="spterm"></div><div class="sp-bar"><i id="spbar"></i></div></div>
 <div id="app">
   <div id="hud">
     <div class="row">
       <div class="chip"><i class="ico" data-ic="clock"></i><span id="clock">09:00</span></div>
       <button class="chip" id="goal"><i class="ico" data-ic="target"></i><span id="goaltx">Осмотрись</span></button>
       <button class="chip" id="jbtn"><i class="ico" data-ic="book"></i></button>
-      <button class="chip" id="qbtn"><i class="ico" data-ic="gear"></i></button>
+      <button class="chip" id="menubtn"><i class="ico" data-ic="gear"></i></button>
       <button class="chip" id="snd"><i class="ico" data-ic="music"></i></button>
     </div>
   </div>
@@ -362,6 +390,7 @@ button{font-family:inherit;cursor:pointer}
     <div id="jr" class="hidden"></div>
     <div id="fade"></div>
     <div id="screen" class="hidden"></div>
+    <div id="pause" class="hidden"></div>
     <div id="load">ЗАГРУЗКА...</div>
   </div>
 </div>
@@ -447,14 +476,14 @@ const QNAME={high:'Графика: высокая',mid:'Графика: сред
 function qRatio(){const pr=window.devicePixelRatio||1;return QL==='high'?Math.min(2,pr):QL==='mid'?Math.min(1.5,pr):Math.min(1,pr)}
 function applyQ(say){renderer.setPixelRatio(qRatio());const sh=QL!=='low';if(renderer.shadowMap.enabled!==sh){renderer.shadowMap.enabled=sh;scene.traverse(o=>{if(o.material){(Array.isArray(o.material)?o.material:[o.material]).forEach(m=>m.needsUpdate=true)}})}
   const ms=QL==='high'?2048:1024;if(sun.shadow.mapSize.x!==ms){sun.shadow.mapSize.set(ms,ms);if(sun.shadow.map){sun.shadow.map.dispose();sun.shadow.map=null}}
-  resize();if(say)toast(QNAME[QL],'b')}
+  OUTL.forEach(m=>m.visible=QL!=='low');resize();if(say)toast(QNAME[QL],'b')}
 const PF={t:0,n:0,auto:0};
 function perfTick(dt){if(!G||!G.running||document.hidden)return;PF.t+=dt;PF.n++;if(PF.t<5)return;const fps=PF.n/PF.t;PF.t=0;PF.n=0;
   let manual=false;try{manual=!!localStorage.getItem('uptime_q_manual')}catch(e){}
   if(!manual&&fps<28&&QL!=='low'&&PF.auto<2){PF.auto++;QL=QL==='high'?'mid':'low';try{localStorage.setItem('uptime_q',QL)}catch(e){}applyQ(false);toast('Графика упрощена для плавности. Шестерёнка вверху меняет качество','b')}}
 renderer.setPixelRatio(qRatio());
 renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFShadowMap;
-renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=.95;
+renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.3;
 renderer.outputColorSpace=THREE.SRGBColorSpace;
 stage.prepend(renderer.domElement);
 const scene=new THREE.Scene();scene.background=new THREE.Color('#0d121c');
@@ -504,7 +533,11 @@ const clockC=document.createElement('canvas');clockC.width=clockC.height=64;cons
 /* ================= MATERIALS ================= */
 let BUILD=scene;
 const matCache={};
-function M(color,o={}){const k=color+JSON.stringify(o);if(matCache[k])return matCache[k];return matCache[k]=new THREE.MeshStandardMaterial(Object.assign({color,roughness:.7,metalness:0},o))}
+const TOONG=(()=>{const d=new Uint8Array([118,118,118,255,188,188,188,255,255,255,255,255]);const t=new THREE.DataTexture(d,3,1);t.minFilter=t.magFilter=THREE.NearestFilter;t.generateMipmaps=false;t.needsUpdate=true;return t})();
+function M(color,o={}){const k=color+JSON.stringify(o);if(matCache[k])return matCache[k];const p=Object.assign({color,gradientMap:TOONG},o);delete p.roughness;delete p.metalness;delete p.envMapIntensity;return matCache[k]=new THREE.MeshToonMaterial(p)}
+const OUTM=new THREE.MeshBasicMaterial({color:'#1b1622',side:THREE.BackSide});const OUTL=[];
+function addOutline(g){const list=[];g.traverse(o=>{if(o.isMesh&&!o.userData.noOL){if(!o.geometry.boundingSphere)o.geometry.computeBoundingSphere();const r=o.geometry.boundingSphere.radius;if(r>.035)list.push([o,r])}});
+  list.forEach(([o,r])=>{const m=new THREE.Mesh(o.geometry,OUTM);m.userData.noOL=1;m.castShadow=false;m.scale.setScalar(clamp(1+.014/r,1.03,1.16));m.visible=QL!=='low';o.add(m);OUTL.push(m)})}
 function add(geo,mat,x,y,z,parent=BUILD,cast=true){const m=new THREE.Mesh(geo,mat);m.position.set(x,y,z);m.castShadow=cast;m.receiveShadow=true;parent.add(m);return m}
 const GEO=new Map();const geo=(k,f)=>{let g=GEO.get(k);if(!g){g=f();GEO.set(k,g)}return g};
 const box=(w,h,d,mat,x,y,z,p,c)=>add(geo('b'+w+'|'+h+'|'+d,()=>new THREE.BoxGeometry(w,h,d)),mat,x,y,z,p,c);
@@ -762,13 +795,13 @@ function makeChar(c){
     const sh=box(.105,.075,.25,shoe,0,-.43,.05,knee);sh.geometry.translate(0,0,0);hip.knee=knee;return hip};
   const legL=leg(-.092),legR=leg(.092);
   const pel=box(.29,.14,.18,pants,0,.93,0,g);
-  const torso=add(new THREE.CapsuleGeometry(.165,.34,8,16),shirt,0,1.22,0,g);torso.scale.set(1.08,1,.66);
+  const torso=add(new THREE.CapsuleGeometry(.165,.34,8,16),shirt,0,1.22,0,g);torso.scale.set(1.2,1.02,.84);
   if(c.suit||c.tie){const j=add(new THREE.CapsuleGeometry(.172,.3,8,16),M(c.shirt,{roughness:.7}),0,1.2,-.005,g);j.scale.set(1.1,1,.68)}
   cyl(.048,.055,.12,skin,0,1.5,0,g,10);
   const arm=x=>{const sh=new THREE.Group();sh.position.set(x,1.43,0);g.add(sh);sph(.07,shirt,0,0,0,sh,10);add(new THREE.CapsuleGeometry(.056,.24,4,8),shirt,0,-.16,0,sh);
-    const el=new THREE.Group();el.position.y=-.31;sh.add(el);add(new THREE.CapsuleGeometry(.048,.22,4,8),c.short?skin:shirt,0,-.14,0,el);sph(.045,skin,0,-.29,.01,el,10);sh.elbow=el;return sh};
+    const el=new THREE.Group();el.position.y=-.31;sh.add(el);add(new THREE.CapsuleGeometry(.048,.22,4,8),c.short?skin:shirt,0,-.14,0,el);sph(.064,skin,0,-.3,.01,el,12);sh.elbow=el;return sh};
   const armL=arm(-.235),armR=arm(.235);
-  const head=new THREE.Group();head.position.y=1.66;g.add(head);
+  const head=new THREE.Group();head.position.y=1.76;head.scale.setScalar(1.62);g.add(head);
   const hd=sph(.112,skin,0,0,0,head,24);hd.scale.set(.9,1.12,.98);
   sph(.03,skin,-.105,0,0,head,8);sph(.03,skin,.105,0,0,head,8);
   const st=c.style||'short';
@@ -778,7 +811,8 @@ function makeChar(c){
     if(st==='long'){const l=box(.22,.32,.08,hair,0,-.13,-.07,head);}
     if(st==='bun')sph(.06,hair,0,.12,-.1,head,12);
     if(st==='curly')for(let i=0;i<9;i++){const a=i/9*6.28;sph(.05,hair,Math.cos(a)*.1,.07+Math.sin(i*1.7)*.03,Math.sin(a)*.1-.02,head,8)}}
-  [-.04,.04].forEach(x=>sph(.012,M('#1a1410',{roughness:.2}),x,.015,.098,head,8));
+  [-.042,.042].forEach(x=>{const w=sph(.03,M('#ffffff'),x,.016,.084,head,12);w.scale.set(.9,1.15,.55);w.castShadow=false;const pu=sph(.017,M('#1a1410'),x+(x>0?-.004:.004),.012,.1,head,10);pu.castShadow=false;sph(.0055,M('#ffffff'),x+.006,.022,.111,head,6).castShadow=false});
+  {const mo=new THREE.Mesh(new THREE.TorusGeometry(.026,.006,6,12,Math.PI),M('#7a2a2a'));mo.rotation.z=Math.PI;mo.position.set(0,-.045,.1);head.add(mo);[-.07,.07].forEach(x=>{const c=sph(.022,M('#ff9e9e',{transparent:true,opacity:.45}),x,-.025,.083,head,8);c.scale.set(1,.6,.4);c.castShadow=false})}
   [-.04,.04].forEach(x=>box(.035,.006,.006,M(st==='scarf'?'#3a2418':c.hair),x,.045,.1,head,false));
   sph(.016,skin,0,-.015,.108,head,8);
   if(c.glasses)[-.042,.042].forEach(x=>add(new THREE.TorusGeometry(.028,.005,6,14),M('#14161a',{metalness:.6,roughness:.3}),x,.015,.102,head));
@@ -790,6 +824,7 @@ function makeChar(c){
   if(c.mop){const m=cyl(.015,.015,1.35,M('#9a7a50'),0,-.25,.12,armR.elbow,6);m.rotation.x=.25;box(.34,.06,.12,M('#5b8bb0'),0,-.92,.3,armR.elbow)}
   if(c.hat==='doppi'){cyl(.105,.112,.07,M('#14161a'),0,.105,-.005,head,16);for(let i=0;i<4;i++){const a=i/4*6.28;box(.028,.028,.004,M('#e8eef4'),Math.cos(a)*.107,.105,Math.sin(a)*.107,head,false).rotation.y=-a+Math.PI/2}}
   if(c.hat==='cap'){cyl(.118,.118,.07,M('#1c2638'),0,.09,-.005,head,16);box(.13,.015,.09,M('#141c2c'),0,.06,.12,head);box(.03,.025,.004,M('#c9a227'),0,.11,.118,head)}
+  addOutline(g);
   return {g,legL,legR,armL,armR,head,torso};
 }
 const CH={
@@ -1055,13 +1090,14 @@ function render3DPortraits(){try{
   const ids=[...Object.keys(CH),'me'];
   const keep=BUILD;BUILD=sc;
   for(const id of ids){const d=id==='me'?{shirt:'#2f7d4f',hair:'#2b1d14',badge:true,headset:true}:CH[id];const ch=makeChar(d);sc.add(ch.g);ch.g.rotation.y=-.35;ch.head.rotation.y=.25;
-    cam.position.set(.16,1.66,.82);cam.lookAt(0,1.6,0);
+    cam.position.set(.2,1.78,1.25);cam.lookAt(0,1.73,0);
     const bg=new THREE.Color(d.bg||'#1f3a2a');sc.background=null;r.setClearColor(bg,1);r.render(sc,cam);PORT[id]=r.domElement.toDataURL('image/jpeg',.88);sc.remove(ch.g)}
   BUILD=keep;pm.dispose();r.dispose();r.forceContextLoss&&r.forceContextLoss()}catch(e){console.warn('portraits',e)}}
 
 /* ================= UI HELPERS ================= */
 const ov=$('ov');
-function proj(X,Y,Z){const v=new THREE.Vector3(X,Y,Z).project(camera);const r=stage.getBoundingClientRect();return [(v.x+1)/2*r.width,(1-v.y)/2*r.height,v.z]}
+const _pv=new THREE.Vector3();let STW=1,STH=1;function proj(X,Y,Z){const v=_pv.set(X,Y,Z).project(camera);return [(v.x+1)/2*STW,(1-v.y)/2*STH,v.z]}
+function setIc(ic,cls,key){if(ic._k!==key){ic._k=key;ic.className=cls;ic.innerHTML=IC[key]||''}}
 function toast(t,cls=''){t=t.replace(/[\p{Extended_Pictographic}\uFE0F\u200D]/gu,'').replace(/\s+/g,' ').trim();const d=document.createElement('div');d.className='toast '+cls;d.textContent=t;$('toasts').appendChild(d);setTimeout(()=>d.remove(),3300)}
 const fmt=m=>String(Math.floor(m/60)).padStart(2,'0')+':'+String(Math.floor(m%60)).padStart(2,'0');
 function addTime(m){G.min+=m}
@@ -1368,7 +1404,7 @@ function markerFor(id){return EPS[EPN].markerFor(id)}
 function objectives(){return EPS[EPN].objectives()}
 function checkEvents(){if(!G||G.busy||!G.running||G.F.ev.final)return;EPS[EPN].events()}
 function startFinal(){EPS[EPN].final()}
-function endingScreen(){EPS[EPN].ending()}
+function endingScreen(){EPS[EPN].ending();SCR='ending'}
 function ready(){return EPS[EPN].ready?EPS[EPN].ready():false}
 function hotIcon(h){const o=EPS[EPN].hot&&EPS[EPN].hot[h.id];if(o)return o.icon();if(EPN===1||h.common)return h.icon?h.icon():'';return ''}
 function hotNode(h){const o=EPS[EPN].hot&&EPS[EPN].hot[h.id];if(o)return o.node();return h.node()}
@@ -1380,14 +1416,15 @@ function setAway(id){const n=NPC[id];n.away=true;n.loc='away';n.path=[];n.state=
 function setHome(id,h){const n=NPC[id];n.away=false;n.home=h;n.loc=h.loc;n.x=h.x;n.y=h.y;n.rot=h.rot||0;n.sy=h.sy||0;n.state=h.seat?'sit':'idle';n.curStand=h.seat?h.stand:null}
 function baseState(extraF,relKeys){const r={};relKeys.forEach(k=>r[k]=0);Object.assign(r,prevRel());relKeys.forEach(k=>{if(r[k]==null)r[k]=0});Object.keys(r).forEach(k=>{if(!relKeys.includes(k))delete r[k]});
   return {min:540,F:Object.assign({lunch:0,ev:{}},extraF),rel:r,clues:[],items:[],log:[],p:{x:100,y:298,path:[],walk:0,rot:Math.PI,vx:0,vy:0,dust:0},pending:null,running:true,busy:false,realT:0,visited:{office:1}}}
-function playEpisode(n){EPN=n;const s=$('screen');s.classList.add('hidden');startMusic();resetNPCs();G=EPS[n].newGame();EPS[n].setup&&EPS[n].setup();setLoc('office');ov.style.display='';setTimeout(()=>talk(EPS[n].intro),400)}
-function showSeason(){const s=$('screen');s.classList.remove('hidden');s.classList.add('season');
+function playEpisode(n){SCR='game';PAUSED=false;EPN=n;const s=$('screen');s.classList.add('hidden');startMusic();resetNPCs();G=EPS[n].newGame();EPS[n].setup&&EPS[n].setup();setLoc('office');ov.style.display='';setTimeout(()=>talk(EPS[n].intro),400)}
+function showSeason(){const s=$('screen');SCR='season';s.classList.remove('hidden');s.classList.add('season');
   const avail=n=>n===1||!!SEASON.done[n-1];
-  s.innerHTML=`<div class="tag">DEFACTUM GAMES представляет</div><h1>АПТАЙМ</h1><h2>Сезон 1: «Тень списания»</h2>
+  s.innerHTML=`<button class="backb" id="sback">← Назад</button><div class="tag">DEFACTUM GAMES представляет</div><h1>АПТАЙМ</h1><h2>Сезон 1: «Тень списания»</h2>
   <p style="font-size:13px;color:#9aa7b4;margin:4px 0 12px">Каждое решение переходит в следующие эпизоды.</p>
   <div class="eplist">${EPLIST.map(e=>{const d=SEASON.done[e.n],ok=avail(e.n)&&!e.soon;return `<button class="epc ${ok?'':'lock'} ${d?'done':''}" data-n="${e.n}" ${ok?'':'disabled'}>
     <div class="epn">${e.n}</div><div class="ept"><b>${e.t}</b><small>${e.soon?'Скоро':d?'Пройден: '+d.title.replace(/[\p{Extended_Pictographic}️]/gu,'').trim():ok?'Новый эпизод':'Сначала пройди эпизод '+(e.n-1)}</small><p>${e.d}</p></div></button>`}).join('')}</div>
   <p style="font-size:11px;color:#6e7681;margin-top:10px">🎧 лучше со звуком</p>`;
+  $('sback').onclick=()=>{sPop();showMainMenu()};
   s.querySelectorAll('.epc').forEach(b=>b.onclick=()=>{const n=+b.dataset.n;if(!avail(n))return;sPop();s.classList.remove('season');playEpisode(n)})}
 function seasonButton(label){return `<button class="btn" id="tosea">${label||'К списку эпизодов ▶'}</button>`}
 
@@ -1806,15 +1843,15 @@ const MK={};
 function mkEl(key,onTap){const d=document.createElement('div');d.className='mk';d.innerHTML='<div class="ic"></div><div class="nm"></div>';ov.appendChild(d);d.querySelector('.ic').onpointerdown=e=>{e.stopPropagation();startMusic();onTap()};MK[key]=d;return d}
 Object.keys(NPC).forEach(id=>{const d=mkEl(id,()=>interact({npc:id}));d.querySelector('.nm').textContent=CH[id].name});
 HOT.forEach(h=>{const d=mkEl('h_'+h.id,()=>interact({hot:h}));if(h.door)d.querySelector('.nm').textContent=h.label;else d.querySelector('.nm').remove()});
-function updMarkers(){
+function updMarkers(){STW=stage.clientWidth;STH=stage.clientHeight;
   const hide=!G||!G.running||G.busy;
   Object.values(NPC).forEach(n=>{const d=MK[n.id];if(n.loc!==LOC||hide){d.style.display='none';return}d.style.display='';const t=markerFor(n.id);
-    const [x,y]=proj(wx(n.x),2.05+n.c.g.position.y,wz(n.y));d.style.transform=`translate(${clamp(x,46,stage.clientWidth-46)}px,${y}px) translateX(-50%)`;
-    const ic=d.querySelector('.ic');ic.className='ic '+(t||'c');ic.innerHTML=IC[t==='q'?'excl':t==='t'?'qst':t==='s'?'search':'chat'];ic.style.display=t?'':'none';d.querySelector('.nm').style.opacity=t?1:.75;
-    if(n.chat){const [cx,cy]=proj(wx(n.x),2.25+n.c.g.position.y,wz(n.y));n.chat.style.transform=`translate(${cx}px,${cy-50}px) translateX(-50%)`}});
+    const [x,y]=proj(wx(n.x),2.3+n.c.g.position.y,wz(n.y));d.style.transform=`translate(${clamp(x,46,stage.clientWidth-46)}px,${y}px) translateX(-50%)`;
+    const ic=d._ic||(d._ic=d.querySelector('.ic'));setIc(ic,'ic '+(t||'c'),t==='q'?'excl':t==='t'?'qst':t==='s'?'search':'chat');ic.style.display=t?'':'none';(d._nm||(d._nm=d.querySelector('.nm'))).style.opacity=t?1:.75;
+    if(n.chat){const [cx,cy]=proj(wx(n.x),2.5+n.c.g.position.y,wz(n.y));n.chat.style.transform=`translate(${cx}px,${cy-50}px) translateX(-50%)`}});
   HOT.forEach(h=>{const d=MK['h_'+h.id];if(h.loc!==LOC||hide||hotHidden(h)){d.style.display='none';return}
     const t=h.door?'d':hotIcon(h);if(!t){d.style.display='none';return}d.style.display='';const [x,y]=proj(wx(h.x),h.h,wz(h.y));d.style.transform=`translate(${clamp(x,46,stage.clientWidth-46)}px,${y}px) translateX(-50%)`;
-    const ic=d.querySelector('.ic');ic.className='ic '+t;ic.innerHTML=IC[t==='q'?'excl':t==='t'?'qst':t==='s'?'search':t==='d'?'door':(h.ic||'')]||''})}
+    const ic=d._ic||(d._ic=d.querySelector('.ic'));setIc(ic,'ic '+t,t==='q'?'excl':t==='t'?'qst':t==='s'?'search':t==='d'?'door':(h.ic||''))})}
 
 /* ================= LOOP ================= */
 let T=0,texT=0,lastMin=-1;
@@ -1875,7 +1912,7 @@ function visuals(dt){
 function hud(){$('clock').textContent=fmt(G.min);const o=objectives().find(x=>!x[1]);$('goaltx').textContent=o?o[0]:'Все задачи выполнены!'}
 let lastT=performance.now();
 function frame(now){const dt=Math.min(.05,(now-lastT)/1000);lastT=now;T+=dt;
-  if(G&&G.running){update(dt);hud()}
+  if(G&&G.running&&!PAUSED){update(dt);hud()}
   visuals(dt);updParts(dt);updMarkers();if(QL==='high')composer.render();else renderer.render(scene,camera);perfTick(dt);requestAnimationFrame(frame)}
 
 /* ---------- start ---------- */
@@ -1890,8 +1927,52 @@ resize();setLoc('office');$('load').remove();requestAnimationFrame(frame);
 GAMES.logs=function(body,o,win){body.innerHTML=`<div class="hint">${o.hint}</div><div class="tm"><div class="th">${o.cols.map((c,i)=>`<span style="flex:${i===o.cols.length-1?2:1}">${c}</span>`).join('')}</div>${o.rows.map((r,i)=>`<div class="tr lg" data-i="${i}">${r.map((c,j)=>`<span style="flex:${j===r.length-1?2:1}">${c}</span>`).join('')}</div>`).join('')}</div><div class="hint" id="tmh"></div>`;
   body.querySelectorAll('.tr').forEach(t=>t.onclick=()=>{if(+t.dataset.i===o.ans){t.classList.add('bad');$('tmh').innerHTML='✅ Нашёл!';beep(880,.08,'triangle',.05);setTimeout(win,700)}else{shakeBox();$('tmh').innerHTML='❌ Не то. Смотри внимательнее.'}})};
 document.querySelectorAll('[data-ic]').forEach(e=>e.innerHTML=IC[e.dataset.ic]||'');
-applyQ(false);render3DPortraits();showSeason();
-$('qbtn').onclick=()=>{QL=QL==='high'?'mid':QL==='mid'?'low':'high';try{localStorage.setItem('uptime_q',QL);localStorage.setItem('uptime_q_manual','1')}catch(e){}applyQ(true)};
+
+/* ================= SPLASH · MENU · PAUSE · BACK ================= */
+let SCR='splash',PAUSED=false;
+const qLabel=()=>({high:'высокая',mid:'средняя',low:'экономная'})[QL];
+function setQ(q){QL=q;try{localStorage.setItem('uptime_q',QL);localStorage.setItem('uptime_q_manual','1')}catch(e){}applyQ(true)}
+const cycleQ=()=>setQ(QL==='high'?'mid':QL==='mid'?'low':'high');
+function toggleSound(){musicOn=!musicOn;$('snd').innerHTML=ic(musicOn?'music':'mute');if(musG)musG.gain.value=musicOn?.5:0;startMusic()}
+function nextEp(){for(const e of EPLIST){if(e.soon)break;if(!SEASON.done[e.n])return e.n}return Math.max(1,...EPLIST.filter(e=>!e.soon).map(e=>e.n))}
+function showMainMenu(){SCR='main';PAUSED=false;$('pause').classList.add('hidden');const s=$('screen');s.classList.remove('hidden','season');s.classList.add('menu');
+  const n=nextEp(),e=EPLIST.find(x=>x.n===n),started=Object.keys(SEASON.done).length>0;
+  s.innerHTML=`<div class="tag">DEFACTUM GAMES представляет</div><h1 class="mlogo">АПТАЙМ</h1><h2>Сезон 1: «Тень списания»</h2>
+  <div class="mbtns"><button class="mb1" id="m_play"><b>${started?'Продолжить':'Начать игру'}</b><small>Эпизод ${n}: ${e?e.t:''}</small></button>
+  <button class="mb2" id="m_eps">📺 Эпизоды</button><button class="mb2" id="m_q">⚙️ Графика: ${qLabel()}</button><button class="mb2" id="m_snd">${musicOn?'🔊 Звук: включён':'🔇 Звук: выключен'}</button><button class="mb2" id="m_about">ℹ️ Об игре</button></div>
+  <p class="mver">версия ${window.UPTIME_V||'dev'}</p>`;
+  $('m_play').onclick=()=>{sPop();s.classList.remove('menu');playEpisode(n)};$('m_eps').onclick=()=>{sPop();s.classList.remove('menu');showSeason()};
+  $('m_q').onclick=()=>{cycleQ();$('m_q').textContent='⚙️ Графика: '+qLabel()};$('m_snd').onclick=()=>{toggleSound();$('m_snd').textContent=musicOn?'🔊 Звук: включён':'🔇 Звук: выключен'};
+  $('m_about').onclick=()=>{sPop();showAbout()}}
+function showAbout(){SCR='about';const s=$('screen');s.classList.remove('menu');
+  s.innerHTML=`<button class="backb" id="aback">← Назад</button><h2>Об игре</h2><div class="sum">АПТАЙМ — сюжетная игра про сисадмина в ташкентском офисе. Каждое решение влияет на следующие эпизоды.<br><br>Разработка: Defactum Games<br>Движок: three.js (MIT)<br><br>Новые эпизоды приходят обновлением сами.</div>`;
+  $('aback').onclick=()=>{sPop();showMainMenu()}}
+function openPause(){if(!G||!G.running)return;PAUSED=true;const p=$('pause');p.classList.remove('hidden');
+  p.innerHTML=`<div class="pbox"><h3>Пауза</h3><button class="mb1" id="p_go"><b>▶ Продолжить</b></button><button class="mb2" id="p_jr">📓 Журнал</button><button class="mb2" id="p_q">⚙️ Графика: ${qLabel()}</button><button class="mb2" id="p_snd">${musicOn?'🔊 Звук: включён':'🔇 Звук: выключен'}</button><button class="mb2 red" id="p_exit">🚪 Выйти в меню</button><p class="pnote">При выходе прогресс текущего эпизода не сохранится</p></div>`;
+  $('p_go').onclick=closePause;$('p_jr').onclick=()=>{closePause();if(!G.busy)openJournal()};$('p_q').onclick=()=>{cycleQ();$('p_q').textContent='⚙️ Графика: '+qLabel()};
+  $('p_snd').onclick=()=>{toggleSound();$('p_snd').textContent=musicOn?'🔊 Звук: включён':'🔇 Звук: выключен'};$('p_exit').onclick=exitToMenu}
+function closePause(){PAUSED=false;$('pause').classList.add('hidden');lastT=performance.now()}
+function exitToMenu(){closePause();if(G){G.running=false;G.busy=false}if(D)closeDlg(true);$('dlg').classList.add('hidden');$('jr').classList.add('hidden');if(!$('mg').classList.contains('hidden')){if(mg.cleanup)mg.cleanup();mg.cleanup=null;$('mg').classList.add('hidden');$('mg').innerHTML=''}
+  Object.values(NPC).forEach(n=>n.hold=false);setLoc('office');showMainMenu()}
+$('menubtn').onclick=()=>{if(G&&G.running){sPop();PAUSED?closePause():openPause()}else showMainMenu()};
+window.uptimeBack=function(){
+  if(SCR==='splash')return true;
+  if(!$('mg').classList.contains('hidden')){const l=$('later');if(l){l.click();return true}}
+  if(!$('jr').classList.contains('hidden')){const c=$('jclose');if(c)c.click();return true}
+  if(!$('pause').classList.contains('hidden')){closePause();return true}
+  if(G&&G.running){if(!$('dlg').classList.contains('hidden'))return true;openPause();return true}
+  if(SCR==='season'||SCR==='about'){showMainMenu();return true}
+  if(SCR==='ending'){showSeason();return true}
+  return false};
+try{history.pushState({u:1},'');addEventListener('popstate',()=>{if(window.uptimeBack())history.pushState({u:1},'')})}catch(e){}
+function splash(){const lines=['> ping defactum.uz','64 bytes: time=12 ms','> systemctl start uptime','[ OK ] Сеть поднята','> uptime','99.9% ✓'];const t=$('spterm'),bar=$('spbar');let i=0;
+  const step=()=>{if(i<lines.length){t.innerHTML+=`<div>${lines[i]}</div>`;i++;bar.style.width=(i/lines.length*100)+'%';beep(400+i*60,.03,'square',.015);setTimeout(step,260)}else setTimeout(done,350)};
+  const done=()=>{const sp=$('splash');sp.classList.add('out');setTimeout(()=>sp.remove(),650);showMainMenu()};
+  setTimeout(()=>{render3DPortraits();step()},120)}
+fetch('version.json').then(r=>r.json()).then(v=>{window.UPTIME_V=v.web;const e=document.querySelector('.mver');if(e)e.textContent='версия '+v.web}).catch(()=>{});
+applyQ(false);splash();
+
+
 
 </script>
 </body>
