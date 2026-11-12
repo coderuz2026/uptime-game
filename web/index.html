@@ -2454,7 +2454,7 @@ function ep1Ending(){G.running=false;ov.style.display='none';const f=F(),q=G.q;
 /* ---------- input ---------- */
 const ray=new THREE.Raycaster(),floorP=new THREE.Plane(new THREE.Vector3(0,1,0),0),hit=new THREE.Vector3();
 function goTo(x,y){G.p.path=astar(G.p.x,G.p.y,x,y,LOC)}
-function interact(t){if(!G.running||G.busy)return;if(G.pending?.npc&&G.pending.npc!==t.npc)NPC[G.pending.npc].hold=false;G.pending=t;sPop();
+function interact(t){if(!G.running||G.busy)return;standUp();if(G.pending?.npc&&G.pending.npc!==t.npc)NPC[G.pending.npc].hold=false;G.pending=t;sPop();
   if(t.npc){const n=NPC[t.npc];n.hold=true;let tp=n.state==='sit'&&n.curStand?n.curStand:null;if(!tp){const gr=LOCS[LOC].grid,ok=(x,y)=>x>10&&y>10&&x<350&&y<470&&!gr[Math.floor(y/CELL)*GC+Math.floor(x/CELL)],sd=G.p.x>n.x?1:-1;tp=[[22*sd,6],[-22*sd,6],[0,24],[0,-24],[16*sd,18],[-16*sd,18]].map(([a,b])=>({x:n.x+a,y:n.y+b})).find(q=>ok(q.x,q.y))||{x:n.x+20*sd,y:n.y+8}}goTo(tp.x,tp.y)}else goTo(t.hot.stand.x,t.hot.stand.y);if(!G.p.path.length)arrive()}
 /* жесты: тап = идти, палец = двигать камеру, два пальца = зум */
 const PT=new Map();let PDRAG=false,PIN=0;
@@ -2476,7 +2476,7 @@ function tapAt(e){
   let best=null,bd=24;for(const n of Object.values(NPC)){if(n.loc!==LOC)continue;const d=Math.hypot(x-n.x,y-n.y);if(d<bd){bd=d;best={npc:n.id}}}
   if(!best)for(const h of HOT){if(h.loc!==LOC||hotHidden(h))continue;const d=Math.hypot(x-h.x,y-h.y);if(d<(h.door?30:26)){best={hot:h};break}}
   if(best){interact(best);return}
-  if(G.pending?.npc)NPC[G.pending.npc].hold=false;G.pending=null;G.p.path=astar(G.p.x,G.p.y,clamp(x,14,346),clamp(y,40,474),LOC,true);puff(wx(x),.1,wz(y),8,{c:'#ffd166',sp:1.5,life:.4,g:0})}
+  standUp();if(G.pending?.npc)NPC[G.pending.npc].hold=false;G.pending=null;G.p.path=astar(G.p.x,G.p.y,clamp(x,14,346),clamp(y,40,474),LOC,true);puff(wx(x),.1,wz(y),8,{c:'#ffd166',sp:1.5,life:.4,g:0})}
 function arrive(){const t=G.pending;G.pending=null;if(!t)return;
   if(t.npc){const n=NPC[t.npc];if(n.loc!==LOC){n.hold=false;return}G.p.rot=Math.atan2(n.x-G.p.x,n.y-G.p.y);let node=nodeFor(t.npc);
     if(!node){node={who:t.npc,mood:G.rel[t.npc]>0?'h':G.rel[t.npc]<0?'a':'n',text:rnd(gossipFor(t.npc)),next:END}}
@@ -2512,10 +2512,14 @@ function ambTick(dt){const a=AC;if(!a||a.state!=='running'||!G||!G.running)retur
   AMBT-=dt;if(AMBT>0||G.busy)return;AMBT=LOC==='yard'?3+Math.random()*5:4+Math.random()*7;
   if(LOC==='yard'){const t=a.currentTime;for(let i=0;i<2+Math.floor(Math.random()*3);i++){const o=a.createOscillator(),g=a.createGain(),t0=t+i*.13,f=2600+Math.random()*900;o.type='sine';o.frequency.setValueAtTime(f,t0);o.frequency.exponentialRampToValueAtTime(f*1.25,t0+.05);g.gain.setValueAtTime(.0001,t0);g.gain.exponentialRampToValueAtTime(.012,t0+.015);g.gain.exponentialRampToValueAtTime(.0001,t0+.09);o.connect(g);g.connect(bus('s'));o.start(t0);o.stop(t0+.1)}}
   else if(LOC==='office'&&!srv){const t=a.currentTime,n=4+Math.floor(Math.random()*7);let tt=t;for(let i=0;i<n;i++){tt+=.06+Math.random()*.12;const o=a.createOscillator(),g=a.createGain();o.type='square';o.frequency.value=1500+Math.random()*1400;g.gain.setValueAtTime(.006,tt);g.gain.exponentialRampToValueAtTime(.0001,tt+.018);o.connect(g);g.connect(bus('s'));o.start(tt);o.stop(tt+.02)}}}catch(e){}}
+let LASTIN=performance.now();document.addEventListener('pointerdown',()=>{LASTIN=performance.now()},true);
+function standUp(){const p=G&&G.p;if(p&&p.watch){p.watch=0;p.autoSit=0;p.x=PCSTAND.x;p.y=PCSTAND.y}else if(p)p.autoSit=0}
 function update(dt){ambTick(dt);
   {const n=NPC.bobur;if(n.radio>0)n.radio-=dt;RADIOT-=dt;if(RADIOT<=0){RADIOT=14+Math.random()*14;if(n.loc===LOC&&!n.hold&&!n.away&&!G.busy){sayBubble(n,rnd(RADIOL));n.chatT=4;n.radio=3;sRadio()}}}
   if(!G.busy){G.realT+=dt;if(G.realT>2.4){G.realT=0;G.min+=1}}
   const p=G.p;p.vx=p.vy=0;
+  if(!G.busy&&!p.path.length&&!p.watch&&!p.eat&&!G.pending&&LOC==='office'&&performance.now()-LASTIN>35000){LASTIN=performance.now();if(Math.hypot(p.x-PCSTAND.x,p.y-PCSTAND.y)<16){p.watch=1;p.x=PCPOS.x;p.y=PCPOS.y;p.rot=0}else{p.path=astar(p.x,p.y,PCSTAND.x,PCSTAND.y,LOC);p.autoSit=p.path.length?1:0}}
+  if(p.autoSit&&!p.path.length&&!G.busy){p.autoSit=0;if(Math.hypot(p.x-PCSTAND.x,p.y-PCSTAND.y)<16){p.watch=1;p.x=PCPOS.x;p.y=PCPOS.y;p.rot=0;toast('🖥️ Заявок нет. Присматриваешь за серверами','b')}}
   if(!G.busy&&p.path.length){const n=p.path[0],dx=n.x-p.x,dy=n.y-p.y,d=Math.hypot(dx,dy),sp=(mkOwn('sneakers')?121:105)*dt;p.rot=Math.atan2(dx,dy);
     if(d<=sp){p.x=n.x;p.y=n.y;p.path.shift();if(!p.path.length)arrive()}else{p.x+=dx/d*sp;p.y+=dy/d*sp;p.vx=dx/d*105;p.vy=dy/d*105}
     p.walk+=dt*11;p.dust-=dt;if(p.dust<=0){p.dust=.12;puff(wx(p.x),.05,wz(p.y),1,{c:'#8a7a6a',sp:.3,up:.4,g:0,life:.5,k:.5})}}
@@ -2532,6 +2536,7 @@ function visuals(dt){
   sun.intensity=((out?2.3:1.7)-.8*ev)*(1-.6*nt);sun.position.set(-6+10*prog,24-9*ev,-12);hemi.intensity=((out?1.25:1.05)-.3*ev)*(1-.35*nt);lamps.forEach((l,i)=>{l.intensity=ev*2.5;l.visible=ev>.03&&(QL==='high'||i===2)});
   const f=G&&EPN===1?G.F:{dil:G?3:0,ransom:0,virus:0,srv:G?3:0,acOn:!!G,tim:0,bobTV:G?1:0,mal:0,met_boss:0};
   texT-=dt;if(texT<=0){texT=.3;drawSky(prog,T);
+    if(LOC==='office'&&FR%30===0)dashDraw(T);
     if(LOC==='office')screens.forEach(s=>{let st='ok';if(s.i===0&&f.dil<3)st='nonet';if(s.i===1&&f.ransom===1)st='ransom';if(s.i===2)st=f.virus===1?'virus':f.tim==='main'||f.tim==='guest'?'movie':'ok';drawScreen(s,st,T)});
     if(LOC==='hall'){drawTV(f.bobTV,T);drawCam(T)}}
   const m=G?G.min:545;if(Math.floor(m)!==lastMin){lastMin=Math.floor(m);drawClock(m)}
@@ -2570,7 +2575,7 @@ function visuals(dt){
       else if(D.typing){c.armR.rotation.set(-.8+Math.sin(T*5)*.22,0,-.15);r.rotation.x=-1.1+Math.sin(T*7)*.15}}});
   if(G){const pl=G.p;admin.g.visible=true;admin.g.position.set(wx(pl.x),0,wz(pl.y));let dr=pl.rot-admin.g.rotation.y;dr=Math.atan2(Math.sin(dr),Math.cos(dr));admin.g.rotation.y+=dr*Math.min(1,dt*12);
     setFace(admin,D&&D.node&&D.node.who==='me'?(D.node.mood||'n'):'n',false,T);
-    poseChar(admin,AT_PC||pl.eat?'sit':pl.path.length&&!G.busy?'walk':'stand',pl.walk,T,pl.eat?.04:0);if(pl.eat){const b=Math.max(0,Math.sin(T*1.6));admin.armR.rotation.set(-.6-1.1*b,0,-.1);admin.armR.elbow.rotation.x=-1-.8*b;admin.armL.rotation.set(-.5,0,.1);admin.armL.elbow.rotation.x=-.9;admin.head.rotation.x=.1*b}if(pl.drink>0){pl.drink-=dt;const u=Math.min(1,(3.2-pl.drink)*2.5,pl.drink*2.5),sip=.5+.5*Math.sin(T*2.2);admin.cup.visible=true;admin.armL.rotation.set(-1.25*u-.25*u*sip,0,-.18*u);admin.armL.elbow.rotation.x=-1.55*u-.35*u*sip;admin.head.rotation.x=-.12*u*sip}else if(admin.cup.visible){admin.cup.visible=false;admin.head.rotation.x=0}if(AT_PC){admin.armL.rotation.x=-.45+Math.sin(T*14)*.07;admin.armR.rotation.x=-.45+Math.sin(T*14+2)*.07;admin.armL.elbow.rotation.x=admin.armR.elbow.rotation.x=-1.05}else if(!mgEl.classList.contains('hidden')){admin.armR.rotation.x=-1.3+Math.sin(T*16)*.25;admin.armL.rotation.x=-1.1+Math.sin(T*16+1)*.25}
+    poseChar(admin,AT_PC||pl.eat||pl.watch?'sit':pl.path.length&&!G.busy?'walk':'stand',pl.walk,T,pl.eat?.04:0);if(pl.eat){const b=Math.max(0,Math.sin(T*1.6));admin.armR.rotation.set(-.6-1.1*b,0,-.1);admin.armR.elbow.rotation.x=-1-.8*b;admin.armL.rotation.set(-.5,0,.1);admin.armL.elbow.rotation.x=-.9;admin.head.rotation.x=.1*b}if(pl.drink>0){pl.drink-=dt;const u=Math.min(1,(3.2-pl.drink)*2.5,pl.drink*2.5),sip=.5+.5*Math.sin(T*2.2);admin.cup.visible=true;admin.armL.rotation.set(-1.25*u-.25*u*sip,0,-.18*u);admin.armL.elbow.rotation.x=-1.55*u-.35*u*sip;admin.head.rotation.x=-.12*u*sip}else if(admin.cup.visible){admin.cup.visible=false;admin.head.rotation.x=0}if(pl.watch&&!AT_PC){const ty=Math.sin(T*.6)>.55;admin.armL.rotation.x=-.5+(ty?Math.sin(T*14)*.07:0);admin.armR.rotation.x=-.5+(ty?Math.sin(T*14+2)*.07:0);admin.armL.elbow.rotation.x=admin.armR.elbow.rotation.x=-1.05;admin.head.rotation.y=Math.sin(T*.4)*.15}if(AT_PC){admin.armL.rotation.x=-.45+Math.sin(T*14)*.07;admin.armR.rotation.x=-.45+Math.sin(T*14+2)*.07;admin.armL.elbow.rotation.x=admin.armR.elbow.rotation.x=-1.05}else if(!mgEl.classList.contains('hidden')){admin.armR.rotation.x=-1.3+Math.sin(T*16)*.25;admin.armL.rotation.x=-1.1+Math.sin(T*16+1)*.25}
     const tg=pl.path.length?pl.path[pl.path.length-1]:null;ring.visible=!!tg&&!G.busy;if(tg){ring.position.set(wx(tg.x),.02,wz(tg.y));ring.scale.setScalar(1+Math.sin(T*6)*.12);ring.rotation.z+=dt*2}}
   else{admin.g.visible=false;ring.visible=false}
   if(cam.loc!==LOC){cam.loc=LOC;cam.uz=0;cam.free=false}
@@ -2665,10 +2670,23 @@ const GEAR=[
  {id:'fw2',after:'fw',ship:2880,why:'Она заметит взломщика в сети в первые минуты, а не через неделю',n:'Система обнаружения вторжений',d:'Улучшение: тревога при взломе в первые минуты',cost:2000000,req:['sec',3],mg:['rules',{}],col:'#ff7b72'}];
 /* 3D: admin desk + mount rack in the server room */
 const PCPOS={x:42,y:444},PCSTAND={x:42,y:434},MOUNT={x:285,y:392};
-const gearMesh={},deskMesh={};
+const gearMesh={},deskMesh={},DASH={h:Array.from({length:24},()=>.3+Math.random()*.4)};
+/* состояние серверов для дашборда: и на экране в 3D, и во вкладке «Монитор» */
+function dashState(){const f=G?G.F:{},g=PR().gear,bad=EPN===3&&G&&!f.restored,hot=EPN===1&&G&&f.srv!=null&&f.srv<3,enc=bad&&!f.clean;
+  const rows=[['1С и база',bad?(enc?'r':'y'):'g',bad?(enc?'зашифровано':'ждёт восстановления'):'работает'],['Файловый сервер',bad?(enc?'r':'y'):'g',bad?(enc?'зашифровано':'ждёт восстановления'):'работает'],['Почта',EPN===3&&G&&f.iso===2&&!f.restored?'r':'g',EPN===3&&G&&f.iso===2&&!f.restored?'зашифровано':'работает'],['Свитч',hot?'y':EPN===3&&G&&f.iso&&!f.restored?'y':'g',hot?'перегрев':EPN===3&&G&&f.iso&&!f.restored?'сеть отключена':'работает'],['Интернет',EPN===3&&G&&f.iso&&!f.restored?'y':'g',EPN===3&&G&&f.iso&&!f.restored?'отключён вручную':'100 Мбит/с']];
+  if(g.includes('ups'))rows.push(['ИБП','g',g.includes('ups2')?'заряд 100%, запас 4 ч':'заряд 100%, запас 20 мин']);if(g.includes('nas'))rows.push(['Сервер копий','g',g.includes('nas2')?'копия 03:00 + вторая площадка':'последняя копия 03:00']);
+  if(g.includes('fw'))rows.push(['Межсетевой экран','g','отражено атак сегодня: '+(12+Math.floor((G?G.min:540)/7)%60)]);if(g.includes('ap'))rows.push(['Wi-Fi','g',g.includes('ap2')?'3 точки, гостевая сеть':'гостевая сеть отдельно']);
+  return {rows,alarm:rows.some(r=>r[1]==='r'),warn:rows.some(r=>r[1]==='y')}}
+function dashDraw(T){const c=DASH.c;if(!c)return;const g=c.getContext('2d'),st=dashState();DASH.h.push(clamp(DASH.h[DASH.h.length-1]+(Math.random()-.5)*.25,.08,st.alarm?.98:.8));DASH.h.shift();
+  g.fillStyle=st.alarm?(Math.floor(T*2)%2?'#3a0d0d':'#2a0a0a'):'#0b1420';g.fillRect(0,0,160,96);g.fillStyle=st.alarm?'#ff5a4d':st.warn?'#ffd166':'#3fb950';g.fillRect(0,0,160,9);
+  g.fillStyle='#0b1420';g.font='bold 7px sans-serif';g.fillText(st.alarm?'ALERT':st.warn?'WARNING':'ALL SYSTEMS OK',4,7);
+  g.strokeStyle=st.alarm?'#ff7b72':'#58a6ff';g.lineWidth=1.5;g.beginPath();DASH.h.forEach((v,i)=>{const x=6+i*3.6,y=52-v*34;i?g.lineTo(x,y):g.moveTo(x,y)});g.stroke();
+  st.rows.slice(0,6).forEach((r,i)=>{g.fillStyle=r[1]==='r'?'#ff5a4d':r[1]==='y'?'#ffd166':'#3fb950';g.fillRect(100,15+i*7,6,5);g.fillStyle='#30363d';g.fillRect(109,15+i*7,44,5)});
+  for(let i=0;i<8;i++){const v=.25+.6*Math.abs(Math.sin(T*.7+i*1.3));g.fillStyle=['#3fb950','#58a6ff','#d2a8ff','#ffd166'][i%4];g.fillRect(8+i*11,90-v*28,8,v*28)}
+  DASH.t.needsUpdate=true}
 {const P=LOCS.office.group,x=wx(42),z=wz(462),wd=M('#c9a26b'),dk=M('#1b1f27'),mt=M('#57606a');
   box(1.9,.08,.8,wd,x,.78,z,P);[[-.85,-.32],[.85,-.32],[-.85,.32],[.85,.32]].forEach(([a,b])=>box(.06,.76,.06,mt,x+a,.38,z+b,P));
-  box(.9,.56,.05,dk,x,1.3,z+.12,P);const sc=new THREE.Mesh(new THREE.PlaneGeometry(.82,.48),emis('#3fb950',1.4));sc.rotation.y=Math.PI;sc.position.set(x,1.3,z+.09);P.add(sc);box(.08,.3,.06,dk,x,.98,z+.12,P);box(.6,.03,.2,dk,x,.83,z-.15,P);
+  box(.9,.56,.05,dk,x,1.3,z+.12,P);DASH.c=document.createElement('canvas');DASH.c.width=160;DASH.c.height=96;DASH.t=tex(DASH.c);const sc=new THREE.Mesh(new THREE.PlaneGeometry(.82,.48),new THREE.MeshStandardMaterial({color:'#000',map:DASH.t,emissive:'#ffffff',emissiveMap:DASH.t,emissiveIntensity:1.5,roughness:.2}));sc.userData.dyn=1;sc.rotation.y=Math.PI;sc.position.set(x,1.3,z+.09);P.add(sc);box(.08,.3,.06,dk,x,.98,z+.12,P);box(.6,.03,.2,dk,x,.83,z-.15,P);
   box(.3,.5,.5,dk,x+.72,1.07,z+.05,P);cyl(.07,.06,.16,M('#f0883e'),x-.7,.9,z-.1,P);
   const cg=new THREE.Group();cg.position.set(wx(PCPOS.x),0,wz(PCPOS.y));P.add(cg);makeChair(cg,M('#2f9e5a'));
   {const own=((SEASON.prof||{}).mk||{}).own||[],mkg=(id,f)=>{const u=new THREE.Group();u.position.set(x,.82,z);P.add(u);f(u);u.visible=own.includes(id);u.traverse(o=>{o.userData.dyn=1});deskMesh[id]=u};
@@ -2680,10 +2698,10 @@ const gearMesh={},deskMesh={};
   box(1,.16,.02,emis('#f0883e',1.2),mx,2.42,mz+.42,P,false);
   GEAR.forEach((g,i)=>{const u=new THREE.Group(),sl=g.after?GEAR.findIndex(b=>b.id===g.after):i;u.position.set(mx,.28+sl*.4,mz);P.add(u);if(g.after){box(1.05,.07,.83,M(g.col),0,.16,0,u);box(.3,.04,.02,emis('#ffd166',3),.3,.16,.42,u,false);for(let k=0;k<3;k++)box(.04,.04,.02,emis('#3dff7a',3),-.4+k*.09,.16,.42,u,false)}else{box(1.02,.3,.8,M(g.col),0,0,0,u);box(.9,.05,.02,M('#0d1117'),0,.06,.41,u,false);for(let k=0;k<4;k++)box(.05,.05,.02,emis(k%2?'#3dff7a':'#58a6ff',3),-.36+k*.12,-.06,.41,u,false)}u.visible=PR().gear.includes(g.id);gearMesh[g.id]=u})}
 let AT_PC=false,PCTAB='edu',PCREMOTE=false;
-function openPC(remote){PCREMOTE=!!remote;if(G&&G.running){G.busy=true;if(!remote){AT_PC=true;G.p.path=[];G.p.x=PCPOS.x;G.p.y=PCPOS.y;G.p.rot=0}}if(remote)PCTAB='sk';else if(PCTAB==='sk')PCTAB='edu';renderPC()}
-function closePC(){$('pc').classList.add('hidden');$('pc').innerHTML='';if(AT_PC)leavePC();if(G&&G.running)G.busy=false}
+function openPC(remote){PCREMOTE=!!remote;if(G&&G.running){G.busy=true;if(!remote){AT_PC=true;G.p.path=[];G.p.x=PCPOS.x;G.p.y=PCPOS.y;G.p.rot=0}}if(remote)PCTAB='sk';else if(PCTAB==='sk')PCTAB='edu';if(G)G.p.watch=0;clearInterval(DASH.iv);DASH.iv=setInterval(()=>{if($('pc').classList.contains('hidden')){clearInterval(DASH.iv);return}if(PCTAB==='mon'){dashDraw(performance.now()/1000);renderPC()}},1000);renderPC()}
+function closePC(){clearInterval(DASH.iv);$('pc').classList.add('hidden');$('pc').innerHTML='';if(AT_PC)leavePC();if(G&&G.running)G.busy=false}
 function leavePC(){AT_PC=false;if(G){G.p.x=PCSTAND.x;G.p.y=PCSTAND.y}}
-function renderPC(){const p=PR(),el=$('pc'),_ob=el.querySelector('.pcb'),_st=_ob?_ob.scrollTop:0,_tab=el._tab;el.classList.remove('hidden');const tabs=PCREMOTE?[['sk','Навыки']]:[['edu','Курсы'],['shop','Закупки'],['sk','Навыки']];
+function renderPC(){const p=PR(),el=$('pc'),_ob=el.querySelector('.pcb'),_st=_ob?_ob.scrollTop:0,_tab=el._tab;el.classList.remove('hidden');const tabs=PCREMOTE?[['sk','Навыки']]:[['mon','Монитор'],['edu','Курсы'],['shop','Закупки'],['sk','Навыки']];
   let h=`<div class="pcb"><div class="pch"><b>${PCREMOTE?'Мой профиль':'Рабочее место админа'}</b><button class="pcx" id="pcx">✕</button></div>
   <div class="pcs"><span>⭐ Уровень <b>${p.lvl}</b></span><span>💰 Зарплата <b>${fmtM(p.money)}</b></span><span>📈 Аптайм <b>${upPct()}%</b></span></div><div class="xpb"><i style="width:${p.xp/xpNeed(p.lvl)*100}%"></i></div><small class="xpt">${p.xp} / ${xpNeed(p.lvl)} опыта до уровня ${p.lvl+1}</small>
   <div class="pct">${tabs.map(([k,t])=>`<button class="${PCTAB===k?'on':''}" data-tab="${k}">${t}</button>`).join('')}</div>`;
@@ -2696,6 +2714,10 @@ function renderPC(){const p=PR(),el=$('pc'),_ob=el.querySelector('.pcb'),_st=_ob
     h+='<div class="pcsec">Оборудование · поставка 1–2 дня</div>'+GEAR.filter(g=>!g.after||p.gear.includes(g.after)).map(g=>{const inst=p.gear.includes(g.id),own=p.owned.includes(g.id);
       return `<div class="pcr"><div><b>${g.n}</b><small>${g.d} · ${fmtM(g.cost)} сум · ${fmtDur(g.ship)} · установка: ${skTxt(g.req)}</small></div>${inst?'<span class="pcok">Установлено</span>':own?'<span class="pclk">На складе. Установи в стойке</span>':ord(g.id)?'<span class="pclk">Заявка подана</span>':`<button class="pcbtn y" data-req="${g.id}">Заявка</button>`}</div>`}).join('');
     h+='<div class="pcsec">Расходники · в пределах лимита админа, 3–4 часа</div>'+SMALL.map(g=>`<div class="pcr"><div><b>${g.n}</b><small>${g.d} · ${fmtM(g.cost)} сум · ${fmtDur(g.ship)}</small></div>${p.small.includes(g.id)?'<span class="pcok">Получено</span>':ord(g.id)?'<span class="pclk">Заказано</span>':p.budget>=g.cost?`<button class="pcbtn" data-ord="${g.id}">Заказать</button>`:'<span class="pclk">Нет бюджета</span>'}</div>`).join('')+'<p class="pcn">Время доставки идёт вместе с игровым временем. Ночь между эпизодами тоже считается.</p>'}
+  if(PCTAB==='mon'){const st=dashState(),hs=DASH.h,w=300,pts=hs.map((v,i)=>(i*w/(hs.length-1)).toFixed(1)+','+(58-v*50).toFixed(1)).join(' ');
+    h+=`<div class="pcr" style="display:block;background:${st.alarm?'#2a1010':st.warn?'#2a2410':'#10241a'};border-color:${st.alarm?'#8e1519':st.warn?'#7a5c00':'#1f5a33'}"><b style="color:${st.alarm?'#ff7b72':st.warn?'#ffd166':'#56d364'}">${st.alarm?'🚨 Авария':st.warn?'⚠️ Требует внимания':'✅ Все системы работают'}</b><small style="display:block;margin-top:2px">Аптайм офиса ${upPct()}% · заявок в очереди: ${G&&G.tk?1:0}</small></div>
+    <div class="pcr" style="display:block"><b>Нагрузка на сервер</b><svg viewBox="0 0 ${w} 62" style="width:100%;height:62px;display:block;margin-top:6px"><polyline points="${pts}" fill="none" stroke="${st.alarm?'#ff7b72':'#58a6ff'}" stroke-width="2.5" stroke-linejoin="round"/><line x1="0" y1="60" x2="${w}" y2="60" stroke="#30363d"/></svg><small>сейчас ${Math.round(hs[hs.length-1]*100)}% · обновляется каждую секунду</small></div>
+    <div class="pcsec">Узлы</div>`+st.rows.map(r=>`<div class="pcr"><div><b><i style="display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:7px;background:${r[1]==='r'?'#ff5a4d':r[1]==='y'?'#ffd166':'#3fb950'};box-shadow:0 0 8px ${r[1]==='r'?'#ff5a4d':r[1]==='y'?'#ffd166':'#3fb950'}"></i>${r[0]}</b><small>${r[2]}</small></div></div>`).join('')+'<p class="pcn">Если тебя не трогать, ты сам сядешь сюда и будешь присматривать за серверами.</p>'}
   if(PCTAB==='sk')h+=Object.keys(SKN).map(k=>`<div class="pcr"><div><b>${SKN[k]}</b><small>${['Новичок','Базовый','Уверенный','Эксперт'][p.sk[k]]}</small></div><span class="pips">${'●'.repeat(p.sk[k])}${'○'.repeat(3-p.sk[k])}</span></div>`).join('')+
     `<div class="pcr"><div><b>Оборудование</b><small>${p.gear.length?p.gear.map(id=>GEAR.find(g=>g.id===id).n).join(', '):'Пока ничего не установлено'}</small></div><span class="pips">${p.gear.length}/${GEAR.length}</span></div><div class="pcr"><div><b>Решено задач</b></div><span class="pips">${p.tasks}</span></div>`+(PCREMOTE?'<p class="pcn">Курсы и магазин открываются за твоим компьютером: зелёный стул в серверной, слева внизу.</p>':'');
   el.innerHTML=h+'</div>';{const nb=el.querySelector('.pcb');if(nb&&_tab===PCTAB)nb.scrollTop=_st;el._tab=PCTAB}$('pcx').onclick=()=>{sPop();closePC()};
