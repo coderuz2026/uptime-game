@@ -1612,7 +1612,7 @@ const prevF=n=>(SEASON.done[n]&&SEASON.done[n].F)||{};
 const prevRel=()=>{const r={};for(let i=1;i<EPN;i++)Object.assign(r,(SEASON.done[i]||{}).rel||{});return r};
 function finishEpisode(n,title,F,rel){const first=!SEASON.done[n]||!SEASON.done[n].paid;SEASON.done[n]={title,F,rel,t:Date.now(),paid:1};if(first){PR().budget+=1500000;gainXP(150,500000);toast('Директор увеличил бюджет ИТ на 1,5 млн сум','y')}saveSeason()}
 /* dispatchers */
-function nodeFor(id){const base=EPS[EPN].nodeFor(id);if(id==='boss'&&G.F.met_boss&&!G.F.ev.final&&PR().orders.some(o=>o.st==='wait'))return reqNode(base);if(!base&&G.tk&&G.tk.id===id)return tkNode(id);return base}
+function nodeFor(id){const base=EPS[EPN].nodeFor(id);if(id==='boss'&&G.F.met_boss&&!G.F.ev.final&&PR().orders.some(o=>o.st==='wait'))return reqNode(base);if(!base&&G.tk&&G.tk.id===id)return tkNode(id);if(!base&&G.F.lunch===1&&LOC==='yard'&&(id in LUNCHERS)&&NPC[id].state==='sit'&&NPC[id].loc==='yard')return lunchNode(id);return base}
 function markerFor(id){if(id==='boss'&&G.F.met_boss&&PR().orders.some(o=>o.st==='wait'))return 't';const m=EPS[EPN].markerFor(id);return !m&&G.tk&&G.tk.id===id?'q':m}
 function objectives(){const o=EPS[EPN].objectives();if(Object.values(PR().sk).every(v=>v===0)&&(EPN!==1||G.F.met_boss))o.unshift(['📚 Пройди первый курс за своим компьютером (серверная, слева внизу)',0]);PR().orders.forEach(r=>{const it=itemOf(r);o.push([r.st==='wait'?'📝 Согласовать у директора заявку: '+it.n:'📦 '+it.n+': '+stageOf(r)+', ещё '+fmtDur(r.eta-PR().clock),0])});return o}
 function checkEvents(){if(!G||G.busy||!G.running||G.F.ev.final)return;EPS[EPN].events();if(!G.busy)tkTick()}
@@ -2265,6 +2265,8 @@ EPS[4]={intro:'e4_intro',
    hamid:['Плов надо доедать.','Кто шепчется за едой, тот что-то прячет.'],
    lim:['Я слушаю.','Время идёт.']},
  events(){const f=F(),m=G.min,e=f.ev;
+  if(!e.lunch&&m>=720){e.lunch=1;f.lunch=1;talk('lunchEv');return}
+  if(e.lunch===1&&m>=780){e.lunch=2;f.lunch=0;toast('🏢 Обед окончен, все возвращаются в офис','b')}
   if(!e.far&&m>=630&&f.met_boss&&f.p2.farSusp&&!f.far4){e.far=1;talk('e4_farCall');return}
   if(!e.half&&m>=780&&f.met_boss){e.half=1;talk('e4_half','lim');return}
   if(!e.warn&&m>=990&&f.met_boss){e.warn=1;talk('e4_warn','lim');return}
@@ -2564,7 +2566,7 @@ function visuals(dt){
       else if(D.typing){c.armR.rotation.set(-.8+Math.sin(T*5)*.22,0,-.15);r.rotation.x=-1.1+Math.sin(T*7)*.15}}});
   if(G){const pl=G.p;admin.g.visible=true;admin.g.position.set(wx(pl.x),0,wz(pl.y));let dr=pl.rot-admin.g.rotation.y;dr=Math.atan2(Math.sin(dr),Math.cos(dr));admin.g.rotation.y+=dr*Math.min(1,dt*12);
     setFace(admin,D&&D.node&&D.node.who==='me'?(D.node.mood||'n'):'n',false,T);
-    poseChar(admin,AT_PC?'sit':pl.path.length&&!G.busy?'walk':'stand',pl.walk,T);if(pl.drink>0){pl.drink-=dt;const u=Math.min(1,(3.2-pl.drink)*2.5,pl.drink*2.5),sip=.5+.5*Math.sin(T*2.2);admin.cup.visible=true;admin.armL.rotation.set(-1.25*u-.25*u*sip,0,-.18*u);admin.armL.elbow.rotation.x=-1.55*u-.35*u*sip;admin.head.rotation.x=-.12*u*sip}else if(admin.cup.visible){admin.cup.visible=false;admin.head.rotation.x=0}if(AT_PC){admin.armL.rotation.x=-.45+Math.sin(T*14)*.07;admin.armR.rotation.x=-.45+Math.sin(T*14+2)*.07;admin.armL.elbow.rotation.x=admin.armR.elbow.rotation.x=-1.05}else if(!mgEl.classList.contains('hidden')){admin.armR.rotation.x=-1.3+Math.sin(T*16)*.25;admin.armL.rotation.x=-1.1+Math.sin(T*16+1)*.25}
+    poseChar(admin,AT_PC||pl.eat?'sit':pl.path.length&&!G.busy?'walk':'stand',pl.walk,T,pl.eat?.04:0);if(pl.eat){const b=Math.max(0,Math.sin(T*1.6));admin.armR.rotation.set(-.6-1.1*b,0,-.1);admin.armR.elbow.rotation.x=-1-.8*b;admin.armL.rotation.set(-.5,0,.1);admin.armL.elbow.rotation.x=-.9;admin.head.rotation.x=.1*b}if(pl.drink>0){pl.drink-=dt;const u=Math.min(1,(3.2-pl.drink)*2.5,pl.drink*2.5),sip=.5+.5*Math.sin(T*2.2);admin.cup.visible=true;admin.armL.rotation.set(-1.25*u-.25*u*sip,0,-.18*u);admin.armL.elbow.rotation.x=-1.55*u-.35*u*sip;admin.head.rotation.x=-.12*u*sip}else if(admin.cup.visible){admin.cup.visible=false;admin.head.rotation.x=0}if(AT_PC){admin.armL.rotation.x=-.45+Math.sin(T*14)*.07;admin.armR.rotation.x=-.45+Math.sin(T*14+2)*.07;admin.armL.elbow.rotation.x=admin.armR.elbow.rotation.x=-1.05}else if(!mgEl.classList.contains('hidden')){admin.armR.rotation.x=-1.3+Math.sin(T*16)*.25;admin.armL.rotation.x=-1.1+Math.sin(T*16+1)*.25}
     const tg=pl.path.length?pl.path[pl.path.length-1]:null;ring.visible=!!tg&&!G.busy;if(tg){ring.position.set(wx(tg.x),.02,wz(tg.y));ring.scale.setScalar(1+Math.sin(T*6)*.12);ring.rotation.z+=dt*2}}
   else{admin.g.visible=false;ring.visible=false}
   if(cam.loc!==LOC){cam.loc=LOC;cam.uz=0;cam.free=false}
@@ -2762,6 +2764,7 @@ const ACH=[
  ['mg20','🧩','Мастер на все руки','Выиграй 20 мини-игр',p=>p.cnt.mg>=20],
  ['tk5','📋','Заявка закрыта','Закрой 5 заявок коллег',p=>p.cnt.tk>=5],
  ['tk25','🏅','Служба поддержки','Закрой 25 заявок коллег',p=>p.cnt.tk>=25],
+ ['lunch6','🍲','Свой человек','Пообедай в чайхане с каждым из шести коллег',p=>p.lunch&&Object.keys(p.lunch).length>=6],
  ['learn4','📚','Вечный студент','Пройди по курсу в каждом навыке',p=>Object.values(p.sk).every(v=>v>=1)],
  ['master','🎓','Профи','Прокачай любой навык до максимума',p=>Object.values(p.sk).some(v=>v>=3)],
  ['gear3','🗄️','Своя серверная','Установи 3 единицы оборудования',p=>p.gear.length>=3],
@@ -2785,6 +2788,22 @@ function showAch(){SCR='about';const s=$('screen'),p=MT();s.classList.remove('me
   <p style="font-size:12px;color:#8b949e;margin:4px 0 14px">🔥 Дней подряд: ${p.streak}. Задания обновляются каждый день.</p>
   <h2>Достижения ${Object.keys(p.ach).length}/${ACH.length}</h2>${ACH.map(a=>{const ok=p.ach[a[0]];return `<div class="sum" style="display:flex;align-items:center;gap:10px;margin:6px 0;opacity:${ok?1:.55};${ok?'border-color:#f5c54288':''}"><span style="font-size:24px;filter:${ok?'none':'grayscale(1)'}">${a[1]}</span><div style="flex:1;text-align:left"><b>${a[2]}</b><br><small style="color:#8b949e">${a[3]}</small></div><span style="font-size:20px">${ok?'🏆':'🔒'}</span></div>`}).join('')}`;
   $('aback').onclick=()=>{sPop();showMainMenu()}}
+/* ================= ОБЕД С КОЛЛЕГОЙ В ЧАЙХАНЕ ================= */
+const LTALK={
+ dilnoza:['Садись, болам. Ешь, ты худой как квартальный отчёт в январе. Вот скажи: почему компьютер всегда ломается именно в день сдачи отчёта?',['Он чувствует ваш страх, Дильноза опа','Потому что в этот день вы нажимаете всё сразу'],'Вой, шутник! А ведь правда… Ладно. В следующий раз позову тебя за день до отчёта. Бери лепёшку.'],
+ malika:['О, админ за нашим столом! Слушай, я тут придумала слоган: «Туран Трейд. Мы не тормозим». Как тебе?',['Сильно. Только интернет сначала ускорю','А принтер в курсе?'],'Ха! Вот поэтому я с тобой и советуюсь. Кстати, если нужен красивый плакат в серверную, я нарисую.'],
+ sardor:['Садись. Только про склад не спрашивай, я ем. …Ладно, спрашивай. Но плов остынет.',['Не буду. Расскажи лучше, где тут самая вкусная самса','Один вопрос: коробки ты сам считаешь?'],'Самса у Хамид-аки, по четвергам. А коробки… считаю. Иногда. Ты ешь давай.'],
+ timur:['Брат! Садись! Слушай, а правда, что если десять раз неправильно ввести пароль, компьютер взорвётся?',['Правда. Но только твой','Нет. Но я могу это настроить'],'Ха-ха-ха! Вот за это я тебя уважаю. Хамид-ака, ещё чайник моему другу!'],
+ nigora:['Ой, садись к нам! Я как раз рассказывала, как сегодня клиент попросил «переслать интернет на флешку».',['И что ты ему ответила?','А я могу. Давай флешку'],'Что наш админ лично привезёт! Шучу. Хорошо, что ты у нас появился: теперь есть кому объяснять такие вещи.'],
+ lola:['Присаживайся. Знаешь, ты первый админ, который обедает с нами. Прошлый ел за компьютером.',['За компьютером плов невкусный','А мне сказали, тут самые важные новости'],'Это точно! Если хочешь знать, что происходит в фирме, не читай почту. Приходи в чайхану.']};
+function lunchNode(id){const first=!(G.ate&&G.ate[id]);return {who:id,mood:'h',text:first?'Приятного аппетита! Садись с нами, место найдётся.':'Ещё плова? Садись, место есть.',choices:[{t:'Сесть рядом и пообедать вместе',go:()=>eatWith(id)},{t:'Спасибо, в другой раз',go:END}]}}
+function eatWith(id){const n=NPC[id],own=LSEATS[LUNCHERS[id]],two=LUNCHERS[id]>=4,sn=two?own:LSEATS[6],sp=two?LSEATS[LUNCHERS[id]===4?6:7]:LSEATS[7],first=!(G.ate&&G.ate[id]),T=LTALK[id],fade=$('fade');
+  const rot=q=>Math.atan2(q.c[0]-q.x,q.c[1]-q.y);fade.style.opacity=1;
+  setTimeout(()=>{sitAt(n,sn.x,sn.y,rot(sn),.04,sn.st);const p=G.p;p.path=[];p.x=sp.x;p.y=sp.y;p.rot=rot(sp);p.eat=1;fade.style.opacity=0},320);
+  const done=()=>{const p=G.p;p.eat=0;p.x=sp.st.x;p.y=sp.st.y;sitAt(n,own.x,own.y,rot(own),.04,own.st);addTime(25);G.ate=G.ate||{};G.ate[id]=1;const pr=PR();pr.lunch=pr.lunch||{};pr.lunch[id]=1;saveSeason();if(first){rel(id,1);logc('Пообедал с коллегой: '+CH[id].name)}toast('🍲 Вкусно пообедали','g')};
+  const end={who:id,mood:'h',text:first?T[2]:'Хорошо посидели. Приходи ещё!',act:done,next:END};
+  const q=first?{who:id,mood:'h',text:T[0],choices:T[1].map(t=>({t,go:()=>end}))}:{who:id,mood:'h',text:rnd(['Плов сегодня удался. Хамид-ака в ударе.','Ешь, ешь. Работа не убежит, а плов остынет.','Вот так бы каждый день.']),next:end};
+  return {who:'narr',text:(two?'Ты садишься за их столик.':'Вы пересаживаетесь за свободный столик под чинарой.')+' Хамид-ака ставит перед вами плов, лепёшку и чайник.',next:q}}
 /* ---------- заявки коллег ---------- */
 const TICKETS=[
  {b:'Принтер зажевал!',t:'Принтер опять жуёт бумагу, а мне срочно печатать. Посмотришь?',mg:['mash',{}],w:'Печатает! Рахмат, выручил.'},
@@ -2807,7 +2826,7 @@ EPS[0]={intro:'fs_intro',
  setup(){setAway('farrukh');if(prevF(2).rb){setAway('sardor');setHome('rustam',deskOf(5))}},
  nodeFor:()=>null,markerFor:()=>'',hot:{},hotHidden:h=>!h.door&&!h.common,
  objectives(){return [[G.tk?'📋 Заявка: '+CH[G.tk.id].name+' ждёт помощи':'Жди заявок от коллег',0],['Закрыто заявок: '+(G.tkDone||0),0],['Смена до 18:00',0]]},
- events(){if(G.min>=1080&&!G.F.ev.final)startFinal()},
+ events(){const f=G.F,e=f.ev,m=G.min;if(!e.lunch&&m>=720){e.lunch=1;f.lunch=1;talk('lunchEv');return}if(e.lunch===1&&m>=780){e.lunch=2;f.lunch=0;toast('🏢 Обед окончен, все возвращаются в офис','b')}if(m>=1080&&!e.final)startFinal()},
  final(){if(G.busy){G.pendingFinal=true;return}G.F.ev.final=1;endingScreen()},
  ending(){G.running=false;ov.style.display='none';const n=G.tkDone||0,s=$('screen'),pb=PR().best||0,rec=n>pb;if(rec)PR().best=n;s.classList.remove('hidden');saveSeason();
   s.innerHTML=`<div class="tag">СМЕНА ОКОНЧЕНА</div><h2 style="font-size:24px">${n>=8?'🏆 Герой офиса':n>=4?'👍 Хорошая смена':'☕ Тихий день'}</h2><p>Закрыто заявок: <b style="color:#ffd166">${n}</b>${rec&&n?' · 🎉 новый рекорд!':pb?' · рекорд: '+pb:''}</p><div class="sum">За каждую заявку ты получил опыт и премию. Заявки идут в задания дня и достижения.</div>${seasonButton('В меню ▶')}`;$('tosea').onclick=()=>showMainMenu()}};
