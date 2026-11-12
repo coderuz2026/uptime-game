@@ -571,7 +571,7 @@ const boardC=cvs(256,96,(g)=>{g.fillStyle='#f6f8fa';g.fillRect(0,0,256,96);g.str
   g.strokeStyle='#cf222e';g.beginPath();g.moveTo(70,29);g.lineTo(110,29);g.moveTo(150,29);g.lineTo(190,29);g.moveTo(130,38);g.lineTo(130,62);g.stroke();
   g.fillStyle='#2da44e';g.font='bold 15px sans-serif';g.fillText('План на день: ВЫЖИТЬ',14,90)});
 const signC=cvs(256,48,(g)=>{g.fillStyle='#0d1117';g.fillRect(0,0,256,48);g.fillStyle='#79c0ff';g.font='bold 26px sans-serif';g.textAlign='center';g.fillText('⚡ СЕРВЕРНАЯ',128,34)});
-const posterC=cvs(64,96,(g)=>{g.fillStyle='#1f6feb';g.fillRect(0,0,64,96);g.fillStyle='#fff';g.font='bold 40px sans-serif';g.textAlign='center';g.fillText('⏻',32,52);g.font='bold 9px sans-serif';g.fillText('ВЫКЛ→ВКЛ',32,80)});
+const posterC=cvs(64,96,(g)=>{g.fillStyle='#1f6feb';g.fillRect(0,0,64,96);g.fillStyle='#fff';g.font='bold 40px sans-serif';g.textAlign='center';g.strokeStyle='#fff';g.lineWidth=5;g.lineCap='round';g.beginPath();g.arc(32,40,13,-1.05,Math.PI+1.05);g.stroke();g.beginPath();g.moveTo(32,22);g.lineTo(32,40);g.stroke();g.font='bold 9px sans-serif';g.fillText('ВЫКЛ→ВКЛ',32,80)});
 const skyC=document.createElement('canvas');skyC.width=256;skyC.height=64;const skyT=tex(skyC);
 const clockC=document.createElement('canvas');clockC.width=clockC.height=64;const clockT=tex(clockC);
 
@@ -906,7 +906,8 @@ function makeChar(c){
   if(c.hat==='cap'){cyl(.118,.118,.07,M('#1c2638'),0,.09,-.005,head,16);box(.13,.015,.09,M('#141c2c'),0,.06,.12,head);box(.03,.025,.004,M('#c9a227'),0,.11,.118,head)}
   [legL,legL.knee,legR,legR.knee,armL,armL.elbow,armR,armR.elbow,head].forEach(bakePart);const body=bakePart(g);
   {const b=new THREE.Mesh(geo('blob',()=>new THREE.CircleGeometry(.34,18)),BLOBM);b.rotation.x=-Math.PI/2;b.position.y=.02;b.userData.noOL=1;b.visible=QL==='low';g.add(b);BLOBS.push(b)}
-  return {g,legL,legR,armL,armR,head,torso:body||torso,face};
+  const cup=cyl(.035,.028,.085,M('#f4f6fa',{roughness:.4}),0,-.33,.07,armL.elbow,10);cup.userData.noOL=1;cup.userData.dyn=1;cup.visible=false;
+  return {g,legL,legR,armL,armR,head,torso:body||torso,face,cup};
 }
 const CH={
   nigora:{name:'Нигора',role:'Ресепшн',skin:'#e8b48f',hair:'#2a1a12',style:'long',shirt:'#f778ba',bg:'#5a2346'},
@@ -1277,7 +1278,7 @@ function npcUpdate(n,dt){if(n.away)return;
     if(n.id==='boss'){npcGo(n,262+Math.random()*60,298,()=>{n.state='idle';n.timer=4})}
     else if(n.id==='rustam'){n.timer=999}
     else if(Math.random()<.45&&startConv(n)){}
-    else{const pool=IDLE[n.loc];const s=rnd(pool);npcGo(n,s.x+(Math.random()-.5)*10,s.y,()=>{n.state='idle';n.timer=4+Math.random()*5;if(Math.random()<.6)sayBubble(n,rnd(CHATS[n.id]))})}}
+    else{const pool=IDLE[n.loc],k=n.loc==='office'&&Math.random()<.4?(Math.random()<.5?0:1):Math.floor(Math.random()*pool.length),s=pool[k],dr=n.loc==='office'&&k<2;npcGo(n,s.x+(dr?0:(Math.random()-.5)*10),s.y,()=>{n.state='idle';n.timer=4+Math.random()*5;if(dr){n.drink=3.2;n.rot=k?0:Math.PI;n.timer=5.5;sayBubble(n,rnd(k?['Кофе… ☕','Без кофе не работаю','Третья чашка за утро']:['Водички…','Жарко сегодня','Вода закончится — скажу админу']))}else if(Math.random()<.6)sayBubble(n,rnd(CHATS[n.id]))})}}
   else if(n.state==='idle'&&n.home.seat){const h=n.home;npcGo(n,h.x,h.y,()=>{sitAt(n,h.x,h.y,h.rot,h.sy||0,h.stand);n.timer=25+Math.random()*40})}
   else n.timer=5;
 }
@@ -1402,7 +1403,7 @@ const DLG={
  gul5:N('gulya','s','Я тебе ничего не говорила. Мне эта работа нужна. Но Рустам был хороший мальчик… Всегда мне помогал телефон настроить.',{next:END}),
  rackHot:{who:'narr',text:'В серверной жарко, как в Термезе в июле 🥵 Свитч орёт и мигает красным. А кондиционер… выключен!',act:()=>{F().srv=1;addTime(5)},next:END},
  acOn:{who:'narr',text:'Ты включаешь кондиционер. Он довольно загудел ❄️ Теперь нужно перезапустить перегревшийся свитч.',act:()=>{F().acOn=true;F().srv=2;addTime(5);beep(300,.4,'sine',.05)},next:END},
- rackReb:{who:'narr',text:'Свитч горячий, как самса из тандыра. Нужно аккуратно перезапустить.',choices:[{t:'⏻ Перезапустить свитч',mg:['reboot',{need:2},'rackOK']},{t:'Позже',go:END}]},
+ rackReb:{who:'narr',text:'Свитч горячий, как самса из тандыра. Нужно аккуратно перезапустить.',choices:[{t:'🔌 Перезапустить свитч',mg:['reboot',{need:2},'rackOK']},{t:'Позже',go:END}]},
  rackOK:{who:'narr',text:'Свитч ожил! Зелёные огоньки бегут как надо ✅',act:()=>{F().srv=3;addTime(20);logc('❄️ Спас серверную от перегрева')},next:END},
  rackLook:{who:'narr',text:'Ты внимательно осматриваешь патч-панель… За кабелями спрятан маленький роутер TP-Link с наклейкой «Т.» От него в стену уходит синий кабель!',act:()=>{F().rogue=1;addClue('rogue_found');rogue.visible=true;addTime(10)},choices:[
    {t:'Выдернуть его прямо сейчас',act:()=>{F().rogue=2;rogueOut();logc('📡 Выдернул чужой роутер')},go:'rackPull'},{t:'Оставить пока. Сначала разберусь, чей он',go:END}]},
@@ -1412,7 +1413,8 @@ const DLG={
  rackFine:{who:'narr',text:'Стойки гудят ровно. Красота 😌',next:END},
  floor1:{who:'narr',text:'Ты поднимаешь плитку фальшпола у третьей стойки… Под ней пакетик, а в нём флешка с надписью «РУСТАМ. НЕ ТРОГАТЬ» 💾',act:()=>{addItem('flash');tileLift.visible=true;addTime(5)},next:'floor2'},
  floor2:{who:'narr',text:'Ты открываешь файл на ноутбуке. Таблица: 7 ноутбуков TRN-031…037. По складу все «на месте». А последний раз они выходили в сеть… через чужой роутер TP-Link. Значит, ноутбуки где-то совсем рядом!',act:()=>{addClue('flash_data');addTime(10)},next:END},
- coffee:{who:'narr',text:()=>rnd(['☕ Ты наливаешь кофе. Жить стало чуть лучше.','☕ Кофемашина издаёт звук умирающего дракона, но кофе даёт.','☕ Кто-то оставил записку: «Не трогать мою кружку! — Т.»']),act:()=>addTime(5),next:END},
+ cooler:{who:'narr',text:()=>rnd(['💧 Холодная вода. То, что нужно.','💧 Кулер булькает. Бутыль почти пустая: надо сказать Нигоре.','💧 Ты пьёшь воду и слушаешь, о чём шепчутся у кулера. Пока ни о чём.']),act:()=>{addTime(2);G.p.drink=3.2},next:END},
+ coffee:{who:'narr',text:()=>rnd(['☕ Ты наливаешь кофе. Жить стало чуть лучше.','☕ Кофемашина издаёт звук умирающего дракона, но кофе даёт.','☕ Кто-то оставил записку: «Не трогать мою кружку! — Т.»']),act:()=>{addTime(5);G.p.drink=3.2},next:END},
  printer:{who:'narr',text:'Принтер зажевал целую пачку. Изнутри торчит бумага.',choices:[{t:'📄 Вытащить бумагу',mg:['mash',{},'malOK']},{t:'Позже',go:END}]},
  bossVirus:N('boss','a','Мне сказали, у Лолы вирус?! Что у тебя тут происходит?!',{act:()=>{rel('boss',-1);F().ev.bossV=1},next:END}),
  bossReady:N('boss','n','Ну что, всё готово к звонку?',{choices:[{t:'Да, можно начинать',go:()=>{startFinal();return END}},{t:'Ещё нет, дайте пару минут',go:END}]}),
@@ -1552,6 +1554,7 @@ const HOT=[
   {id:'floor',loc:'office',x:230,y:436,h:.9,stand:{x:230,y:450},icon:()=>F().metR&&!has('flash')?'s':'',node:()=>!has('flash')?'floor1':{who:'narr',text:'Пустой тайник Рустама.',next:END}},
   {id:'ac',loc:'office',x:330,y:352,h:2.7,stand:{x:300,y:356},icon:()=>F().srv===1&&!F().acOn?'q':'',node:()=>F().srv===1&&!F().acOn?'acOn':{who:'narr',text:F().acOn?'Кондиционер гудит. Холодно и хорошо ❄️':'Белый шкаф с надписью «Не выключать!!!»',next:END}},
   {id:'printer',loc:'office',x:44,y:272,h:1.9,stand:{x:60,y:304},icon:()=>F().mal===1?'q':'',node:()=>F().mal===1?'printer':{who:'narr',text:'Принтер. Смотрит на тебя с подозрением.',next:END}},
+  {id:'cooler',common:1,loc:'office',x:121,y:150,h:1.75,stand:{x:121,y:172},icon:()=>'c',ic:'bottle',node:()=>'cooler'},
   {id:'coffee',common:1,loc:'office',x:132,y:258,h:1.45,stand:{x:132,y:238},icon:()=>'c',ic:'cup',node:()=>'coffee'},
   {id:'cable',loc:'hall',x:120,y:120,h:2.75,stand:{x:120,y:150},icon:()=>!has('cable_hall')?'s':'',node:()=>'cable'},
   {id:'vend',common:1,loc:'hall',x:338,y:200,h:2.5,stand:{x:316,y:232},icon:()=>'c',ic:'bottle',node:()=>'vend'},
@@ -1722,7 +1725,7 @@ Object.assign(DLG,{
  e2_dil3:N('dilnoza','n','Смотри что хочешь, мне скрывать нечего. Только найди, кто это сделал. Меня в пятьдесят девять лет воровкой назовут, позор на всю махаллю…',{next:END}),
  e2_bob1:N('bobur','n',()=>prevF(1).bobTV?'Сынок! Телевизор твой до сих пор как новый. Чего надо?':'Стой. А, айтишник. Чего надо?',{choices:[
    {t:'Бобур-ака, журнал пропусков за пятницу покажете?',go:()=>prevF(1).bobTV||G.rel.bobur>=1?'e2_bob3':'e2_bob2'},{t:'Просто здороваюсь',go:END}]}),
- e2_bob2:N('bobur','s','Журнал — это служебное. Хотя… камера в коридоре с утра виснет. Почини, и поговорим.',{choices:[{t:'⏻ Перезагрузить регистратор',mg:['reboot',{need:2,title:'Регистратор камер',icon:'power'},'e2_bob2ok']},{t:'Потом',go:END}]}),
+ e2_bob2:N('bobur','s','Журнал — это служебное. Хотя… камера в коридоре с утра виснет. Почини, и поговорим.',{choices:[{t:'🔌 Перезагрузить регистратор',mg:['reboot',{need:2,title:'Регистратор камер',icon:'power'},'e2_bob2ok']},{t:'Потом',go:END}]}),
  e2_bob2ok:N('bobur','h','Вот! Картинка есть. Ты мастер, сынок. Держи журнал.',{act:()=>{rel('bobur',1);addTime(10)},next:'e2_bob3'}),
  e2_bob3:N('bobur','n','Смотри сам, я в этих табличках не разбираюсь. Пятница вся тут.',{choices:[{t:'Изучить журнал пропусков',mg:['logs',{title:'Журнал пропусков, пятница',icon:'book',hint:'Кто <b>вошёл</b> в офис, когда все уже ушли?',cols:['Время','Событие','Карта'],rows:[['18:05','выход','№09 Юсупова Д.'],['18:12','выход','№03 Каримова Н.'],['18:40','выход','№22 Тимур А.'],['20:48','вход','№17 Рашидов Ф.'],['21:31','выход','№17 Рашидов Ф.']],ans:3},'e2_bob4']},{t:'Потом',go:END}]}),
  e2_bob4:N('bobur','o','Карта семнадцать… Это же Фаррух Рашидович. А говорил, что в Дубае был. Хм. Я тебе ничего не показывал, сынок.',{act:()=>{addClue('e2_pass');addClue('e2_dil_left');addTime(10);F().bob=1},next:END}),
@@ -2545,6 +2548,7 @@ function visuals(dt){
     if(mode==='sit'){if(upset){c.armL.elbow.rotation.x=c.armR.elbow.rotation.x=-.3;c.armL.rotation.x=-2.8+Math.sin(T*10)*.3;c.armR.rotation.x=-2.8+Math.sin(T*10+1.5)*.3;c.armL.rotation.z=-.3;c.armR.rotation.z=.3}
       else if(n.loc==='yard'){c.armL.elbow.rotation.x=c.armR.elbow.rotation.x=-.9;c.armL.rotation.x=-.5+Math.sin(T*2+n.x)*.15;c.armR.rotation.x=-1.4+Math.max(0,Math.sin(T*1.3+n.y))*.6;c.armL.rotation.z=c.armR.rotation.z=0}
       else{const dk=n.loc==='office'&&n.home&&n.home.stand&&n.id!=='boss';c.armL.rotation.x=(dk?-.92:-.45)+Math.sin(T*14+n.x)*.05;c.armR.rotation.x=(dk?-.92:-.45)+Math.sin(T*14+n.x+2)*.05;c.armL.elbow.rotation.x=(dk?-.72:-1.05)+Math.sin(T*14+n.x+1)*.06;c.armR.elbow.rotation.x=(dk?-.72:-1.05)+Math.sin(T*14+n.x+3)*.06;c.armL.rotation.z=dk?-.12:0;c.armR.rotation.z=dk?.12:0}}
+    if(n.drink>0){n.drink-=dt;const u=Math.min(1,(3.2-n.drink)*2.5,n.drink*2.5),sip=.5+.5*Math.sin(T*2.2);c.cup.visible=mode!=='walk';if(mode!=='walk'){c.armL.rotation.set(-1.25*u-.25*u*sip,0,-.18*u);c.armL.elbow.rotation.x=-1.55*u-.35*u*sip;c.head.rotation.x=-.12*u*sip}}else if(c.cup.visible)c.cup.visible=false;
     if(n.id==='gulya'&&mode!=='sit')c.armR.rotation.x=-.5+(mode==='stand'?Math.sin(T*3)*.4:0);
     if(n.id==='bobur'&&n.radio>0){c.armR.rotation.x=-1.9;c.armR.rotation.z=.25;c.armR.elbow.rotation.x=-1.9}
     if(n.id==='hamid'&&mode==='stand'){c.armR.rotation.x=-1.2+Math.sin(T*4)*.5;c.armL.rotation.x=-.4}
@@ -2560,7 +2564,7 @@ function visuals(dt){
       else if(D.typing){c.armR.rotation.set(-.8+Math.sin(T*5)*.22,0,-.15);r.rotation.x=-1.1+Math.sin(T*7)*.15}}});
   if(G){const pl=G.p;admin.g.visible=true;admin.g.position.set(wx(pl.x),0,wz(pl.y));let dr=pl.rot-admin.g.rotation.y;dr=Math.atan2(Math.sin(dr),Math.cos(dr));admin.g.rotation.y+=dr*Math.min(1,dt*12);
     setFace(admin,D&&D.node&&D.node.who==='me'?(D.node.mood||'n'):'n',false,T);
-    poseChar(admin,AT_PC?'sit':pl.path.length&&!G.busy?'walk':'stand',pl.walk,T);if(AT_PC){admin.armL.rotation.x=-.45+Math.sin(T*14)*.07;admin.armR.rotation.x=-.45+Math.sin(T*14+2)*.07;admin.armL.elbow.rotation.x=admin.armR.elbow.rotation.x=-1.05}else if(!mgEl.classList.contains('hidden')){admin.armR.rotation.x=-1.3+Math.sin(T*16)*.25;admin.armL.rotation.x=-1.1+Math.sin(T*16+1)*.25}
+    poseChar(admin,AT_PC?'sit':pl.path.length&&!G.busy?'walk':'stand',pl.walk,T);if(pl.drink>0){pl.drink-=dt;const u=Math.min(1,(3.2-pl.drink)*2.5,pl.drink*2.5),sip=.5+.5*Math.sin(T*2.2);admin.cup.visible=true;admin.armL.rotation.set(-1.25*u-.25*u*sip,0,-.18*u);admin.armL.elbow.rotation.x=-1.55*u-.35*u*sip;admin.head.rotation.x=-.12*u*sip}else if(admin.cup.visible){admin.cup.visible=false;admin.head.rotation.x=0}if(AT_PC){admin.armL.rotation.x=-.45+Math.sin(T*14)*.07;admin.armR.rotation.x=-.45+Math.sin(T*14+2)*.07;admin.armL.elbow.rotation.x=admin.armR.elbow.rotation.x=-1.05}else if(!mgEl.classList.contains('hidden')){admin.armR.rotation.x=-1.3+Math.sin(T*16)*.25;admin.armL.rotation.x=-1.1+Math.sin(T*16+1)*.25}
     const tg=pl.path.length?pl.path[pl.path.length-1]:null;ring.visible=!!tg&&!G.busy;if(tg){ring.position.set(wx(tg.x),.02,wz(tg.y));ring.scale.setScalar(1+Math.sin(T*6)*.12);ring.rotation.z+=dt*2}}
   else{admin.g.visible=false;ring.visible=false}
   if(cam.loc!==LOC){cam.loc=LOC;cam.uz=0;cam.free=false}
@@ -2647,7 +2651,12 @@ const GEAR=[
  {id:'ap',ship:1440,why:'Гости будут в отдельной сети и не увидят наши документы',n:'Точка доступа Wi-Fi 6',d:'Гостевая сеть отдельно от рабочей',cost:600000,req:['net',1],mg:['tv',{title:'Настройка антенн',icon:'tv'}],col:'#e6edf3'},
  {id:'sw',ship:1440,why:'Разделим отделы по сетям: вирус из одного не разойдётся по всем',n:'Управляемый свитч, 48 портов',d:'VLAN для отделов, сеть быстрее',cost:700000,req:['net',2],mg:['patch',{}],col:'#2ea043'},
  {id:'nas',ship:2880,why:'Каждую ночь будет копия 1С и документов. Сломается сервер, восстановим за час',n:'Сервер резервных копий',d:'Ночные копии 1С и документов',cost:900000,req:['sys',2],mg:['ipcfg',{}],col:'#1f6feb'},
- {id:'fw',ship:2880,why:'Он не пустит взломщиков из интернета к нашим серверам',n:'Межсетевой экран',d:'Фильтрует атаки из интернета',cost:1200000,req:['sec',2],mg:['rules',{}],col:'#da3633'}];
+ {id:'fw',ship:2880,why:'Он не пустит взломщиков из интернета к нашим серверам',n:'Межсетевой экран',d:'Фильтрует атаки из интернета',cost:1200000,req:['sec',2],mg:['rules',{}],col:'#da3633'},
+ {id:'ups2',after:'ups',ship:2880,why:'Свет могут отключить на несколько часов. Со вторым ИБП серверы доработают до конца дня',n:'Второй ИБП с запасом на 4 часа',d:'Улучшение: серверы работают при долгом отключении',cost:1400000,req:['hw',2],mg:['reboot',{need:2,title:'Запуск второго ИБП',icon:'power'}],col:'#8b949e'},
+ {id:'ap2',after:'ap',ship:2880,why:'В переговорной и на складе связь не будет рваться на звонках с инвесторами',n:'Wi-Fi на весь этаж, ещё 2 точки',d:'Улучшение: связь в переговорной и на складе',cost:1100000,req:['net',2],mg:['tv',{title:'Настройка антенн',icon:'tv'}],col:'#79c0ff'},
+ {id:'sw2',after:'sw',ship:2880,why:'Если основной провайдер упадёт, офис останется на связи через второй канал',n:'Резервный канал интернета',d:'Улучшение: второй провайдер на случай аварии',cost:1300000,req:['net',3],mg:['patch',{}],col:'#56d364'},
+ {id:'nas2',after:'nas',ship:2880,why:'Пожар или кража в серверной не уничтожат данные: вторая копия лежит вне офиса',n:'Копии на второй площадке',d:'Улучшение: копия данных хранится вне офиса',cost:1600000,req:['sys',3],mg:['ipcfg',{}],col:'#58a6ff'},
+ {id:'fw2',after:'fw',ship:2880,why:'Она заметит взломщика в сети в первые минуты, а не через неделю',n:'Система обнаружения вторжений',d:'Улучшение: тревога при взломе в первые минуты',cost:2000000,req:['sec',3],mg:['rules',{}],col:'#ff7b72'}];
 /* 3D: admin desk + mount rack in the server room */
 const PCPOS={x:42,y:444},PCSTAND={x:42,y:434},MOUNT={x:285,y:392};
 const gearMesh={};
@@ -2658,7 +2667,7 @@ const gearMesh={};
   const cg=new THREE.Group();cg.position.set(wx(PCPOS.x),0,wz(PCPOS.y));P.add(cg);makeChair(cg,M('#2f9e5a'));
   const mx=wx(MOUNT.x),mz=wz(MOUNT.y),fr=M('#2a2f3a');[[-.55,-.4],[.55,-.4],[-.55,.4],[.55,.4]].forEach(([a,b])=>box(.07,2.3,.07,fr,mx+a,1.15,mz+b,P));box(1.2,.07,.9,fr,mx,2.3,mz,P);box(1.2,.07,.9,fr,mx,.06,mz,P);
   box(1,.16,.02,emis('#f0883e',1.2),mx,2.42,mz+.42,P,false);
-  GEAR.forEach((g,i)=>{const u=new THREE.Group();u.position.set(mx,.28+i*.4,mz);P.add(u);box(1.02,.3,.8,M(g.col),0,0,0,u);box(.9,.05,.02,M('#0d1117'),0,.06,.41,u,false);for(let k=0;k<4;k++)box(.05,.05,.02,emis(k%2?'#3dff7a':'#58a6ff',3),-.36+k*.12,-.06,.41,u,false);u.visible=PR().gear.includes(g.id);gearMesh[g.id]=u})}
+  GEAR.forEach((g,i)=>{const u=new THREE.Group(),sl=g.after?GEAR.findIndex(b=>b.id===g.after):i;u.position.set(mx,.28+sl*.4,mz);P.add(u);if(g.after){box(1.05,.07,.83,M(g.col),0,.16,0,u);box(.3,.04,.02,emis('#ffd166',3),.3,.16,.42,u,false);for(let k=0;k<3;k++)box(.04,.04,.02,emis('#3dff7a',3),-.4+k*.09,.16,.42,u,false)}else{box(1.02,.3,.8,M(g.col),0,0,0,u);box(.9,.05,.02,M('#0d1117'),0,.06,.41,u,false);for(let k=0;k<4;k++)box(.05,.05,.02,emis(k%2?'#3dff7a':'#58a6ff',3),-.36+k*.12,-.06,.41,u,false)}u.visible=PR().gear.includes(g.id);gearMesh[g.id]=u})}
 let AT_PC=false,PCTAB='edu',PCREMOTE=false;
 function openPC(remote){PCREMOTE=!!remote;if(G&&G.running){G.busy=true;if(!remote){AT_PC=true;G.p.path=[];G.p.x=PCPOS.x;G.p.y=PCPOS.y;G.p.rot=0}}if(remote)PCTAB='sk';else if(PCTAB==='sk')PCTAB='edu';renderPC()}
 function closePC(){$('pc').classList.add('hidden');$('pc').innerHTML='';if(AT_PC)leavePC();if(G&&G.running)G.busy=false}
@@ -2673,7 +2682,7 @@ function renderPC(){const p=PR(),el=$('pc');el.classList.remove('hidden');const 
   if(PCTAB==='shop'){const ord=id=>p.orders.find(o=>o.id===id);h+=`<div class="bud">Бюджет ИТ: <b>${fmtM(p.budget)} сум</b><small>Деньги компании. Крупные покупки согласует директор.</small></div>`;
     if(p.orders.length)h+='<div class="pcsec">Мои заявки</div>'+p.orders.map(r=>{const it=itemOf(r),w=r.st==='wait',pr=w?0:clamp((p.clock-r.t0)/(r.eta-r.t0),0,1),pp=w?0:r.pay/(r.eta-r.t0);
       return `<div class="pcr col"><div class="orow"><b>${it.n}</b><span class="${w?'pclk':'pcok'}">${w?'Ждёт директора':'ещё '+fmtDur(r.eta-p.clock)}</span></div><div class="stg"><i class="${w?'now':'ok'}">Согласование</i><i class="${w?'':pr<pp?'now':'ok'}">Оплата</i><i class="${!w&&pr>=pp?'now':''}">Доставка</i><i>Склад</i></div><div class="obar"><i style="width:${(w?4:8+pr*92)}%"></i></div>${w?'':`<button class="adbtn" data-fast="${r.id}">🎬 Ускорить на 6 часов за рекламу</button>`}</div>`}).join('');
-    h+='<div class="pcsec">Оборудование · поставка 1–2 дня</div>'+GEAR.map(g=>{const inst=p.gear.includes(g.id),own=p.owned.includes(g.id);
+    h+='<div class="pcsec">Оборудование · поставка 1–2 дня</div>'+GEAR.filter(g=>!g.after||p.gear.includes(g.after)).map(g=>{const inst=p.gear.includes(g.id),own=p.owned.includes(g.id);
       return `<div class="pcr"><div><b>${g.n}</b><small>${g.d} · ${fmtM(g.cost)} сум · ${fmtDur(g.ship)} · установка: ${skTxt(g.req)}</small></div>${inst?'<span class="pcok">Установлено</span>':own?'<span class="pclk">На складе. Установи в стойке</span>':ord(g.id)?'<span class="pclk">Заявка подана</span>':`<button class="pcbtn y" data-req="${g.id}">Заявка</button>`}</div>`}).join('');
     h+='<div class="pcsec">Расходники · в пределах лимита админа, 3–4 часа</div>'+SMALL.map(g=>`<div class="pcr"><div><b>${g.n}</b><small>${g.d} · ${fmtM(g.cost)} сум · ${fmtDur(g.ship)}</small></div>${p.small.includes(g.id)?'<span class="pcok">Получено</span>':ord(g.id)?'<span class="pclk">Заказано</span>':p.budget>=g.cost?`<button class="pcbtn" data-ord="${g.id}">Заказать</button>`:'<span class="pclk">Нет бюджета</span>'}</div>`).join('')+'<p class="pcn">Время доставки идёт вместе с игровым временем. Ночь между эпизодами тоже считается.</p>'}
   if(PCTAB==='sk')h+=Object.keys(SKN).map(k=>`<div class="pcr"><div><b>${SKN[k]}</b><small>${['Новичок','Базовый','Уверенный','Эксперт'][p.sk[k]]}</small></div><span class="pips">${'●'.repeat(p.sk[k])}${'○'.repeat(3-p.sk[k])}</span></div>`).join('')+
@@ -2705,7 +2714,7 @@ Object.assign(GAMES,{
    const L=body.querySelectorAll('[data-l]');L.forEach(b=>b.onclick=()=>{if(b.disabled)return;L.forEach(x=>x.classList.remove('sel'));b.classList.add('sel');sel=+b.dataset.l;beep(520,.03)});
    body.querySelectorAll('[data-r]').forEach(b=>b.onclick=()=>{if(sel===null||b.disabled)return;if(+b.dataset.r===sel){const l=body.querySelector(`[data-l="${sel}"]`);[l,b].forEach(x=>{x.disabled=true;x.classList.remove('sel');x.classList.add('okk')});sel=null;done++;beep(700+done*80,.06,'triangle',.05);if(done>=4)setTimeout(win,300)}else shakeBox()})},
  reboot(body,o,win){const N=(o.need||1)+2,seq=Array.from({length:N},()=>Math.floor(Math.random()*4)),NM=['PWR','SYS','LAN','WAN'],FQ=[392,494,587,740];let phase=0,hold=0,down=false,idx=0,lock=true,raf,last=performance.now(),tm=[];
-   body.innerHTML=`<div class="hint" id="rbh">Шаг 1. <b>Зажми и держи</b> кнопку питания, пока кольцо не заполнится.</div><div class="pww"><button class="pwb" id="pw"><span>⏻</span></button></div><div class="leds">${NM.map((n,i)=>`<button class="led" data-i="${i}" disabled>${n}</button>`).join('')}</div>`;
+   body.innerHTML=`<div class="hint" id="rbh">Шаг 1. <b>Зажми и держи</b> кнопку питания, пока кольцо не заполнится.</div><div class="pww"><button class="pwb" id="pw"><span><svg viewBox="0 0 24 24" width="44" height="44" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round"><path d="M12 3v9"/><path d="M6.4 6.6a8 8 0 1 0 11.2 0"/></svg></span></button></div><div class="leds">${NM.map((n,i)=>`<button class="led" data-i="${i}" disabled>${n}</button>`).join('')}</div>`;
    const pw=$('pw'),leds=[...body.querySelectorAll('.led')];
    const flash=i=>{leds[i].classList.add('on');beep(FQ[i],.18,'sine',.06);tm.push(setTimeout(()=>leds[i].classList.remove('on'),300))};
    const play=()=>{lock=true;idx=0;$('rbh').innerHTML='Шаг 2. Устройство загружается. <b>Запомни порядок огней</b>…';seq.forEach((s,k)=>tm.push(setTimeout(()=>flash(s),500+k*520)));tm.push(setTimeout(()=>{lock=false;$('rbh').innerHTML='Теперь <b>повтори порядок</b>, нажимая на индикаторы.'},500+N*520))};
@@ -2756,7 +2765,8 @@ const ACH=[
  ['learn4','📚','Вечный студент','Пройди по курсу в каждом навыке',p=>Object.values(p.sk).every(v=>v>=1)],
  ['master','🎓','Профи','Прокачай любой навык до максимума',p=>Object.values(p.sk).some(v=>v>=3)],
  ['gear3','🗄️','Своя серверная','Установи 3 единицы оборудования',p=>p.gear.length>=3],
- ['gear5','🏢','Полный комплект','Установи всё оборудование',p=>p.gear.length>=5],
+ ['gear5','🏢','Полный комплект','Установи 5 единиц оборудования',p=>p.gear.length>=5],
+ ['gear10','🏆','Серверная мечты','Установи всё оборудование и все улучшения',p=>p.gear.length>=10],
  ['lvl5','⭐','Старший админ','Достигни 5 уровня',p=>p.lvl>=5],
  ['st3','🔥','Три дня подряд','Заходи в игру 3 дня подряд',p=>p.streak>=3],
  ['st7','📅','Неделя на посту','Заходи в игру 7 дней подряд',p=>p.streak>=7]];
