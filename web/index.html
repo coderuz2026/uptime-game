@@ -542,7 +542,7 @@ function fitCamera(){Object.values(LOCS).forEach(L=>{const [x0,y0,x1,y1,hh]=L.bo
   let D=40;for(let d=8;d<120;d+=.25){camera.position.copy(t).addScaledVector(camDir,d);camera.lookAt(t);camera.updateMatrixWorld();if(pts.every(p=>{const v=p.clone().project(camera);return Math.abs(v.x)<1.05&&Math.abs(v.y)<.92})){D=d;break}}
   /* высокий экран: приближаем, чтобы комната заняла его по высоте; по ширине камера едет за игроком */
   let Dh=D;for(let d=8;d<D;d+=.25){camera.position.copy(t).addScaledVector(camDir,d);camera.lookAt(t);camera.updateMatrixWorld();if(pts.every(p=>Math.abs(p.clone().project(camera).y)<.95)){Dh=d;break}}
-  D=Math.max(Dh,D*.6);L.panX=Math.max(0,(wx(x1)-wx(x0))/2-D*Math.tan(THREE.MathUtils.degToRad(camera.fov/2))*camera.aspect*.92);
+  L.camDfull=D;D=Math.max(Dh,D*.6);L.panX=Math.max(0,(wx(x1)-wx(x0))/2-D*Math.tan(THREE.MathUtils.degToRad(camera.fov/2))*camera.aspect*.92);
   L.camT=t;L.camD=D});
   baseTarget.copy(LOCS[LOC].camT);baseDist=LOCS[LOC].camD;cam.t.copy(baseTarget);cam.tt.copy(baseTarget);cam.d=cam.td=baseDist}
 function resize(){
@@ -1930,14 +1930,27 @@ const ray=new THREE.Raycaster(),floorP=new THREE.Plane(new THREE.Vector3(0,1,0),
 function goTo(x,y){G.p.path=astar(G.p.x,G.p.y,x,y,LOC)}
 function interact(t){if(!G.running||G.busy)return;if(G.pending?.npc&&G.pending.npc!==t.npc)NPC[G.pending.npc].hold=false;G.pending=t;sPop();
   if(t.npc){const n=NPC[t.npc];n.hold=true;const tp=n.state==='sit'&&n.curStand?n.curStand:{x:n.x+(G.p.x>n.x?20:-20),y:n.y+8};goTo(tp.x,tp.y)}else goTo(t.hot.stand.x,t.hot.stand.y);if(!G.p.path.length)arrive()}
-renderer.domElement.addEventListener('pointerdown',e=>{startMusic();
-  if(!G||!G.running||G.busy)return;const r=renderer.domElement.getBoundingClientRect();
+/* жесты: тап = идти, палец = двигать камеру, два пальца = зум */
+const PT=new Map();let PDRAG=false,PIN=0;
+function camLim(d){const L=LOCS[LOC],k=Math.tan(THREE.MathUtils.degToRad(camera.fov/2)),dv=(baseDist-d)*k;return [Math.max(0,(L.panX||0)+dv*camera.aspect),Math.max(0,dv/Math.sin(EL))]}
+function camZoom(k){if(!G||!G.running||G.busy)return;const L=LOCS[LOC];cam.uz=clamp((cam.uz||baseDist)*k,baseDist*.4,L.camDfull);cam.d=cam.td=cam.uz}
+function camDrag(dx,dy){if(!G||!G.running||G.busy)return;const wpp=2*cam.d*Math.tan(THREE.MathUtils.degToRad(camera.fov/2))/STH,[px,pz]=camLim(cam.td);
+  if(!cam.free){cam.free=true;cam.fx=cam.t.x;cam.fz=cam.t.z}cam.fx=clamp(cam.fx-dx*wpp,baseTarget.x-px,baseTarget.x+px);cam.fz=clamp(cam.fz-dy*wpp/Math.sin(EL),baseTarget.z-pz,baseTarget.z+pz);cam.t.x=cam.tt.x=cam.fx;cam.t.z=cam.tt.z=cam.fz}
+{const el=renderer.domElement;
+  el.addEventListener('pointerdown',e=>{startMusic();try{el.setPointerCapture(e.pointerId)}catch(_){}PT.set(e.pointerId,{x:e.clientX,y:e.clientY,sx:e.clientX,sy:e.clientY});if(PT.size===1)PDRAG=false;else{PDRAG=true;const [a,b]=[...PT.values()];PIN=Math.hypot(a.x-b.x,a.y-b.y)}});
+  el.addEventListener('pointermove',e=>{const q=PT.get(e.pointerId);if(!q)return;const dx=e.clientX-q.x,dy=e.clientY-q.y;
+    if(PT.size===1){if(!PDRAG&&Math.hypot(e.clientX-q.sx,e.clientY-q.sy)>10)PDRAG=true;if(PDRAG)camDrag(dx,dy);q.x=e.clientX;q.y=e.clientY}
+    else{q.x=e.clientX;q.y=e.clientY;const [a,b]=[...PT.values()],d=Math.hypot(a.x-b.x,a.y-b.y);if(PIN>20&&d>20)camZoom(PIN/d);PIN=d}});
+  const up=e=>{const had=PT.delete(e.pointerId);if(had&&!PT.size&&!PDRAG&&e.type==='pointerup')tapAt(e)};el.addEventListener('pointerup',up);el.addEventListener('pointercancel',up);
+  el.addEventListener('wheel',e=>{e.preventDefault();camZoom(e.deltaY>0?1.1:.9)},{passive:false})}
+function tapAt(e){
+  if(!G||!G.running||G.busy)return;cam.free=false;const r=renderer.domElement.getBoundingClientRect();
   ray.setFromCamera(new THREE.Vector2((e.clientX-r.left)/r.width*2-1,-((e.clientY-r.top)/r.height)*2+1),camera);
   if(!ray.ray.intersectPlane(floorP,hit))return;const x=hit.x*S+180,y=hit.z*S+240;
   let best=null,bd=24;for(const n of Object.values(NPC)){if(n.loc!==LOC)continue;const d=Math.hypot(x-n.x,y-n.y);if(d<bd){bd=d;best={npc:n.id}}}
   if(!best)for(const h of HOT){if(h.loc!==LOC)continue;const d=Math.hypot(x-h.x,y-h.y);if(d<(h.door?30:26)){best={hot:h};break}}
   if(best){interact(best);return}
-  if(G.pending?.npc)NPC[G.pending.npc].hold=false;G.pending=null;G.p.path=astar(G.p.x,G.p.y,clamp(x,14,346),clamp(y,40,474),LOC,true);puff(wx(x),.1,wz(y),8,{c:'#ffd166',sp:1.5,life:.4,g:0})});
+  if(G.pending?.npc)NPC[G.pending.npc].hold=false;G.pending=null;G.p.path=astar(G.p.x,G.p.y,clamp(x,14,346),clamp(y,40,474),LOC,true);puff(wx(x),.1,wz(y),8,{c:'#ffd166',sp:1.5,life:.4,g:0})}
 function arrive(){const t=G.pending;G.pending=null;if(!t)return;
   if(t.npc){const n=NPC[t.npc];if(n.loc!==LOC){n.hold=false;return}G.p.rot=Math.atan2(n.x-G.p.x,n.y-G.p.y);let node=nodeFor(t.npc);
     if(!node){node={who:t.npc,mood:G.rel[t.npc]>0?'h':G.rel[t.npc]<0?'a':'n',text:rnd(gossipFor(t.npc)),next:END}}
@@ -2024,7 +2037,10 @@ function visuals(dt){
     poseChar(admin,AT_PC?'sit':pl.path.length&&!G.busy?'walk':'stand',pl.walk,T);if(AT_PC){admin.armL.rotation.x=-.45+Math.sin(T*14)*.07;admin.armR.rotation.x=-.45+Math.sin(T*14+2)*.07;admin.armL.elbow.rotation.x=admin.armR.elbow.rotation.x=-1.05}else if(!mgEl.classList.contains('hidden')){admin.armR.rotation.x=-1.3+Math.sin(T*16)*.25;admin.armL.rotation.x=-1.1+Math.sin(T*16+1)*.25}
     const tg=pl.path.length?pl.path[pl.path.length-1]:null;ring.visible=!!tg&&!G.busy;if(tg){ring.position.set(wx(tg.x),.02,wz(tg.y));ring.scale.setScalar(1+Math.sin(T*6)*.12);ring.rotation.z+=dt*2}}
   else{admin.g.visible=false;ring.visible=false}
-  if(G&&G.running&&cam.td===baseDist){const px=LOCS[LOC].panX||0;cam.tt.x=clamp(wx(G.p.x),baseTarget.x-px,baseTarget.x+px)}
+  if(cam.loc!==LOC){cam.loc=LOC;cam.uz=0;cam.free=false}
+  if(G&&G.running&&!G.busy){cam.td=clamp(cam.uz||baseDist,baseDist*.4,LOCS[LOC].camDfull);const [px,pz]=camLim(cam.td);
+    if(cam.free){cam.tt.x=clamp(cam.fx,baseTarget.x-px,baseTarget.x+px);cam.tt.z=clamp(cam.fz,baseTarget.z-pz,baseTarget.z+pz)}
+    else{cam.tt.x=clamp(wx(G.p.x),baseTarget.x-px,baseTarget.x+px);cam.tt.z=clamp(wz(G.p.y),baseTarget.z-pz,baseTarget.z+pz);cam.tt.y=baseTarget.y}}
   const k=Math.min(1,dt*3);cam.t.lerp(cam.tt,k);cam.d+=(cam.td-cam.d)*k;
   camera.position.copy(cam.t).addScaledVector(camDir,cam.d);
   if(!G||!G.running)camera.position.x+=Math.sin(T*.25)*1.2;
