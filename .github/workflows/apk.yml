@@ -29,13 +29,14 @@ jobs:
         env:
           KS_B64: ${{ secrets.KS_B64 }}
         run: |
-          if [ -n "$KS_B64" ]; then echo "$KS_B64" | base64 -d > android/app/release.jks; else cp android/keystore/release.jks android/app/release.jks; fi
+          if [ -z "$KS_B64" ]; then echo 'Нет секрета KS_B64'; exit 1; fi
+          echo "$KS_B64" | base64 -d > android/app/release.jks
       - name: Сборка
         env:
           KS_SECRET: ${{ secrets.KS_PASS }}
           KS_ALIAS: uptime
         run: |
-          export KS_PASS="${KS_SECRET:-$(cat android/keystore/pass.txt)}"
+          export KS_PASS="$KS_SECRET"
           VC=$(cat android/version.txt)
           gradle -p android assembleRelease -Pvc=$VC --no-daemon
           cp android/app/build/outputs/apk/release/app-release.apk uptime.apk
