@@ -540,6 +540,9 @@ composer.addPass(new OutputPass());
 function fitCamera(){Object.values(LOCS).forEach(L=>{const [x0,y0,x1,y1,hh]=L.bounds;const t=new THREE.Vector3((wx(x0)+wx(x1))/2,0,(wz(y0)+wz(y1))/2+.5);
   const pts=[[wx(x0),0,wz(y1)],[wx(x1),0,wz(y1)],[wx(x0),hh,wz(y0)],[wx(x1),hh,wz(y0)],[wx(x0),0,wz(y0)],[wx(x1),0,wz(y0)]].map(p=>new THREE.Vector3(...p));
   let D=40;for(let d=8;d<120;d+=.25){camera.position.copy(t).addScaledVector(camDir,d);camera.lookAt(t);camera.updateMatrixWorld();if(pts.every(p=>{const v=p.clone().project(camera);return Math.abs(v.x)<1.05&&Math.abs(v.y)<.92})){D=d;break}}
+  /* высокий экран: приближаем, чтобы комната заняла его по высоте; по ширине камера едет за игроком */
+  let Dh=D;for(let d=8;d<D;d+=.25){camera.position.copy(t).addScaledVector(camDir,d);camera.lookAt(t);camera.updateMatrixWorld();if(pts.every(p=>Math.abs(p.clone().project(camera).y)<.95)){Dh=d;break}}
+  D=Math.max(Dh,D*.6);L.panX=Math.max(0,(wx(x1)-wx(x0))/2-D*Math.tan(THREE.MathUtils.degToRad(camera.fov/2))*camera.aspect*.92);
   L.camT=t;L.camD=D});
   baseTarget.copy(LOCS[LOC].camT);baseDist=LOCS[LOC].camD;cam.t.copy(baseTarget);cam.tt.copy(baseTarget);cam.d=cam.td=baseDist}
 function resize(){
@@ -1948,7 +1951,7 @@ Object.keys(NPC).forEach(id=>{const d=mkEl(id,()=>interact({npc:id}));d.querySel
 HOT.forEach(h=>{const d=mkEl('h_'+h.id,()=>interact({hot:h}));if(h.door)d.querySelector('.nm').textContent=h.label;else d.querySelector('.nm').remove()});
 let MKF=0,MKH=null,MKL=null;
 function updMarkers(){const hide=!G||!G.running||G.busy,re=(MKF++%8)===0||MKH!==hide||MKL!==LOC;MKH=hide;MKL=LOC;
-  const put=(d,x,y)=>{const tr=`translate(${Math.round(clamp(x,46,STW-46))}px,${Math.round(y)}px) translateX(-50%)`;if(d._tr!==tr){d._tr=tr;d.style.transform=tr}};
+  const put=(d,x,y)=>{const tr=`translate(${Math.round(clamp(x,46,STW-46))}px,${Math.round(y)}px) translateX(-50%)`;if(d._tr!==tr){d._tr=tr;d.style.transform=tr}const off=x<-24||x>STW+24;if(d._off!==off){d._off=off;d.style.visibility=off?'hidden':''}};
   const vis=(d,v)=>{if(d._v!==v){d._v=v;d.style.display=v?'':'none'}};
   for(const id in NPC){const n=NPC[id],d=MK[id],show=n.loc===LOC&&!hide;vis(d,show);
     if(n.chat){if(n.loc===LOC){const [cx,cy]=proj(wx(n.x),2.5+n.c.g.position.y,wz(n.y));n.chat.style.transform=`translate(${Math.round(cx)}px,${Math.round(cy-14)}px) translate(-50%,-100%)`}}
@@ -2021,6 +2024,7 @@ function visuals(dt){
     poseChar(admin,AT_PC?'sit':pl.path.length&&!G.busy?'walk':'stand',pl.walk,T);if(AT_PC){admin.armL.rotation.x=-.45+Math.sin(T*14)*.07;admin.armR.rotation.x=-.45+Math.sin(T*14+2)*.07;admin.armL.elbow.rotation.x=admin.armR.elbow.rotation.x=-1.05}else if(!mgEl.classList.contains('hidden')){admin.armR.rotation.x=-1.3+Math.sin(T*16)*.25;admin.armL.rotation.x=-1.1+Math.sin(T*16+1)*.25}
     const tg=pl.path.length?pl.path[pl.path.length-1]:null;ring.visible=!!tg&&!G.busy;if(tg){ring.position.set(wx(tg.x),.02,wz(tg.y));ring.scale.setScalar(1+Math.sin(T*6)*.12);ring.rotation.z+=dt*2}}
   else{admin.g.visible=false;ring.visible=false}
+  if(G&&G.running&&cam.td===baseDist){const px=LOCS[LOC].panX||0;cam.tt.x=clamp(wx(G.p.x),baseTarget.x-px,baseTarget.x+px)}
   const k=Math.min(1,dt*3);cam.t.lerp(cam.tt,k);cam.d+=(cam.td-cam.d)*k;
   camera.position.copy(cam.t).addScaledVector(camDir,cam.d);
   if(!G||!G.running)camera.position.x+=Math.sin(T*.25)*1.2;
