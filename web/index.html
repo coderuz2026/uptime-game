@@ -348,6 +348,7 @@ button{font-family:inherit;cursor:pointer}
       <div class="chip"><i class="ico" data-ic="clock"></i><span id="clock">09:00</span></div>
       <button class="chip" id="goal"><i class="ico" data-ic="target"></i><span id="goaltx">Осмотрись</span></button>
       <button class="chip" id="jbtn"><i class="ico" data-ic="book"></i></button>
+      <button class="chip" id="qbtn"><i class="ico" data-ic="gear"></i></button>
       <button class="chip" id="snd"><i class="ico" data-ic="music"></i></button>
     </div>
   </div>
@@ -440,7 +441,18 @@ const EQI={router:'router',switch:'switch',wifi:'wifi',ups:'battery',server:'ser
 const stage=$('stage');
 let renderer;
 try{renderer=new THREE.WebGLRenderer({antialias:true,powerPreference:'high-performance'})}catch(e){$('load').textContent='WebGL недоступен 😢';throw e}
-renderer.setPixelRatio(Math.min(2,window.devicePixelRatio||1));
+const IS_MOB=/Android|iPhone|iPad|Mobile/i.test(navigator.userAgent);
+let QL='high';try{QL=localStorage.getItem('uptime_q')||(IS_MOB?'mid':'high')}catch(e){}
+const QNAME={high:'Графика: высокая',mid:'Графика: средняя',low:'Графика: экономная'};
+function qRatio(){const pr=window.devicePixelRatio||1;return QL==='high'?Math.min(2,pr):QL==='mid'?Math.min(1.5,pr):Math.min(1,pr)}
+function applyQ(say){renderer.setPixelRatio(qRatio());const sh=QL!=='low';if(renderer.shadowMap.enabled!==sh){renderer.shadowMap.enabled=sh;scene.traverse(o=>{if(o.material){(Array.isArray(o.material)?o.material:[o.material]).forEach(m=>m.needsUpdate=true)}})}
+  const ms=QL==='high'?2048:1024;if(sun.shadow.mapSize.x!==ms){sun.shadow.mapSize.set(ms,ms);if(sun.shadow.map){sun.shadow.map.dispose();sun.shadow.map=null}}
+  resize();if(say)toast(QNAME[QL],'b')}
+const PF={t:0,n:0,auto:0};
+function perfTick(dt){if(!G||!G.running||document.hidden)return;PF.t+=dt;PF.n++;if(PF.t<5)return;const fps=PF.n/PF.t;PF.t=0;PF.n=0;
+  let manual=false;try{manual=!!localStorage.getItem('uptime_q_manual')}catch(e){}
+  if(!manual&&fps<28&&QL!=='low'&&PF.auto<2){PF.auto++;QL=QL==='high'?'mid':'low';try{localStorage.setItem('uptime_q',QL)}catch(e){}applyQ(false);toast('Графика упрощена для плавности. Шестерёнка вверху меняет качество','b')}}
+renderer.setPixelRatio(qRatio());
 renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFShadowMap;
 renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=.95;
 renderer.outputColorSpace=THREE.SRGBColorSpace;
@@ -463,7 +475,7 @@ function fitCamera(){Object.values(LOCS).forEach(L=>{const [x0,y0,x1,y1,hh]=L.bo
 function resize(){
   const w=Math.min(window.innerWidth,560),h=window.innerHeight-$('hud').offsetHeight-6;
   $('app').style.width=w+'px';stage.style.height=h+'px';
-  renderer.setSize(w,h,false);composer.setSize(w,h);composer.setPixelRatio(Math.min(2,window.devicePixelRatio||1));
+  renderer.setSize(w,h,false);composer.setSize(w,h);composer.setPixelRatio(qRatio());
   camera.aspect=w/h;camera.updateProjectionMatrix();fitCamera();
 }
 
@@ -1864,7 +1876,7 @@ function hud(){$('clock').textContent=fmt(G.min);const o=objectives().find(x=>!x
 let lastT=performance.now();
 function frame(now){const dt=Math.min(.05,(now-lastT)/1000);lastT=now;T+=dt;
   if(G&&G.running){update(dt);hud()}
-  visuals(dt);updParts(dt);updMarkers();composer.render();requestAnimationFrame(frame)}
+  visuals(dt);updParts(dt);updMarkers();if(QL==='high')composer.render();else renderer.render(scene,camera);perfTick(dt);requestAnimationFrame(frame)}
 
 /* ---------- start ---------- */
 function startScreen(){const s=$('screen');s.classList.remove('hidden');
@@ -1878,7 +1890,8 @@ resize();setLoc('office');$('load').remove();requestAnimationFrame(frame);
 GAMES.logs=function(body,o,win){body.innerHTML=`<div class="hint">${o.hint}</div><div class="tm"><div class="th">${o.cols.map((c,i)=>`<span style="flex:${i===o.cols.length-1?2:1}">${c}</span>`).join('')}</div>${o.rows.map((r,i)=>`<div class="tr lg" data-i="${i}">${r.map((c,j)=>`<span style="flex:${j===r.length-1?2:1}">${c}</span>`).join('')}</div>`).join('')}</div><div class="hint" id="tmh"></div>`;
   body.querySelectorAll('.tr').forEach(t=>t.onclick=()=>{if(+t.dataset.i===o.ans){t.classList.add('bad');$('tmh').innerHTML='✅ Нашёл!';beep(880,.08,'triangle',.05);setTimeout(win,700)}else{shakeBox();$('tmh').innerHTML='❌ Не то. Смотри внимательнее.'}})};
 document.querySelectorAll('[data-ic]').forEach(e=>e.innerHTML=IC[e.dataset.ic]||'');
-render3DPortraits();showSeason();
+applyQ(false);render3DPortraits();showSeason();
+$('qbtn').onclick=()=>{QL=QL==='high'?'mid':QL==='mid'?'low':'high';try{localStorage.setItem('uptime_q',QL);localStorage.setItem('uptime_q_manual','1')}catch(e){}applyQ(true)};
 
 </script>
 </body>
