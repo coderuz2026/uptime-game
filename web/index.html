@@ -1744,6 +1744,7 @@ const HOT=[
   {id:'haqua',common:1,need:'aqua',loc:'home',x:33,y:128,h:2.2,stand:{x:64,y:128},icon:()=>'c',ic:'fish',node:()=>homeNode('aqua')},
   {id:'hfridge',common:1,loc:'home',x:36,y:288,h:2.2,stand:{x:72,y:290},icon:()=>'c',ic:'cup',node:()=>homeNode('food')},
   {id:'hbed',common:1,loc:'home',x:300,y:345,h:1.5,stand:{x:246,y:350},icon:()=>'c',ic:'bed',node:()=>homeNode('bed')},
+  {id:'gate',common:1,ep0:1,label:'🚕 Такси',loc:'yard',x:180,y:446,h:1.8,stand:{x:180,y:424},icon:()=>'c',ic:'door',node:()=>({who:'narr',text:'Ворота на улицу. Такси подъезжает за пару минут, дорога в одну сторону 20 минут.',choices:[{t:'🏠 Домой, в квартиру',go:()=>{setTimeout(()=>travel('home'),60);return END}},{t:'🪩 В клуб «Неон»',go:()=>{setTimeout(()=>travel('club'),60);return END}},{t:'Остаться',go:END}]})},
   {id:'cexit',common:1,loc:'club',x:180,y:452,h:1.6,stand:{x:180,y:424},icon:()=>'c',ic:'door',node:()=>'c_exit'},
   {id:'cdance',common:1,loc:'club',x:180,y:210,h:.7,stand:{x:180,y:238},icon:()=>'c',ic:'music',node:()=>clubDanceNode()},
   {id:'cmic',common:1,loc:'club',x:298,y:170,h:2.1,stand:{x:262,y:182},icon:()=>'c',ic:'mic',node:()=>'c_mic'},
@@ -1802,7 +1803,7 @@ function endingScreen(){clearRun();EPS[EPN].ending();SCR='ending'}
 function ready(){return EPS[EPN].ready?EPS[EPN].ready():false}
 function hotIcon(h){const o=EPS[EPN].hot&&EPS[EPN].hot[h.id];if(o)return o.icon();if(EPN===1||h.common)return h.icon?h.icon():'';return ''}
 function hotNode(h){const o=EPS[EPN].hot&&EPS[EPN].hot[h.id];if(o)return o.node();return h.node()}
-function hotHidden(h){return EPS[EPN].hotHidden?EPS[EPN].hotHidden(h):false}
+function hotHidden(h){if(h.ep0&&EPN!==0)return true;if(h.need&&!homeHas(h.need))return true;return EPS[EPN].hotHidden?EPS[EPN].hotHidden(h):false}
 function gossipFor(id){const g=EPS[EPN].gossip&&EPS[EPN].gossip[id];return g||GOSSIP[id]||['…']}
 /* NPC placement */
 function resetNPCs(){Object.values(NPC).forEach(n=>{if(!n.home0)n.home0=n.home;const h=n.home=n.home0;n.loc=h.loc;n.x=h.x;n.y=h.y;n.rot=h.rot||0;n.sy=h.sy||0;n.state=h.seat?'sit':'idle';n.path=[];n.hold=false;n.away=false;n.conv=null;n.lunchGo=false;n.after=null;n.dance=0;n.lift=0;n.drink=0;n.timer=5+Math.random()*20;n.curStand=h.seat?h.stand:null;if(n.chat){n.chat.remove();n.chat=null}});if(NPC.lim)setAway('lim')}
@@ -1818,7 +1819,7 @@ function saveRun(){if(EPN>=90||!G||!G.running||G.busy||G.F.ev.final||G.afterFina
 function loadRun(){try{const r=JSON.parse(localStorage.getItem('uptime_run')||'null');return r&&r.v===2&&EPS[r.ep]&&r.G&&r.G.F&&LOCS[r.loc]?r:null}catch(e){return null}}
 function clearRun(){try{localStorage.removeItem('uptime_run')}catch(e){}}
 function resumeRun(){const r=loadRun();if(!r)return false;SCR='game';PAUSED=false;EPN=r.ep;$('screen').classList.add('hidden');startMusic();resetNPCs();G=r.G;G.busy=false;G.running=true;G.pending=null;G.p.path=[];if(!G.F.ev)G.F.ev={};
-  for(const [id,v] of Object.entries(r.npc||{})){const n=NPC[id];if(n)Object.assign(n,v,{path:[],hold:false})}setLoc(r.loc);ov.style.display='';toast('Продолжаем с сохранения','g');return true}
+  for(const [id,v] of Object.entries(r.npc||{})){const n=NPC[id];if(n)Object.assign(n,v,{path:[],hold:false})}setLoc(r.loc);if(r.loc==='club')clubBeat(true);if(r.loc==='home')homeRefresh();ov.style.display='';toast('Продолжаем с сохранения','g');return true}
 function playEpisode(n){clearRun();clubBeat(false);PR().clock+=1080;saveSeason();SCR='game';PAUSED=false;EPN=n;const s=$('screen');s.classList.add('hidden');startMusic();resetNPCs();G=EPS[n].newGame();EPS[n].setup&&EPS[n].setup();setLoc('office');ov.style.display='';setTimeout(()=>talk(EPS[n].intro),400)}
 function showSeason(){const s=$('screen');SCR='season';s.classList.remove('hidden');s.classList.add('season');
   const avail=n=>n===1||!!SEASON.done[n-1];
@@ -2664,7 +2665,7 @@ function arrive(){const t=G.pending;G.pending=null;if(!t)return;
 const MK={};
 function mkEl(key,onTap){const d=document.createElement('div');d.className='mk';d.innerHTML='<div class="ic"></div><div class="nm"></div>';ov.appendChild(d);d.querySelector('.ic').onpointerdown=e=>{e.stopPropagation();startMusic();onTap()};MK[key]=d;return d}
 Object.keys(NPC).forEach(id=>{const d=mkEl(id,()=>interact({npc:id}));d.querySelector('.nm').innerHTML='<i class="av">'+avatarSVG(id,'n')+'</i>'+CH[id].name});
-HOT.forEach(h=>{const d=mkEl('h_'+h.id,()=>interact({hot:h}));if(h.door)d.querySelector('.nm').textContent=h.label;else d.querySelector('.nm').remove()});
+HOT.forEach(h=>{const d=mkEl('h_'+h.id,()=>interact({hot:h}));if(h.door||h.label)d.querySelector('.nm').textContent=h.label;else d.querySelector('.nm').remove()});
 let MKF=0,MKH=null,MKL=null;
 function updMarkers(){const hide=!G||!G.running||G.busy,re=(MKF++%8)===0||MKH!==hide||MKL!==LOC;MKH=hide;MKL=LOC;
   const put=(d,x,y)=>{const tr=`translate(${Math.round(clamp(x,46,STW-46))}px,${Math.round(y)}px) translateX(-50%)`;if(d._tr!==tr){d._tr=tr;d.style.transform=tr}const off=x<-24||x>STW+24;if(d._off!==off){d._off=off;d.style.visibility=off?'hidden':''}};
@@ -3148,6 +3149,9 @@ function homeOrdHTML(p){return HS().ord.map(o=>{const it=HI(o.id),pr=clamp(1-(o.
 function homeShopHTML(p,all){return (all?'<div class="pcsec">Для дома · 50% сразу, 50% после доставки</div>':'<p class="pcn" style="margin:0 2px 8px">Предоплата 50%. Остаток платишь, когда курьер или мастер пришлёт в мессенджер фото готовой работы.</p>')+
   HOMEI.map(it=>{const st=homeSt(it.id),pre=Math.round(it.cost/2);return `<div class="pcr"><div style="font-size:26px;flex:none;width:34px;text-align:center">${it.ic}</div><div style="flex:1"><b>${it.n}</b><small>${it.d} · ${fmtM(it.cost)} сум · ${it.inst?'доставка и установка':'доставка'} ${fmtDur(it.ship)}</small></div>${st==='own'?'<span class="pcok">Есть дома</span>':st==='ship'?'<span class="pclk">В пути</span>':st==='wait'?`<button class="pcbtn y" data-hchat="${it.id}">Фото</button>`:p.money>=pre?`<button class="pcbtn" data-hbuy="${it.id}">50%: ${fmtM(pre)}</button>`:'<span class="pclk">Не хватает</span>'}</div>`}).join('')}
 /* ================= РЕЖИМЫ БЕЗ СЮЖЕТА: ДОМ И КЛУБ ================= */
+function travel(to){const from=LOC;G.busy=true;const fade=$('fade');fade.style.opacity=1;beep(220,.15,'sine',.04);
+  setTimeout(()=>{setLoc(to);const e=to==='home'?{x:46,y:230}:to==='club'?{x:180,y:410}:{x:180,y:424};G.p.x=e.x;G.p.y=e.y;G.p.path=[];G.p.rest=null;G.p.dance=0;G.p.sing=0;addTime(20);clubBeat(to==='club');if(to==='home')homeRefresh();
+    toast(to==='yard'?'🚕 Вернулся на работу':'🚕 '+LOCS[to].name,'b');fade.style.opacity=0;setTimeout(()=>{G.busy=false;checkEvents()},350)},450)}
 function playFree(n,loc,o){clearRun();clubBeat(false);SCR='game';PAUSED=false;EPN=n;const s=$('screen');s.classList.add('hidden');s.classList.remove('season','menu');startMusic();resetNPCs();Object.keys(NPC).forEach(id=>setAway(id));
   G=baseState({met_boss:0},o.rel||[]);G.min=o.min;G.next=o.next;G.p.x=o.x;G.p.y=o.y;G.p.rot=o.rot==null?Math.PI:o.rot;G.rel0=Object.assign({},G.rel);setLoc(loc);ov.style.display='';cam.uz=0;cam.free=false;if(o.intro)setTimeout(()=>talk(o.intro),350)}
 function freeStop(){clubBeat(false);stopSpeak();closeChat();closePhone();if(G){G.running=false;G.busy=false}ov.style.display='none';setLoc('office');resetNPCs()}
@@ -3164,7 +3168,9 @@ function homeNode(k){const v=G.F.visit;
   if(k==='desk')return {who:'narr',text:homeHas('pcdesk')?'Домашнее рабочее место: два монитора и мощный компьютер.':'Старый стол и ноутбук, который включается с третьего раза.',choices:[{t:G.F.study||v?'💻 Посидеть за компьютером':'📚 Поучиться вечером · +'+(homeHas('pcdesk')?60:35)+' опыта',go:()=>{homeRest('pc');return END}},{t:'Отойти',go:END}]};
   if(k==='food')return {who:'narr',text:homeHas('kitchen')?'Новая кухня. Ты готовишь плов по маминому рецепту, и вся квартира пахнет зирой.':'Старый холодильник гудит как трактор. Внутри вчерашний плов и банка варенья.',act:()=>{G.p.drink=3.2;hx('food',5)},next:END};
   if(k==='aqua')return {who:'narr',text:rnd(['Рыбки плавают туда-сюда. Ни одна не пишет «у меня не работает интернет».','Ты пять минут смотришь на рыбок. Давление снижается, мысли проясняются.']),act:()=>hx('aqua',5),next:END};
+  if(k==='bed'&&EPN===0)return {who:'narr',text:'Кровать. Посреди смены спать нельзя, но полежать 15 минут никто не запретит.',choices:[{t:'😴 Полежать 15 минут',go:()=>{addTime(15);toast('Полежал. Стало легче','g');return END}},{t:'Встать',go:END}]};
   if(k==='bed')return {who:'narr',text:v?'Кровать. Можно прилечь, а можно вернуться в меню.':G.min>=1500?'Глубокая ночь. Самое время спать.':'Кровать. Завтра снова на работу.',choices:[{t:'😴 Лечь спать',go:()=>{setTimeout(homeSleep,60);return END}},{t:'Ещё не хочу',go:END}]};
+  if(k==='door'&&EPN===0)return {who:'narr',text:'Вернуться на работу? Такси довезёт за 20 минут.',choices:[{t:'🚕 На работу',go:()=>{setTimeout(()=>travel('yard'),60);return END}},{t:'Остаться',go:END}]};
   if(k==='door')return v?{who:'narr',text:'Выйти из квартиры и вернуться в меню?',choices:[{t:'Выйти',go:()=>{setTimeout(freeEnd,60);return END}},{t:'Остаться',go:END}]}:{who:'narr',text:'Дверь закрыта на два замка. Сегодня ты уже никуда не пойдёшь.',next:END}}
 function homeSleep(){if(!G)return;const v=G.F.visit,cf=homeComfort(),x=v?0:15+Math.floor(cf/5)+(homeHas('bed')?10:0);if(x)gainXP(x,0);saveSeason();const nx=G.next;freeStop();const s=$('screen');s.classList.remove('hidden','menu','season');SCR='ending';
   s.innerHTML=`<div class="tag">${v?'ТВОЯ КВАРТИРА':'УТРО'}</div><div style="font-size:56px;line-height:1">${v?'🛏️':'☀️'}</div><h2 style="font-size:22px">${v?'Хорошо дома':homeHas('bed')?'Выспался как король':cf>50?'Выспался':'Старая кровать снова скрипела'}</h2><p style="max-width:420px">${v?'Уют квартиры: '+cf+'/100.':'+'+x+' опыта за отдых. Уют квартиры: '+cf+'/100. Чем уютнее дома, тем лучше отдыхаешь.'}</p><button class="btn" id="hm1">${v?'В меню ▶':'На работу ▶'}</button>`;
@@ -3193,7 +3199,7 @@ function leaveClub(){if(!G)return;const nx=G.next,p=PR();p.relx=p.relx||{};(G.F.
   s.innerHTML=`<div class="tag">01:20 · ДОРОГА ДОМОЙ</div>${rideSVG(car,1)}<p style="max-width:420px">${car?'Ночной город пустой. Двадцать минут, и ты у подъезда.':'Последний автобус давно ушёл. Едешь на такси, водитель всю дорогу рассказывает про сына-программиста.'}</p><button class="btn" id="ev3">Домой ▶</button>`;
   $('ev3').onclick=()=>{sPop();playHome(nx,{late:1})}}
 Object.assign(DLG,{
- c_exit:{who:'narr',text:'Уже поздно. Поехать домой?',choices:[{t:'🏠 Домой',go:()=>{setTimeout(leaveClub,60);return END}},{t:'Ещё побуду',go:END}]},
+ c_exit:{who:'narr',text:()=>EPN===0?'Вернуться на работу? Такси довезёт за 20 минут.':'Уже поздно. Поехать домой?',choices:[{t:'🚕 Ехать',go:()=>{setTimeout(EPN===0?()=>travel('yard'):leaveClub,60);return END}},{t:'Ещё побуду',go:END}]},
  c_mic:{who:'narr',text:'Караоке. На экране бегут слова песни про интернет и любовь.',choices:[{t:'🎤 Спеть',go:()=>{setTimeout(clubSing,60);return END}},{t:'Не сегодня',go:END}]},
  c_bar:{who:'narr',text:'Лимонадный бар. Бармен жонглирует лимонами и подмигивает.',choices:[{t:'🍋 Лимонад с мятой',go:()=>{G.p.drink=3.2;return END}},{t:'🍊 Свежевыжатый апельсиновый сок',go:()=>{G.p.drink=3.2;return END}},{t:'🍵 Зелёный чай с лимоном',go:()=>{G.p.drink=3.2;return END}}]},
  c_dW:{who:'narr',text:'Толпа расступается. Ты попадаешь в каждый бит, кто-то включает вспышку телефона. Овации! 🎉',act:()=>{const p=PR();p.dancew=(p.dancew||0)+1;G.p.dance=8;if(!G.F.dw){G.F.dw=1;gainXP(25,0);(G.F.who||[]).forEach(id=>{if(G.rel[id]!=null)rel(id,1)})}metaCheck()},next:END},
@@ -3282,7 +3288,7 @@ EPS[0]={intro:'fs_intro',
  objectives(){return [[G.tk?'📋 Заявка: '+CH[G.tk.id].name+' ждёт помощи':'Жди заявок от коллег',0],['Закрыто заявок: '+(G.tkDone||0),0],['Смена до 18:00',0]]},
  events(){const f=G.F,e=f.ev,m=G.min;if(!e.lunch&&m>=720){e.lunch=1;f.lunch=1;talk('lunchEv');return}if(e.lunch===1&&m>=780){e.lunch=2;f.lunch=0;toast('🏢 Обед окончен, все возвращаются в офис','b')}if(m>=1080&&!e.final)startFinal()},
  final(){if(G.busy){G.pendingFinal=true;return}G.F.ev.final=1;endingScreen()},
- ending(){G.running=false;ov.style.display='none';const n=G.tkDone||0,s=$('screen'),pb=PR().best||0,rec=n>pb;if(rec)PR().best=n;s.classList.remove('hidden');saveSeason();
+ ending(){clubBeat(false);G.running=false;ov.style.display='none';const n=G.tkDone||0,s=$('screen'),pb=PR().best||0,rec=n>pb;if(rec)PR().best=n;s.classList.remove('hidden');saveSeason();
   s.innerHTML=`<div class="tag">СМЕНА ОКОНЧЕНА</div><h2 style="font-size:24px">${n>=8?'🏆 Герой офиса':n>=4?'👍 Хорошая смена':'☕ Тихий день'}</h2><p>Закрыто заявок: <b style="color:#ffd166">${n}</b>${rec&&n?' · 🎉 новый рекорд!':pb?' · рекорд: '+pb:''}</p><div class="sum">За каждую заявку ты получил опыт и премию. Заявки идут в задания дня и достижения.</div>${seasonButton('В меню ▶')}`;$('tosea').onclick=()=>showEvening(()=>showMainMenu())}};
 function showMainMenu(){SCR='main';PAUSED=false;$('pause').classList.add('hidden');const s=$('screen');s.classList.remove('hidden','season');s.classList.add('menu');
   const n=nextEp(),e=EPLIST.find(x=>x.n===n),started=Object.keys(SEASON.done).length>0,run=loadRun();
@@ -3312,7 +3318,7 @@ function openPause(){if(!G||!G.running)return;PAUSED=true;const p=$('pause');p.c
   $('p_go').onclick=closePause;$('p_jr').onclick=()=>{closePause();if(!G.busy)openJournal()};$('p_q').onclick=()=>{cycleQ();$('p_q').textContent='⚙️ Графика: '+qLabel()};
   $('p_snd').onclick=()=>{sPop();showSound()};$('p_exit').onclick=exitToMenu}
 function closePause(){PAUSED=false;$('pause').classList.add('hidden');lastT=performance.now()}
-function exitToMenu(){if(EPN>=90)freeStop();saveRun();closePause();closePC();closePhone();if(G){G.running=false;G.busy=false}if(D)closeDlg(true);$('dlg').classList.add('hidden');$('jr').classList.add('hidden');if(!$('mg').classList.contains('hidden')){if(mg.cleanup)mg.cleanup();mg.cleanup=null;$('mg').classList.add('hidden');$('mg').innerHTML=''}
+function exitToMenu(){clubBeat(false);if(EPN>=90)freeStop();else if(LOC==='home'||LOC==='club')setLoc('office');saveRun();closePause();closePC();closePhone();if(G){G.running=false;G.busy=false}if(D)closeDlg(true);$('dlg').classList.add('hidden');$('jr').classList.add('hidden');if(!$('mg').classList.contains('hidden')){if(mg.cleanup)mg.cleanup();mg.cleanup=null;$('mg').classList.add('hidden');$('mg').innerHTML=''}
   Object.values(NPC).forEach(n=>n.hold=false);setLoc('office');showMainMenu()}
 $('menubtn').onclick=()=>{if(G&&G.running){sPop();PAUSED?closePause():openPause()}else showMainMenu()};
 window.uptimeBack=function(){
