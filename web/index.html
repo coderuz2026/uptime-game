@@ -649,6 +649,8 @@ const LOCS={
  office:{name:'Офис «Туран Трейд»',bounds:[0,40,360,486,3.3],bg:'#0d121c'},
  hall:{name:'Коридор, 5 этаж',bounds:[0,104,360,390,2.9],bg:'#0d121c'},
  nb:{name:'Офис «Ташкент Лоджистик»',bounds:[30,100,330,398,2.9],bg:'#0d121c'},
+ f6:{name:'6 этаж · Колл-центр',bounds:[12,100,348,398,2.9],bg:'#0d121c'},
+ f7:{name:'7 этаж · Turan Tech',bounds:[12,100,348,398,2.9],bg:'#0b0a12'},
  yard:{name:'Чайхана «Чинор» во дворе',bounds:[0,50,360,458,3.6],bg:'#16241c',out:true},
  home:{name:'Твоя квартира',bounds:[14,56,346,460,3.2],bg:'#121418'},
  club:{name:'Клуб «Неон»',bounds:[4,58,356,462,3.6],bg:'#07050c'}};
@@ -776,6 +778,7 @@ function laptop(x,y,ry=0,sticker=false,scr='#58a6ff'){const g=new THREE.Group();
   if(sticker)box(.12,.06,.01,M('#ffd166'),.18,.32,-.22,g,false);return g}
 
 /* ---- HALL ---- */
+const LIFTSIGN=[];
 BUILD=LOCS.hall.group;
 {const marbleC=cvs(256,256,(g)=>{for(let i=0;i<2;i++)for(let j=0;j<2;j++){g.fillStyle=(i+j)%2?'#cfc6b6':'#e4ddd1';g.fillRect(i*128,j*128,128,128)}
    g.strokeStyle='rgba(120,110,95,.22)';g.lineWidth=1.2;for(let k=0;k<16;k++){g.beginPath();g.moveTo(rr()*256,rr()*256);g.bezierCurveTo(rr()*256,rr()*256,rr()*256,rr()*256,rr()*256,rr()*256);g.stroke()}
@@ -789,7 +792,7 @@ BUILD=LOCS.hall.group;
   [[wx(60),'#7a4a28'],[wx(300),'#2f6a5a']].forEach(([x,c])=>{box(1.6,2.25,.08,M(c,{roughness:.45}),x,1.12,BZh-.06);box(1.8,.08,.3,ht,x,2.27,BZh);box(.08,2.25,.3,ht,x-.9,1.12,BZh);box(.08,2.25,.3,ht,x+.9,1.12,BZh);sph(.06,gold,x+.55,1.05,BZh+.02,BUILD,10)});
   signPlane('ТУРАН ТРЕЙД','#1f6feb','#fff',1.7,.4,wx(60),2.55,BZh+.15,0,.45,22);signPlane('ТАШКЕНТ ЛОДЖИСТИК','#2d6a4f','#fff',1.7,.4,wx(300),2.55,BZh+.15,0,.45,20);
   const steel=M('#b3bcc8',{metalness:.85,roughness:.22});box(.98,2.3,.06,steel,wx(180)-.5,1.15,BZh-.02);box(.98,2.3,.06,steel,wx(180)+.5,1.15,BZh-.02);box(2.2,.1,.32,steel,wx(180),2.32,BZh);
-  box(.7,.22,.04,emis('#ff8a3d',2),wx(180),2.5,BZh+.16);signPlane('НЕ РАБОТАЕТ','#fff','#d1242f',.7,.22,wx(180),1.5,BZh+.03,0,.3,30);
+  LIFTSIGN.push(box(.7,.22,.04,emis('#ff8a3d',2),wx(180),2.5,BZh+.16),signPlane('НЕ РАБОТАЕТ','#fff','#d1242f',.7,.22,wx(180),1.5,BZh+.03,0,.3,30));LIFTSIGN.forEach(m=>m.userData.dyn=1);
   box(.28,1.1,f.d+.3,hw,-9.39,.55,f.cz);box(.28,1.1,f.d+.3,hw,9.39,.55,f.cz);box(wx(360)-wx(76),.9,.28,hw,(wx(76)+9.25)/2,.45,wz(384)+.14);
   const sx0=-9.25,sx1=wx(74),sz0=wz(298),sz1=wz(384);plane(sx1-sx0,sz1-sz0,M('#15181e'),(sx0+sx1)/2,.008,(sz0+sz1)/2);
   for(let k=0;k<7;k++)box(sx1-sx0-.1,.05+k*.0,.18,M(k%2?'#6e7681':'#8b949e'),(sx0+sx1)/2,.02-k*.0,sz0+.3+k*.6,BUILD,false);
@@ -839,6 +842,46 @@ BUILD=LOCS.nb.group;
   plant(60,140,.9);plant(300,370,.8);
   const nl=new THREE.PointLight('#e8f0ff',3,14,1.4);nl.position.set(wx(180),3,wz(250));BUILD.add(nl);
 }
+/* ---- ВЕРХНИЕ ЭТАЖИ: компания растёт, лифт едет ---- */
+const FDESK={f6:[[76,196],[284,196],[76,300],[278,306]]};
+function floorShell(loc,o){BUILD=LOCS[loc].group;
+  const fc=cvs(128,128,g=>{g.fillStyle=o.f1;g.fillRect(0,0,128,128);g.fillStyle=o.f2;g.fillRect(0,0,64,64);g.fillRect(64,64,64,64);g.strokeStyle='rgba(0,0,0,.14)';g.strokeRect(0,0,128,128)});
+  const f=slabFloor(20,118,340,392,M('#ffffff',{map:tex(fc,6,6),roughness:.9}));
+  const w=M(o.wall,{roughness:.85}),BZ=wz(118)-.14,X0=wx(20),X1=wx(340),steel=M('#b3bcc8',{metalness:.85,roughness:.22});
+  [[X0,wx(180)-1.1],[wx(180)+1.1,X1]].forEach(([a,b])=>box(b-a,2.9,.28,w,(a+b)/2,1.45,BZ));box(2.2,.5,.28,w,wx(180),2.65,BZ);
+  box(X1-X0,.14,.34,M('#2c3344'),0,.07,BZ+.02);
+  box(.98,2.3,.06,steel,wx(180)-.5,1.15,BZ-.02);box(.98,2.3,.06,steel,wx(180)+.5,1.15,BZ-.02);box(2.2,.1,.32,steel,wx(180),2.32,BZ);
+  box(.5,.2,.04,emis('#3dff7a',2),wx(180),2.52,BZ+.16);
+  box(.28,1.1,f.d+.3,w,X0-.14,.55,f.cz);box(.28,1.1,f.d+.3,w,X1+.14,.55,f.cz);box(X1-X0,.9,.28,w,(X0+X1)/2,.45,wz(392)+.14);
+  signPlane(o.sign,o.sbg,'#fff',3.4,.6,wx(84),2.25,BZ+.16,0,.5,o.sf||22);
+  const win=new THREE.Mesh(new THREE.PlaneGeometry(3.2,1.2),new THREE.MeshBasicMaterial({map:skyT,color:'#c8c8c8'}));win.position.set(wx(280),1.9,BZ+.15);BUILD.add(win);
+  box(3.4,.08,.1,whiteM,wx(280),1.27,BZ+.18);box(3.4,.08,.1,whiteM,wx(280),2.53,BZ+.18);box(.08,1.3,.1,whiteM,wx(280),1.9,BZ+.18);
+  const l=new THREE.PointLight(o.light,3,15,1.4);l.position.set(0,3,wz(250));BUILD.add(l);return BZ}
+{const BZ=floorShell('f6',{f1:'#3d5a80',f2:'#44648c',wall:'#8fa7bf',sign:'КОЛЛ-ЦЕНТР · 6 ЭТАЖ',sbg:'#1f6feb',light:'#e8f0ff'});
+  const top=M('#eef2f6',{roughness:.5}),acc=[M('#58a6ff'),M('#f778ba'),M('#7ee787'),M('#ffa657')];
+  FDESK.f6.forEach(([px,py],i)=>{const x=wx(px),z=wz(py-6),boss=i===3;
+    box(3.4,.08,1.15,boss?M('#7a5a3a',{roughness:.45}):top,x,.78,z);box(3.4,.3,.04,acc[i],x,.6,z+.55);
+    [[-1.6,-.5],[1.6,-.5],[-1.6,.5],[1.6,.5]].forEach(([a,b])=>box(.06,.74,.06,metalM,x+a,.37,z+b));
+    box(.08,.35,.06,darkM,x,1,z-.3);box(.4,.03,.25,darkM,x,.83,z-.3);box(1.3,.82,.06,darkM,x,1.5,z-.33);
+    const s=new THREE.Mesh(new THREE.PlaneGeometry(1.2,.72),emis(['#58a6ff','#d2a8ff','#3fb950','#ffd166'][i],.9));s.position.set(x,1.5,z-.296);BUILD.add(s);
+    box(1,.03,.3,M('#2d333b'),x-.3,.835,z+.38);cyl(.07,.06,.16,acc[(i+1)%4],x-1.3,.9,z-.05);
+    if(!boss){box(.08,1.35,1.5,acc[i],x-1.78,.68,z+.1);box(.08,1.35,1.5,acc[i],x+1.78,.68,z+.1);box(.3,.12,.22,M('#1b1f27'),x+1.2,.88,z+.1)}
+    const cg=new THREE.Group();cg.position.set(wx(px-6),0,wz(py+13));cg.rotation.y=Math.PI;BUILD.add(cg);makeChair(cg,boss?M('#5a2346'):M('#22303c'))});
+  signPlane('ЗВОНКОВ СЕГОДНЯ: 248 · ЖДУТ: 3','#0d1117','#3dff7a',3.2,.5,wx(84),1.5,BZ+.16,0,.9,17);
+  plant(40,140,.9);plant(320,372,.9);plant(180,372,.8);
+  box(.9,1.5,.5,M('#e8edf2'),wx(326),.75,wz(150));cyl(.2,.2,.4,M('#79c0ff',{transparent:true,opacity:.7}),wx(326),1.7,wz(150))}
+{const BZ=floorShell('f7',{f1:'#4a4266',f2:'#544b74',wall:'#7a68a8',sign:'</> TURAN TECH · 7 ЭТАЖ',sbg:'#8957e5',light:'#f0e0ff',sf:20});
+  const tt=M('#c9a26b',{roughness:.5}),lg=M('#1b1f27');
+  box(9.6,.1,1.4,tt,wx(180),.8,wz(241));[[-4.5,-.5],[4.5,-.5],[-4.5,.5],[4.5,.5],[0,-.5],[0,.5]].forEach(([a,b])=>box(.08,.78,.08,lg,wx(180)+a,.39,wz(241)+b));
+  [[130,232,Math.PI,'#d2a8ff'],[230,232,Math.PI,'#58a6ff'],[130,250,0,'#3fb950'],[230,250,0,'#ffa657']].forEach(([x,y,r,c])=>{const g=laptop(x,y,r,true,c);g.position.y=.87});
+  [[130,212,0],[230,212,0],[130,270,Math.PI],[230,270,Math.PI]].forEach(([x,y,r])=>{const cg=new THREE.Group();cg.position.set(wx(x),0,wz(y));cg.rotation.y=r;BUILD.add(cg);makeChair(cg,M('#5a2a6a'))});
+  cyl(.07,.06,.16,M('#f778ba'),wx(180),.93,wz(241));box(.5,.04,.36,M('#ffd166'),wx(160),.87,wz(244));
+  signPlane('СПРИНТ 14 · ДЕПЛОЙ В ПЯТНИЦУ? НЕТ.','#f6f8fa','#24292f',3.2,.9,wx(84),1.35,BZ+.16,0,.25,15);
+  [['#f778ba',60,340,1],['#58a6ff',104,356,.85]].forEach(([c,x,y,s])=>{const b=sph(.55,M(c,{roughness:.9}),wx(x),.3*s,wz(y),BUILD,14);b.scale.set(s,.6*s,s)});
+  box(1.1,1.8,.9,M('#161b22'),wx(310),.9,wz(152));[0,1,2,3].forEach(i=>box(.9,.04,.02,emis(i%2?'#3dff7a':'#58a6ff',2),wx(310),.5+i*.35,wz(152)+.46));
+  box(.9,.5,.5,M('#30363d'),wx(300),.25,wz(360));box(1,.06,.6,M('#8b949e'),wx(300),.53,wz(360));cyl(.08,.07,.18,M('#f0f6fc'),wx(292),.65,wz(360));
+  box(11,.02,3.6,M('#8957e5',{roughness:1}),wx(180),.012,wz(241),BUILD,false);const l2=new THREE.PointLight('#d2a8ff',2.5,12,1.4);l2.position.set(0,2.6,wz(330));BUILD.add(l2);
+  plant(40,140,.9);plant(320,300,.9)}
 /* ---- YARD / CHAIKHANA ---- */
 BUILD=LOCS.yard.group;
 const yardFX={};
@@ -1095,16 +1138,25 @@ const CH={
   kamila:{name:'Камила',role:'Секретарь соседей',skin:'#f1c29a',hair:'#e3b341',style:'long',shirt:'#ff7b72',bg:'#5a2a2a'},
   farrukh:{name:'Фаррух Рашидович',role:'Финансовый директор',skin:'#d9a27a',hair:'#2a2a2a',style:'short',shirt:'#3b4252',pants:'#2e3440',tie:1,glasses:1,bg:'#2a3a3a'},
   lim:{name:'Лим Вэй Лин',role:'Аудитор, Сингапур',skin:'#f3cfa6',hair:'#16161d',style:'bun',shirt:'#e6edf3',glasses:1,bg:'#12403a'},
+  shahnoza:{name:'Шахноза',role:'Руководитель колл-центра',skin:'#e8b48f',hair:'#2a1a12',style:'bun',shirt:'#8957e5',glasses:1,bg:'#3a2a5a'},
+  sevara:{name:'Севара',role:'Оператор колл-центра',skin:'#f1c29a',hair:'#3a2418',style:'long',shirt:'#58a6ff',bg:'#1f3a5c'},
+  otabek:{name:'Отабек',role:'Оператор колл-центра',skin:'#d9a27a',hair:'#1b1d29',style:'short',shirt:'#7ee787',bg:'#1f4a2a'},
+  nodira:{name:'Нодира',role:'Оператор колл-центра',skin:'#e0aa82',hair:'#c0602a',style:'curly',shirt:'#ffa657',bg:'#5a3412'},
+  ikrom:{name:'Икром',role:'Тимлид Turan Tech',skin:'#d9a27a',hair:'#1b1d29',style:'short',beard:1,glasses:1,shirt:'#30363d',bg:'#22303c'},
+  zarina:{name:'Зарина',role:'Дизайнер',skin:'#f1c29a',hair:'#d1242f',style:'long',shirt:'#f778ba',bg:'#5a2346'},
+  doston:{name:'Достон',role:'Программист',skin:'#c98e66',hair:'#2a1a12',style:'curly',shirt:'#3fb950',bg:'#12403a'},
+  madina:{name:'Мадина',role:'Тестировщик',skin:'#e8b48f',hair:'#16161d',style:'bun',shirt:'#e3b341',bg:'#5a4012'},
   hamid:{name:'Хамид-ака',role:'Ошпаз чайханы',skin:'#c98e66',hair:'#f0f6fc',style:'bald',beard:1,shirt:'#f0f6fc',pants:'#30363d',hat:'doppi',bg:'#5a4012'},
 };
 const deskHome=i=>{const [dx,dy]=DESKS[i];return {loc:'office',x:dx-6,y:dy+13,rot:Math.PI,seat:true,sy:0,stand:{x:dx+32,y:dy+36}}};
-const HOMES={dilnoza:deskHome(0),lola:deskHome(1),timur:deskHome(2),nigora:deskHome(3),malika:deskHome(4),sardor:deskHome(5),
+const fHome=(loc,dx,dy)=>({loc,x:dx-6,y:dy+13,rot:Math.PI,seat:true,sy:0,stand:{x:dx+32,y:dy+36}}),tHome=(x,far)=>({loc:'f7',x,y:far?212:270,rot:far?0:Math.PI,seat:true,sy:0,stand:{x,y:far?188:296}});
+const HOMES={sevara:fHome('f6',...FDESK.f6[0]),otabek:fHome('f6',...FDESK.f6[1]),nodira:fHome('f6',...FDESK.f6[2]),shahnoza:fHome('f6',...FDESK.f6[3]),ikrom:tHome(130,1),zarina:tHome(230,1),doston:tHome(130,0),madina:tHome(230,0),dilnoza:deskHome(0),lola:deskHome(1),timur:deskHome(2),nigora:deskHome(3),malika:deskHome(4),sardor:deskHome(5),
   boss:{loc:'office',x:300,y:248,rot:0,seat:true,sy:0,stand:{x:300,y:300}},gulya:{loc:'office',x:60,y:150,seat:false},
   rustam:{loc:'yard',x:288,y:372,rot:-.3,seat:true,sy:.04,stand:{x:328,y:384}},bobur:{loc:'hall',x:250,y:282,rot:0,seat:true,sy:0,stand:{x:250,y:338}},
   kamila:{loc:'nb',x:110,y:290,rot:0,seat:true,sy:0,stand:{x:110,y:342}},jasur:{loc:'nb',x:240,y:182,rot:0,seat:true,sy:0,stand:{x:240,y:240}},
   hamid:{loc:'yard',x:100,y:174,rot:Math.PI,seat:false},farrukh:{loc:'office',x:238,y:300,rot:.6,seat:false},lim:{loc:'office',x:268,y:304,rot:Math.PI,seat:false}};
 const IDLE={office:[{x:121,y:172},{x:140,y:238},{x:200,y:274},{x:100,y:232},{x:236,y:112},{x:30,y:130},{x:330,y:140},{x:260,y:210}],
-  hall:[{x:320,y:232},{x:150,y:300},{x:200,y:250}],nb:[{x:80,y:140},{x:200,y:140},{x:280,y:250}],yard:[{x:100,y:174},{x:130,y:166},{x:84,y:196},{x:150,y:160}]};
+  hall:[{x:320,y:232},{x:150,y:300},{x:200,y:250}],f6:[{x:180,y:170},{x:180,y:250},{x:296,y:172}],f7:[{x:180,y:170},{x:300,y:300},{x:180,y:340}],nb:[{x:80,y:140},{x:200,y:140},{x:280,y:250}],yard:[{x:100,y:174},{x:130,y:166},{x:84,y:196},{x:150,y:160}]};
 const ROAM=[{x:30,y:130},{x:130,y:120},{x:240,y:120},{x:330,y:150},{x:240,y:220},{x:110,y:240},{x:60,y:300},{x:290,y:300},{x:185,y:350},{x:100,y:465},{x:300,y:470},{x:40,y:400}];
 const LSEATS=[{x:90,y:252,c:[110,270],st:{x:66,y:252}},{x:130,y:252,c:[110,270],st:{x:154,y:252}},{x:90,y:288,c:[110,270],st:{x:66,y:288}},{x:130,y:288,c:[110,270],st:{x:154,y:288}},
   {x:230,y:252,c:[250,270],st:{x:206,y:252}},{x:270,y:252,c:[250,270],st:{x:294,y:252}},{x:230,y:288,c:[250,270],st:{x:206,y:288}},{x:270,y:288,c:[250,270],st:{x:294,y:288}}];
@@ -1126,6 +1178,10 @@ LOCS.office.doors={hall:{x:22,y:132}};LOCS.office.entry={hall:{x:38,y:134}};
 LOCS.hall.doors={office:{x:60,y:144},nb:{x:300,y:144},yard:{x:38,y:340}};LOCS.hall.entry={office:{x:60,y:166},nb:{x:300,y:166},yard:{x:45,y:322}};
 LOCS.nb.doors={hall:{x:180,y:378}};LOCS.nb.entry={hall:{x:180,y:356}};
 LOCS.yard.doors={hall:{x:180,y:86}};LOCS.yard.entry={hall:{x:180,y:108}};
+{const W=[[0,0,360,124],[0,0,22,480],[338,0,22,480],[0,390,360,90]];
+LOCS.f6.OBST=[...W,[314,138,24,24]];FDESK.f6.forEach(([x,y])=>{LOCS.f6.OBST.push([x-37,y-24,74,30]);LOCS.f6.OBST.push([x-14,y+6,16,14])});
+LOCS.f7.OBST=[...W,[84,228,192,26],[118,204,24,16],[218,204,24,16],[118,262,24,16],[218,262,24,16],[44,326,76,44],[296,134,30,34],[288,348,26,24]];
+for(const a of ['f6','f7']){LOCS[a].doors={hall:{x:180,y:146}};LOCS[a].entry={hall:{x:180,y:160},f6:{x:180,y:160},f7:{x:180,y:160}};LOCS.hall.doors[a]={x:180,y:150};LOCS.hall.entry[a]={x:180,y:160}}}
 LOCS.home.OBST=[[0,0,360,66],[0,0,22,480],[338,0,22,480],[0,450,360,30],[20,259,50,6],[130,259,110,6],[290,259,50,6],[192,262,6,190],
   [60,66,100,24],[62,186,96,28],[88,138,44,18],[270,66,66,20],[22,98,22,60],[312,146,28,72],[168,200,14,14],[170,74,14,14],[178,228,16,16],[318,238,16,16],
   [200,414,36,38],[22,272,34,34],[22,312,32,130],[96,346,48,30],[205,266,56,18],[258,316,82,66],[318,392,22,18]];
@@ -1426,6 +1482,8 @@ const CHATS={nigora:['«Туран Трейд», здравствуйте!','К�
   timur:['Бро, это сделка века!','Где моя зарядка?','Клиент почти мой!'],malika:['Этот шрифт ужасен…','Нужно больше лайков!'],sardor:['Кто брал скотч?','Опять коробки…','…только бы не сегодня'],
   gulya:['Ноги вытирайте!','Чай будешь, болажоним?','Кто разбросал бумажки?!'],boss:['Где отчёт?!','Время — деньги!'],rustam:['Эх, восемь лет…','Плов тут лучший в городе'],
   bobur:['Гол! Ну почти…','Пропуск покажите!','Лифт не работает, по лестнице!'],jasur:['Где зарядки к ноутбукам?!','Алло? Нет, всё чисто…'],kamila:['Ой, опять звонят!','Какой у вас красивый бейдж!'],
+  shahnoza:['Линия три, ответьте!','Улыбку слышно по телефону!','Где отчёт по звонкам?'],sevara:['Алло, «Туран Трейд», слушаю вас!','Оставайтесь на линии…'],otabek:['Ваш звонок очень важен для нас…','Опять гарнитура шипит'],nodira:['Перезвоните позже? Хорошо!','Чай остыл, пока говорила'],
+  ikrom:['Кто пушил в мастер?!','Стендап через пять минут','Это не баг, это фича'],zarina:['Сдвинь на два пикселя…','Шрифт не тот!'],doston:['У меня локально работает','Сейчас, только соберётся…'],madina:['Нашла ещё баг 🐞','Не воспроизводится? Воспроизведу!'],
   hamid:['Плов готов!','Зирвак — это душа плова!','Чай горячий, проходите!']};
 const LCHAT=['Плов сегодня огонь!','Хамид-ака, ещё лепёшку!','Обед — святое 🍲','Слышали про Рустама?','Кто будет чай?'];
 function npcGo(n,x,y,after){n.path=astar(n.x,n.y,x,y,n.loc);n.state='walk';n.after=after;n.curStand=null}
@@ -1678,7 +1736,9 @@ const DLG={
  lt6c:N('dilnoza','h','Вот! Правильный мальчик. Ешь, ешь, ты худой какой-то!',{act:()=>{rel('dilnoza',1);rel('malika',1)},next:'lt7'}),
  lt7:{who:'narr',text:()=>F().metR?'Через двор Рустам ловит твой взгляд и едва заметно кивает.':'За соседним тапчаном одиноко сидит мужчина в очках и делает вид, что вас не слышит…',act:()=>addTime(15),next:END},
 };
-const GOSSIP={nigora:['Директор с утра выпил уже три кофе. Это плохой знак.','Рустам каждое утро приносил мне конфеты… Скучаю.','Если что-то нужно, я всё знаю. Почти всё.'],
+const GOSSIP={shahnoza:['У нас норма: ответ за двадцать секунд. А у админа какая норма?','Если встанет телефония, встанет вся продажа. Береги её.'],sevara:['Клиент спросил, можно ли скачать интернет на флешку. Я сказала: спросите у нашего админа.','После восьми часов в гарнитуре я слышу гудки даже дома.'],otabek:['Я раньше работал на базаре. Там связь была лучше: просто кричишь.','Хочешь лайфхак? Улыбайся, когда перезагружаешь. Помогает.'],nodira:['Говорят, наверху программисты пьют кофе литрами. Вот это жизнь.','У меня рекорд: сорок минут с одним клиентом. Он просто хотел поговорить.'],
+ ikrom:['Нам бы тестовый сервер. И ещё один. И чтобы оба не падали.','Админ и разработчик должны дружить. Иначе страдает прод.'],zarina:['Я нарисовала вам иконку для заявок. Она грустная.','Монитор должен быть откалиброван. Это не каприз!'],doston:['Я не ломал. Оно само. Честно.','Доступ к базе дашь? Ну только почитать…'],madina:['Я нажала кнопку триста раз. На триста первый оно упало.','Люблю, когда всё работает. Но не верю.'],
+ nigora:['Директор с утра выпил уже три кофе. Это плохой знак.','Рустам каждое утро приносил мне конфеты… Скучаю.','Если что-то нужно, я всё знаю. Почти всё.'],
  boss:['Ты почему здесь? Иди работай!','Время идёт, связь где?!','Инвесторы не любят ждать. И я не люблю.'],
  dilnoza:['Спасибо тебе, болам. Ты молодец.','Ешь больше, ты худой какой-то.','Цифры по складу не сходятся… ну ничего.'],
  lola:['Хорошо, что вы у нас есть!','Я теперь все письма проверяю дважды.'],timur:['Бро, всё ровно?','Работаю, работаю… 📱'],
@@ -1735,7 +1795,9 @@ const HOT=[
   {id:'coffee',common:1,loc:'office',x:132,y:258,h:1.45,stand:{x:132,y:238},icon:()=>'c',ic:'cup',node:()=>'coffee'},
   {id:'cable',loc:'hall',x:120,y:120,h:2.75,stand:{x:120,y:150},icon:()=>!has('cable_hall')?'s':'',node:()=>'cable'},
   {id:'vend',common:1,loc:'hall',x:338,y:200,h:2.5,stand:{x:316,y:232},icon:()=>'c',ic:'bottle',node:()=>'vend'},
-  {id:'lift',common:1,loc:'hall',x:180,y:120,h:2.9,stand:{x:180,y:150},icon:()=>'c',ic:'lift',node:()=>'lift'},
+  {id:'lift',common:1,label:'Лифт',loc:'hall',x:180,y:120,h:2.9,stand:{x:180,y:150},icon:()=>EPN===0&&flOpen()?'q':'c',ic:'lift',node:()=>liftNode()},
+  {id:'lift6',common:1,label:'Лифт',loc:'f6',x:180,y:120,h:2.7,stand:{x:180,y:146},icon:()=>'c',ic:'lift',node:()=>liftNode()},
+  {id:'lift7',common:1,label:'Лифт',loc:'f7',x:180,y:120,h:2.7,stand:{x:180,y:146},icon:()=>'c',ic:'lift',node:()=>liftNode()},
   {id:'laptop',loc:'nb',x:110,y:194,h:1.5,stand:{x:110,y:230},icon:()=>!has('laptop_found')?'s':'',node:()=>'laptop'},
   {id:'boxes',loc:'nb',x:280,y:330,h:1.8,stand:{x:248,y:344},icon:()=>'c',ic:'box',node:()=>'boxes'},
   {id:'nbr',loc:'nb',x:310,y:150,h:2.2,stand:{x:286,y:162},icon:()=>!has('cable_nb')?'s':'',node:()=>'nbr'},
@@ -2585,7 +2647,7 @@ $('jbtn').onclick=()=>G&&G.running&&!G.busy&&openJournal();$('goal').onclick=()=
 /* ---------- locations switching ---------- */
 function setLoc(to){LOC=to;Object.entries(LOCS).forEach(([k,L])=>L.group.visible=k===to);scene.background=new THREE.Color(LOCS[to].bg);
   baseTarget.copy(LOCS[to].camT);baseDist=LOCS[to].camD;cam.t.copy(baseTarget);cam.tt.copy(baseTarget);cam.d=cam.td=baseDist;parts=[];
-  $('locname').textContent=LOCS[to].name;Object.values(NPC).forEach(n=>{if(n.chat&&n.loc!==to){n.chat.remove();n.chat=null}})}
+  if(to==='hall')liftSign();$('locname').textContent=LOCS[to].name;Object.values(NPC).forEach(n=>{if(n.chat&&n.loc!==to){n.chat.remove();n.chat=null}})}
 function switchLoc(to){const from=LOC;G.busy=true;const fade=$('fade');fade.style.opacity=1;beep(220,.15,'sine',.04);
   setTimeout(()=>{setLoc(to);const e=LOCS[to].entry[from];G.p.x=e.x;G.p.y=e.y;G.p.path=[];addTime(2);
     if(!G.visited[to]){G.visited[to]=1;toast(LOCS[to].name,'b')}
@@ -3320,6 +3382,23 @@ function promoAsk(){const r=rank(),nx=RANKS[r+1];if(!nx)return {who:'boss',mood:
   if(!canPromo())return {who:'boss',mood:'n',text:'Повышение? Рано. До должности «'+nx.t+'» тебе не хватает: '+rankReq(r+1).filter(x=>!x[1]).map(x=>x[0].toLowerCase()+' (сейчас '+x[2].split('/')[0]+')').join('; ')+'. Сделаешь — приходи.',next:{who:'narr',text:'Все условия и твой прогресс видны в компьютере, вкладка «Карьера».',next:END}};
   return {who:'boss',mood:'h',text:'Я смотрел твои результаты. Заявки закрыты, серверная в порядке, люди довольны. Заслужил. С сегодняшнего дня ты — '+nx.t.toLowerCase()+'.',
     act:()=>{const p=PR();p.rank=rank()+1;gainXP(100,300000);need('m',30);saveSeason();sGood();toast('💼 Новая должность: '+nx.t,'y');metaCheck()},next:{who:'narr',text:'🎉 '+nx.perk+'.',next:END}}}
+/* ================= ЭТАЖИ: компания растёт ================= */
+const FLOORS=[{loc:'f6',n:6,t:'Колл-центр',tk:8,rk:0,who:['shahnoza','sevara','otabek','nodira'],news:'«Туран Трейд» растёт: компания арендовала 6 этаж под колл-центр. Лифт наконец починили! Там четыре новых сотрудника, и компьютеры у них ломаются не реже, чем у нас.'},
+ {loc:'f7',n:7,t:'Turan Tech, разработка',tk:25,rk:1,who:['ikrom','zarina','doston','madina'],news:'Компания открыла на 7 этаже своё ИТ-подразделение Turan Tech: интернет-магазин и приложение. Программисты тоже пишут заявки админу. И пишут много.'}];
+const FLWHO=FLOORS.flatMap(f=>f.who);
+function flTk(){const p=PR();return (p.cnt&&p.cnt.tk)||0}
+function flOpen(){let n=0;for(const f of FLOORS){if(flTk()>=f.tk&&rank()>=f.rk)n++;else break}return n}
+function flOf(id){return FLOORS.find(f=>f.who.includes(id))}
+function flNeed(f){const a=[];if(flTk()<f.tk)a.push('закрой ещё заявок: '+(f.tk-flTk()));if(rank()<f.rk)a.push('получи должность «'+RANKS[f.rk].t+'»');return a.join(' и ')}
+function liftSign(){const on=EPN===0&&flOpen()>0;LIFTSIGN.forEach(m=>m.visible=!on)}
+function flNews(){const p=PR(),o=flOpen();if(EPN!==0||(p.fl||0)>=o)return null;const f=FLOORS[p.fl||0];p.fl=(p.fl||0)+1;saveSeason();liftSign();return f}
+function liftNode(){const o=flOpen(),nx=FLOORS[o];
+  if(EPN!==0)return DLG.lift;
+  if(!o)return {who:'narr',text:'Табличка на лифте: «Не работает». Бобур-ака говорит: если компания вырастет и снимет этаж выше, лифт починят. Для этого '+flNeed(nx)+'.',next:END};
+  const go=to=>()=>{setTimeout(()=>{if(G&&G.running)switchLoc(to)},30);return END};
+  return {who:'narr',text:'Лифт. Двери открываются с тихим «дзынь».'+(nx?' Кнопка '+nx.n+' этажа пока не горит: '+flNeed(nx)+'.':''),choices:[
+    ...FLOORS.slice(0,o).filter(f=>f.loc!==LOC).map(f=>({t:'🔼 '+f.n+' этаж · '+f.t,go:go(f.loc)})),
+    {t:'🔽 5 этаж · наш офис',if:()=>LOC!=='hall',go:go('hall')},{t:'Остаться здесь',go:END}]}}
 /* ================= ЗАЩИТА БЮДЖЕТА ИТ: разговор собирается из частей каждый раз заново ================= */
 const BQP={
  srv:{t:'🖥️ Новый сервер',n:'новый сервер',risk:'старый сервер встанет, и 1С с ним на целый день',gain:'1С и почта перестанут тормозить',min:'хотя бы диски и память в старый'},
@@ -3454,11 +3533,11 @@ function dept(){const p=PR();if(p.rate==null)p.rate=80;return p}
 function rate(d){const p=dept();p.rate=clamp(p.rate+d,0,100)}
 function tkTick(){if(!G||!G.running||G.busy||EPN===3||EPN>=90||!G.F.met_boss||G.F.ev.final)return;const q=TQ(),duty=EPN===0;
   for(const t of [...q])if(G.min>t.till){q.splice(q.indexOf(t),1);const nm=CH[t.id].name;G.tkLate=(G.tkLate||0)+1;if(rank()>=3){rate(1);toast('🧑‍💻 Стажёр Азиз закрыл тикет №'+t.no+' за тебя: '+nm,'b')}else{rate(-6);need('m',-6);toast('⌛ Тикет №'+t.no+' просрочен: '+nm+' не дождался. Рейтинг отдела −6','r')}}
-  if(G.tkNext==null)G.tkNext=G.min+(duty?4:30);if(G.min<G.tkNext||q.length>=(duty?4:1))return;
-  const c=['nigora','dilnoza','lola','timur','malika','sardor'].filter(id=>{const n=NPC[id];return n.loc==='office'&&!n.away&&!n.hold&&n.state==='sit'&&!EPS[EPN].nodeFor(id)&&!tkOf(id)});G.tkNext=G.min+(duty?(9+Math.random()*14)*spdK():40+Math.random()*35);if(!c.length)return;
-  const p=PR();p.tno=(p.tno||100)+1;let k;do{k=Math.floor(Math.random()*TICKETS.length)}while(k===G.tkLastK);G.tkLastK=k;const T=TICKETS[k],id=rnd(c),t={no:p.tno,id,k,t0:G.min,till:G.min+(duty?Math.round([75,55,40][T.p]*spdK()):90),st:'new'};q.push(t);
+  if(G.tkNext==null)G.tkNext=G.min+(duty?4:30);if(G.min<G.tkNext||q.length>=(duty?4+flOpen():1))return;
+  const c=['nigora','dilnoza','lola','timur','malika','sardor',...(duty?FLOORS.slice(0,flOpen()).flatMap(f=>f.who):[])].filter(id=>{const n=NPC[id];return n.loc===n.home.loc&&n.loc!=='yard'&&!n.away&&!n.hold&&n.state==='sit'&&!EPS[EPN].nodeFor(id)&&!tkOf(id)});G.tkNext=G.min+(duty?(9+Math.random()*14)*spdK()/(1+.25*flOpen()):40+Math.random()*35);if(!c.length)return;
+  const p=PR();p.tno=(p.tno||100)+1;let k;do{k=Math.floor(Math.random()*TICKETS.length)}while(k===G.tkLastK);G.tkLastK=k;const T=TICKETS[k],id=rnd(c),t={no:p.tno,id,k,t0:G.min,till:G.min+(duty?Math.round(([75,55,40][T.p]+(flOf(id)?20:0))*spdK()):90),st:'new'};q.push(t);
   sayBubble(NPC[id],T.b);NPC[id].chatT=5;tkNotify(t)}
-function tkNotify(t){const T=TICKETS[t.k],b=$('msgb');b.innerHTML=`<div class="ap" style="background:linear-gradient(135deg,${TPRI[T.p][1]},#30363d)">🎫</div><div style="flex:1;min-width:0"><b>Тикет №${t.no} · ${CH[t.id].name}</b><span>${T.c}: ${T.b} · приоритет ${TPRI[T.p][0]}</span></div>`;
+function tkNotify(t){const T=TICKETS[t.k],b=$('msgb');b.innerHTML=`<div class="ap" style="background:linear-gradient(135deg,${TPRI[T.p][1]},#30363d)">🎫</div><div style="flex:1;min-width:0"><b>Тикет №${t.no} · ${CH[t.id].name}${flOf(t.id)?' · '+flOf(t.id).n+' этаж':''}</b><span>${T.c}: ${T.b} · приоритет ${TPRI[T.p][0]}</span></div>`;
   b.classList.add('on');beep(660,.08,'triangle',.04);if(T.p===2)setTimeout(()=>beep(880,.1,'triangle',.05),120);clearTimeout(MSGT);MSGT=setTimeout(()=>b.classList.remove('on'),6000);b.onclick=()=>{b.classList.remove('on');PHTAB='tk';openPhone()}}
 function tkNode(id){const t=tkOf(id),T=TICKETS[t.k],pr=TPRI[T.p];
   const done=()=>{const q=TQ(),i=q.indexOf(t);if(i>=0)q.splice(i,1);const fast=t.st==='acc'?1.2:1,m=Math.round(pr[3]*form()*fast);G.tkDone=(G.tkDone||0)+1;gainXP(Math.round(pr[2]*form()*fast),m);need('m',4);rate(2);bump('tk');toast('✅ Тикет №'+t.no+' закрыт · +'+fmtM(m)+' сум'+(fast>1?' (принят вовремя: +20%)':''),'g')},win={who:id,mood:'h',text:T.w,act:done,next:END};
@@ -3467,7 +3546,7 @@ function tkNode(id){const t=tkOf(id),T=TICKETS[t.k],pr=TPRI[T.p];
 function tkHTML(){const q=G?TQ():[],p=dept(),rk=rank();if(!G||EPN>=90)return '<p class="pcn">Ты не на работе. Тикеты приходят в рабочее время.</p>';
   return `<div class="pcr" style="display:block;background:#161f2e;border-color:#2f4a7a"><b>Рейтинг ИТ-отдела: <span style="color:${p.rate>=75?'#56d364':p.rate>=50?'#ffd166':'#ff7b72'}">${Math.round(p.rate)}%</span></b><small style="display:block;margin-top:2px">Сегодня закрыто: ${G.tkDone||0} · просрочено: ${G.tkLate||0}. Рейтинг растёт за закрытые тикеты и падает за просроченные. От него зависит транш бюджета.</small></div>`+
   (q.length?q.slice().sort((a,b)=>TICKETS[b.k].p-TICKETS[a.k].p||a.till-b.till).map(t=>{const T=TICKETS[t.k],pr=TPRI[T.p],left=Math.max(0,Math.round(t.till-G.min));
-    return `<div class="pcr" style="display:block;border-left:4px solid ${pr[1]}"><div style="display:flex;justify-content:space-between;gap:8px"><b>№${t.no} · ${CH[t.id].name}</b><small style="color:${left<15?'#ff7b72':'#8b949e'};white-space:nowrap">⏱ ${fmtDur(left)}</small></div><small style="display:block;margin:2px 0 8px">${T.c} · приоритет <span style="color:${pr[1]}">${pr[0]}</span> · ${fmtM(pr[3])} сум<br>«${T.t}»</small>
+    return `<div class="pcr" style="display:block;border-left:4px solid ${pr[1]}"><div style="display:flex;justify-content:space-between;gap:8px"><b>№${t.no} · ${CH[t.id].name}${flOf(t.id)?' · '+flOf(t.id).n+' эт.':''}</b><small style="color:${left<15?'#ff7b72':'#8b949e'};white-space:nowrap">⏱ ${fmtDur(left)}</small></div><small style="display:block;margin:2px 0 8px">${T.c} · приоритет <span style="color:${pr[1]}">${pr[0]}</span> · ${fmtM(pr[3])} сум<br>«${T.t}»</small>
      <div style="display:flex;gap:6px;flex-wrap:wrap">${t.st==='acc'?'<span class="pcok">В работе. Подойди к сотруднику</span>':`<button class="pcbtn" data-tka="${t.no}">Принять</button>`}${t.pp?'':`<button class="pcbtn y" data-tkp="${t.no}">Отложить</button>`}${rk>=3?`<button class="pcbtn y" data-tkd="${t.no}">Передать Азизу</button>`:''}</div></div>`}).join(''):'<p class="pcn">Открытых тикетов нет. Можно выпить кофе.</p>')+
   '<p class="pcn">Принял тикет сразу — премия на 20% больше, и срок продлевается на 15 минут. Отложить можно один раз: +30 минут, но сотрудник будет недоволен.</p>'}
 function tkBind(el){const f=no=>TQ().find(t=>t.no===+no);
@@ -3477,11 +3556,11 @@ function tkBind(el){const f=no=>TQ().find(t=>t.no===+no);
 /* ---------- дежурство: свободная смена без сюжета ---------- */
 Object.assign(DLG,{fs_intro:{who:'narr',text:'Обычный рабочий день. Никаких тайн и детективов: только ты, офис и заявки коллег. Смена до 18:00.',next:END}});
 EPS[0]={intro:'fs_intro',
- newGame(){return baseState({met_boss:1},['nigora','boss','dilnoza','lola','timur','malika','sardor','gulya','rustam','bobur','jasur','kamila','hamid','farrukh'])},
+ newGame(){return baseState({met_boss:1},[...FLWHO,'nigora','boss','dilnoza','lola','timur','malika','sardor','gulya','rustam','bobur','jasur','kamila','hamid','farrukh'])},
  setup(){setAway('farrukh');if(prevF(2).rb){setAway('sardor');setHome('rustam',deskOf(5))}},
  nodeFor:()=>null,markerFor:()=>'',hot:{},hotHidden:h=>!h.door&&!h.common,
  objectives(){return [...(BQ().st?[[BQ().st===1?'💰 Бюджет: получи визу у Дильнозы опа':'💰 Бюджет: защити заявку у директора',0]]:[]),[ND().h<25?'🍲 Ты голоден: плов у Хамид-аки во дворе':(G.tq&&G.tq.length)?'🎫 Тикетов открыто: '+G.tq.length+'. Список в телефоне':'Жди тикетов от коллег',0],['Закрыто заявок: '+(G.tkDone||0),0],['Смена до 18:00',0]]},
- events(){const f=G.F,e=f.ev,m=G.min;if(!e.lunch&&m>=720){e.lunch=1;f.lunch=1;talk('lunchEv');return}if(e.lunch===1&&m>=780){e.lunch=2;f.lunch=0;toast('🏢 Обед окончен, все возвращаются в офис','b')}if(m>=1080&&!e.final)startFinal()},
+ events(){const f=G.F,e=f.ev,m=G.min;{const nf=flNews();if(nf){sGood();talk({who:'narr',text:'🏢 Новость дня. '+nf.news+' Лифт в коридоре, кнопка «'+nf.n+'».',next:END});return}}if(!e.lunch&&m>=720){e.lunch=1;f.lunch=1;talk('lunchEv');return}if(e.lunch===1&&m>=780){e.lunch=2;f.lunch=0;toast('🏢 Обед окончен, все возвращаются в офис','b')}if(m>=1080&&!e.final)startFinal()},
  final(){if(G.busy){G.pendingFinal=true;return}G.F.ev.final=1;endingScreen()},
  ending(){clubBeat(false);G.running=false;ov.style.display='none';const n=G.tkDone||0,s=$('screen'),pb=PR().best||0,rec=n>pb,life=G.life,lt=life?lifeEnd(n):'';if(rec)PR().best=n;s.classList.remove('hidden');saveSeason();
   s.innerHTML=`<div class="tag">СМЕНА ОКОНЧЕНА</div><h2 style="font-size:24px">${n>=8?'🏆 Герой офиса':n>=4?'👍 Хорошая смена':'☕ Тихий день'}</h2><p>Закрыто заявок: <b style="color:#ffd166">${n}</b>${rec&&n?' · 🎉 новый рекорд!':pb?' · рекорд: '+pb:''}</p><div class="sum">За каждую заявку ты получил опыт и премию. Заявки идут в задания дня и достижения.</div>${lt}${seasonButton('В меню ▶')}`;$('tosea').onclick=()=>showEvening(life?()=>{LF().day++;lifeMorning()}:()=>showMainMenu())}};
