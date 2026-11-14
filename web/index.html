@@ -3375,7 +3375,7 @@ const RANKS=[
 const rank=()=>PR().rank||0;
 function rankReq(r){const p=PR(),q=RANKS[r],o=[];if(!q)return o;const tk=(p.cnt&&p.cnt.tk)||0,sv=Object.values(p.sk);
   o.push(['Уровень '+q.lvl,p.lvl>=q.lvl,p.lvl+'/'+q.lvl]);o.push(['Закрыто заявок: '+q.tk,tk>=q.tk,tk+'/'+q.tk]);
-  if(q.sk3)o.push(['Навыков уровня «Эксперт»: '+q.sk3,sv.filter(v=>v>=3).length>=q.sk3,sv.filter(v=>v>=3).length+'/'+q.sk3]);
+  if(q.sk3)o.push(['Навыков с 3 пройденными курсами (●●●): '+q.sk3+'<small style="display:block;color:#8b949e;font-size:11px">Сейчас: '+Object.keys(p.sk).map(k=>SKN[k]+' '+Math.min(3,p.sk[k])+'/3').join(' · ')+'. Курсы ниже, третий курс открывается с уровня 4</small>',sv.filter(v=>v>=3).length>=q.sk3,sv.filter(v=>v>=3).length+'/'+q.sk3]);
   if(q.cert)o.push(['Сертификатов: '+q.cert,sv.filter(v=>v>=4).length>=q.cert,sv.filter(v=>v>=4).length+'/'+q.cert]);
   if(q.gear)o.push(['Установлено оборудования: '+q.gear,p.gear.length>=q.gear,p.gear.length+'/'+q.gear]);return o}
 const canPromo=()=>rank()<RANKS.length-1&&rankReq(rank()+1).every(x=>x[1]);
