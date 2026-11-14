@@ -2651,7 +2651,7 @@ function setLoc(to){LOC=to;Object.entries(LOCS).forEach(([k,L])=>L.group.visible
 function switchLoc(to){const from=LOC;G.busy=true;const fade=$('fade');fade.style.opacity=1;beep(220,.15,'sine',.04);
   setTimeout(()=>{setLoc(to);const e=LOCS[to].entry[from];G.p.x=e.x;G.p.y=e.y;G.p.path=[];addTime(2);
     if(!G.visited[to]){G.visited[to]=1;toast(LOCS[to].name,'b')}
-    fade.style.opacity=0;setTimeout(()=>{G.busy=false;checkEvents()},350)},450)}
+    fade.style.opacity=0;setTimeout(()=>{G.busy=false;checkEvents();autoStep()},350)},450)}
 
 /* ---------- events ---------- */
 function ep1Events(){if(!G||G.busy||!G.running||G.F.ev.final)return;const f=F(),m=G.min,e=f.ev;
@@ -2701,7 +2701,7 @@ function ep1Ending(){G.running=false;ov.style.display='none';const f=F(),q=G.q;
 /* ---------- input ---------- */
 const ray=new THREE.Raycaster(),floorP=new THREE.Plane(new THREE.Vector3(0,1,0),0),hit=new THREE.Vector3();
 function goTo(x,y){G.p.path=astar(G.p.x,G.p.y,x,y,LOC)}
-function interact(t){if(!G.running||G.busy)return;standUp();if(G.pending?.npc&&G.pending.npc!==t.npc)NPC[G.pending.npc].hold=false;G.pending=t;sPop();
+function interact(t){if(!G.running||G.busy)return;G.auto=null;standUp();if(G.pending?.npc&&G.pending.npc!==t.npc)NPC[G.pending.npc].hold=false;G.pending=t;sPop();
   if(t.npc){const n=NPC[t.npc];n.hold=true;let tp=n.state==='sit'&&n.curStand?n.curStand:null;if(!tp){const gr=LOCS[LOC].grid,ok=(x,y)=>x>10&&y>10&&x<350&&y<470&&!gr[Math.floor(y/CELL)*GC+Math.floor(x/CELL)],sd=G.p.x>n.x?1:-1;tp=[[22*sd,6],[-22*sd,6],[0,24],[0,-24],[16*sd,18],[-16*sd,18]].map(([a,b])=>({x:n.x+a,y:n.y+b})).find(q=>ok(q.x,q.y))||{x:n.x+20*sd,y:n.y+8}}goTo(tp.x,tp.y)}else goTo(t.hot.stand.x,t.hot.stand.y);if(!G.p.path.length)arrive()}
 /* жесты: тап = идти, палец = двигать камеру, два пальца = зум */
 const PT=new Map();let PDRAG=false,PIN=0;
@@ -2723,8 +2723,12 @@ function tapAt(e){
   let best=null,bd=24;for(const n of Object.values(NPC)){if(n.loc!==LOC)continue;const d=Math.hypot(x-n.x,y-n.y);if(d<bd){bd=d;best={npc:n.id}}}
   if(!best)for(const h of HOT){if(h.loc!==LOC||hotHidden(h))continue;const d=Math.hypot(x-h.x,y-h.y);if(d<(h.door?30:26)){best={hot:h};break}}
   if(best){interact(best);return}
-  standUp();if(G.pending?.npc)NPC[G.pending.npc].hold=false;G.pending=null;G.p.path=astar(G.p.x,G.p.y,clamp(x,14,346),clamp(y,40,474),LOC,true);puff(wx(x),.1,wz(y),8,{c:'#ffd166',sp:1.5,life:.4,g:0})}
-function arrive(){const t=G.pending;G.pending=null;if(!t)return;
+  standUp();G.auto=null;if(G.pending?.npc)NPC[G.pending.npc].hold=false;G.pending=null;G.p.path=astar(G.p.x,G.p.y,clamp(x,14,346),clamp(y,40,474),LOC,true);puff(wx(x),.1,wz(y),8,{c:'#ffd166',sp:1.5,life:.4,g:0})}
+function autoStep(){const id=G&&G.auto;if(!id||!G.running||G.busy)return;const n=NPC[id];if(!n||n.away||!LOCS[n.loc]||!tkOf(id)){G.auto=null;return}
+  if(n.loc===LOC){G.auto=null;interact({npc:id});return}
+  const LF3=['hall','f6','f7'],to=LOC==='hall'||(LF3.includes(LOC)&&LF3.includes(n.loc))?n.loc:'hall',st=LOCS[LOC].doors[to]||LOCS[LOC].doors.hall;if(!st||!LOCS[to].entry[LOC]){G.auto=null;return}
+  standUp();G.pending={auto:to};goTo(st.x,st.y);if(!G.p.path.length)arrive()}
+function arrive(){const t=G.pending;G.pending=null;if(!t)return;if(t.auto){switchLoc(t.auto);return}
   if(t.npc){const n=NPC[t.npc];if(n.loc!==LOC){n.hold=false;return}G.p.rot=Math.atan2(n.x-G.p.x,n.y-G.p.y);let node=nodeFor(t.npc);
     if(!node){node={who:t.npc,mood:G.rel[t.npc]>0?'h':G.rel[t.npc]<0?'a':'n',text:rnd(gossipFor(t.npc)),next:END}}
     lastNpc=t.npc;talk(node,t.npc)}
@@ -3547,10 +3551,11 @@ function tkHTML(){const q=G?TQ():[],p=dept(),rk=rank();if(!G||EPN>=90)return '<p
   return `<div class="pcr" style="display:block;background:#161f2e;border-color:#2f4a7a"><b>Рейтинг ИТ-отдела: <span style="color:${p.rate>=75?'#56d364':p.rate>=50?'#ffd166':'#ff7b72'}">${Math.round(p.rate)}%</span></b><small style="display:block;margin-top:2px">Сегодня закрыто: ${G.tkDone||0} · просрочено: ${G.tkLate||0}. Рейтинг растёт за закрытые тикеты и падает за просроченные. От него зависит транш бюджета.</small></div>`+
   (q.length?q.slice().sort((a,b)=>TICKETS[b.k].p-TICKETS[a.k].p||a.till-b.till).map(t=>{const T=TICKETS[t.k],pr=TPRI[T.p],left=Math.max(0,Math.round(t.till-G.min));
     return `<div class="pcr" style="display:block;border-left:4px solid ${pr[1]}"><div style="display:flex;justify-content:space-between;gap:8px"><b>№${t.no} · ${CH[t.id].name}${flOf(t.id)?' · '+flOf(t.id).n+' эт.':''}</b><small style="color:${left<15?'#ff7b72':'#8b949e'};white-space:nowrap">⏱ ${fmtDur(left)}</small></div><small style="display:block;margin:2px 0 8px">${T.c} · приоритет <span style="color:${pr[1]}">${pr[0]}</span> · ${fmtM(pr[3])} сум<br>«${T.t}»</small>
-     <div style="display:flex;gap:6px;flex-wrap:wrap">${t.st==='acc'?'<span class="pcok">В работе. Подойди к сотруднику</span>':`<button class="pcbtn" data-tka="${t.no}">Принять</button>`}${t.pp?'':`<button class="pcbtn y" data-tkp="${t.no}">Отложить</button>`}${rk>=3?`<button class="pcbtn y" data-tkd="${t.no}">Передать Азизу</button>`:''}</div></div>`}).join(''):'<p class="pcn">Открытых тикетов нет. Можно выпить кофе.</p>')+
+     <div style="display:flex;gap:6px;flex-wrap:wrap">${t.st==='acc'?`<button class="pcbtn" data-tkg="${t.no}">🚶 Идти к сотруднику</button>`:`<button class="pcbtn" data-tka="${t.no}">Принять</button>`}${t.pp?'':`<button class="pcbtn y" data-tkp="${t.no}">Отложить</button>`}${rk>=3?`<button class="pcbtn y" data-tkd="${t.no}">Передать Азизу</button>`:''}</div></div>`}).join(''):'<p class="pcn">Открытых тикетов нет. Можно выпить кофе.</p>')+
   '<p class="pcn">Принял тикет сразу — премия на 20% больше, и срок продлевается на 15 минут. Отложить можно один раз: +30 минут, но сотрудник будет недоволен.</p>'}
 function tkBind(el){const f=no=>TQ().find(t=>t.no===+no);
-  el.querySelectorAll('[data-tka]').forEach(b=>b.onclick=()=>{const t=f(b.dataset.tka);if(!t)return;t.st='acc';t.till+=15;sGood();toast('🎫 Тикет №'+t.no+' принят. '+CH[t.id].name+' ждёт тебя','g');renderPhone()});
+  el.querySelectorAll('[data-tkg]').forEach(b=>b.onclick=()=>{const t=f(b.dataset.tkg);if(!t)return;sPop();closePhone();closePC();G.busy=false;const n=NPC[t.id];toast('🚶 Иду к: '+CH[t.id].name+(n.loc!==LOC?' · '+LOCS[n.loc].name:''),'b');G.auto=t.id;autoStep()});
+  el.querySelectorAll('[data-tka]').forEach(b=>b.onclick=()=>{const t=f(b.dataset.tka);if(!t)return;t.st='acc';t.till+=15;sGood();toast('🎫 Тикет №'+t.no+' принят. Нажми «Идти к сотруднику»','g');renderPhone()});
   el.querySelectorAll('[data-tkp]').forEach(b=>b.onclick=()=>{const t=f(b.dataset.tkp);if(!t)return;t.pp=1;t.till+=30;if(G.rel[t.id]!=null&&G.rel[t.id]>-3)G.rel[t.id]--;sPop();toast('Тикет №'+t.no+' отложен на 30 минут. '+CH[t.id].name+' запомнит это','b');renderPhone()});
   el.querySelectorAll('[data-tkd]').forEach(b=>b.onclick=()=>{const t=f(b.dataset.tkd);if(!t)return;TQ().splice(TQ().indexOf(t),1);rate(1);sPop();toast('🧑‍💻 Азиз взял тикет №'+t.no+'. Премии не будет, но рейтинг цел','b');renderPhone()})}
 /* ---------- дежурство: свободная смена без сюжета ---------- */
