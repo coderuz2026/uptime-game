@@ -2701,7 +2701,7 @@ let LASTIN=performance.now();document.addEventListener('pointerdown',()=>{LASTIN
 function standUp(){const p=G&&G.p;if(p){p.dance=0;p.sing=0}if(p&&p.rest){const r=p.rest;p.rest=null;p.x=r.sx;p.y=r.sy}if(p&&p.watch){p.watch=0;p.autoSit=0;p.x=PCSTAND.x;p.y=PCSTAND.y}else if(p)p.autoSit=0}
 function update(dt){ambTick(dt);
   {const n=NPC.bobur;if(n.radio>0)n.radio-=dt;RADIOT-=dt;if(RADIOT<=0){RADIOT=14+Math.random()*14;if(n.loc===LOC&&!n.hold&&!n.away&&!G.busy){sayBubble(n,rnd(RADIOL));n.chatT=4;n.radio=3;sRadio()}}}
-  if(!G.busy){G.realT+=dt;if(G.realT>2.4){G.realT=0;G.min+=1}}
+  if(!G.busy){G.realT+=dt;if(G.realT>spdSec()){G.realT=0;G.min+=1}}
   const p=G.p;p.vx=p.vy=0;
   if(!G.busy&&!p.path.length&&!p.watch&&!p.eat&&!G.pending&&LOC==='office'&&performance.now()-LASTIN>35000){LASTIN=performance.now();if(Math.hypot(p.x-PCSTAND.x,p.y-PCSTAND.y)<16){p.watch=1;p.x=PCPOS.x;p.y=PCPOS.y;p.rot=0}else{p.path=astar(p.x,p.y,PCSTAND.x,PCSTAND.y,LOC);p.autoSit=p.path.length?1:0}}
   if(p.autoSit&&!p.path.length&&!G.busy){p.autoSit=0;if(Math.hypot(p.x-PCSTAND.x,p.y-PCSTAND.y)<16){p.watch=1;p.x=PCPOS.x;p.y=PCPOS.y;p.rot=0;toast('🖥️ Заявок нет. Присматриваешь за серверами','b')}}
@@ -3377,8 +3377,8 @@ function rate(d){const p=dept();p.rate=clamp(p.rate+d,0,100)}
 function tkTick(){if(!G||!G.running||G.busy||EPN===3||EPN>=90||!G.F.met_boss||G.F.ev.final)return;const q=TQ(),duty=EPN===0;
   for(const t of [...q])if(G.min>t.till){q.splice(q.indexOf(t),1);const nm=CH[t.id].name;G.tkLate=(G.tkLate||0)+1;if(rank()>=3){rate(1);toast('🧑‍💻 Стажёр Азиз закрыл тикет №'+t.no+' за тебя: '+nm,'b')}else{rate(-6);need('m',-6);toast('⌛ Тикет №'+t.no+' просрочен: '+nm+' не дождался. Рейтинг отдела −6','r')}}
   if(G.tkNext==null)G.tkNext=G.min+(duty?4:30);if(G.min<G.tkNext||q.length>=(duty?4:1))return;
-  const c=['nigora','dilnoza','lola','timur','malika','sardor'].filter(id=>{const n=NPC[id];return n.loc==='office'&&!n.away&&!n.hold&&n.state==='sit'&&!EPS[EPN].nodeFor(id)&&!tkOf(id)});G.tkNext=G.min+(duty?9+Math.random()*14:40+Math.random()*35);if(!c.length)return;
-  const p=PR();p.tno=(p.tno||100)+1;let k;do{k=Math.floor(Math.random()*TICKETS.length)}while(k===G.tkLastK);G.tkLastK=k;const T=TICKETS[k],id=rnd(c),t={no:p.tno,id,k,t0:G.min,till:G.min+(duty?[75,55,40][T.p]:90),st:'new'};q.push(t);
+  const c=['nigora','dilnoza','lola','timur','malika','sardor'].filter(id=>{const n=NPC[id];return n.loc==='office'&&!n.away&&!n.hold&&n.state==='sit'&&!EPS[EPN].nodeFor(id)&&!tkOf(id)});G.tkNext=G.min+(duty?(9+Math.random()*14)*spdK():40+Math.random()*35);if(!c.length)return;
+  const p=PR();p.tno=(p.tno||100)+1;let k;do{k=Math.floor(Math.random()*TICKETS.length)}while(k===G.tkLastK);G.tkLastK=k;const T=TICKETS[k],id=rnd(c),t={no:p.tno,id,k,t0:G.min,till:G.min+(duty?Math.round([75,55,40][T.p]*spdK()):90),st:'new'};q.push(t);
   sayBubble(NPC[id],T.b);NPC[id].chatT=5;tkNotify(t)}
 function tkNotify(t){const T=TICKETS[t.k],b=$('msgb');b.innerHTML=`<div class="ap" style="background:linear-gradient(135deg,${TPRI[T.p][1]},#30363d)">🎫</div><div style="flex:1;min-width:0"><b>Тикет №${t.no} · ${CH[t.id].name}</b><span>${T.c}: ${T.b} · приоритет ${TPRI[T.p][0]}</span></div>`;
   b.classList.add('on');beep(660,.08,'triangle',.04);if(T.p===2)setTimeout(()=>beep(880,.1,'triangle',.05),120);clearTimeout(MSGT);MSGT=setTimeout(()=>b.classList.remove('on'),6000);b.onclick=()=>{b.classList.remove('on');PHTAB='tk';openPhone()}}
@@ -3430,10 +3430,14 @@ function showSupport(){SCR='about';const s=$('screen');s.classList.remove('menu'
 function showAbout(){SCR='about';const s=$('screen');s.classList.remove('menu');
   s.innerHTML=`<button class="backb" id="aback">← Назад</button><h2>Об игре</h2><div class="sum">АПТАЙМ — сюжетная игра про сисадмина в ташкентском офисе. Каждое решение влияет на следующие эпизоды.<br><br>Разработка: Uptime Studio<br>Движок: three.js (MIT)<br><br>Новые эпизоды приходят обновлением сами.<br><br><a href="https://coderuz2026.github.io/uptime-game/privacy.html" target="_blank" style="color:#79c0ff">Политика конфиденциальности</a></div>`;
   $('aback').onclick=()=>{sPop();showMainMenu()}}
+const SPDS=[[2.4,'спокойно'],[1.5,'быстро'],[1,'очень быстро']];let SPD=1;try{const v=localStorage.getItem('uptime_spd');if(v!=null&&SPDS[+v])SPD=+v}catch(e){}
+function spdSec(){return (EPN===0||EPN>=90)?SPDS[SPD][0]:2.4}
+function spdK(){return 2.4/spdSec()}
+function spdLabel(){return '⏩ Время: '+SPDS[SPD][1]}
 function openPause(){if(!G||!G.running)return;PAUSED=true;const p=$('pause');p.classList.remove('hidden');
-  p.innerHTML=`<div class="pbox"><h3>Пауза</h3><button class="mb1" id="p_go"><b>▶ Продолжить</b></button><button class="mb2" id="p_jr">📓 Журнал</button><button class="mb2" id="p_q">⚙️ Графика: ${qLabel()}</button><button class="mb2" id="p_snd">🔊 Звук</button><button class="mb2 red" id="p_exit">🚪 Выйти в меню</button><p class="pnote">Игра сохраняется сама. Продолжить можно из главного меню</p></div>`;
+  p.innerHTML=`<div class="pbox"><h3>Пауза</h3><button class="mb1" id="p_go"><b>▶ Продолжить</b></button><button class="mb2" id="p_jr">📓 Журнал</button><button class="mb2" id="p_q">⚙️ Графика: ${qLabel()}</button><button class="mb2" id="p_snd">🔊 Звук</button>${EPN===0||EPN>=90?`<button class="mb2" id="p_spd">${spdLabel()}</button>`:``}<button class="mb2 red" id="p_exit">🚪 Выйти в меню</button><p class="pnote">Игра сохраняется сама. Продолжить можно из главного меню</p></div>`;
   $('p_go').onclick=closePause;$('p_jr').onclick=()=>{closePause();if(!G.busy)openJournal()};$('p_q').onclick=()=>{cycleQ();$('p_q').textContent='⚙️ Графика: '+qLabel()};
-  $('p_snd').onclick=()=>{sPop();showSound()};$('p_exit').onclick=exitToMenu}
+  $('p_snd').onclick=()=>{sPop();showSound()};if($('p_spd'))$('p_spd').onclick=()=>{sPop();SPD=(SPD+1)%SPDS.length;try{localStorage.setItem('uptime_spd',SPD)}catch(e){}$('p_spd').textContent=spdLabel();toast('Смена 9:00–18:00 ≈ '+Math.round(540*SPDS[SPD][0]/60)+' мин','b')};$('p_exit').onclick=exitToMenu}
 function closePause(){PAUSED=false;$('pause').classList.add('hidden');lastT=performance.now()}
 function exitToMenu(){clubBeat(false);if(EPN>=90)freeStop();else if(LOC==='home'||LOC==='club')setLoc('office');saveRun();closePause();closePC();closePhone();if(G){G.running=false;G.busy=false}needsTick();if(D)closeDlg(true);$('dlg').classList.add('hidden');$('jr').classList.add('hidden');if(!$('mg').classList.contains('hidden')){if(mg.cleanup)mg.cleanup();mg.cleanup=null;$('mg').classList.add('hidden');$('mg').innerHTML=''}
   Object.values(NPC).forEach(n=>n.hold=false);setLoc('office');showMainMenu()}
