@@ -426,7 +426,7 @@ button{font-family:inherit;cursor:pointer}
 <div id="app">
   <div id="hud">
     <div class="row">
-      <div class="chip"><i class="ico" data-ic="clock"></i><span id="clock">09:00</span></div>
+      <button class="chip" id="clockchip"><i class="ico" data-ic="clock"></i><span id="clock">09:00</span><span id="spdi" style="display:none;margin-left:3px;font-size:11px;opacity:.8">⏩</span></button>
       <button class="chip" id="goal"><i class="ico" data-ic="target"></i><span id="goaltx">Осмотрись</span></button>
       <button class="chip" id="jbtn"><i class="ico" data-ic="book"></i></button>
       <button class="chip" id="menubtn"><i class="ico" data-ic="gear"></i></button>
@@ -2701,7 +2701,7 @@ let LASTIN=performance.now();document.addEventListener('pointerdown',()=>{LASTIN
 function standUp(){const p=G&&G.p;if(p){p.dance=0;p.sing=0}if(p&&p.rest){const r=p.rest;p.rest=null;p.x=r.sx;p.y=r.sy}if(p&&p.watch){p.watch=0;p.autoSit=0;p.x=PCSTAND.x;p.y=PCSTAND.y}else if(p)p.autoSit=0}
 function update(dt){ambTick(dt);
   {const n=NPC.bobur;if(n.radio>0)n.radio-=dt;RADIOT-=dt;if(RADIOT<=0){RADIOT=14+Math.random()*14;if(n.loc===LOC&&!n.hold&&!n.away&&!G.busy){sayBubble(n,rnd(RADIOL));n.chatT=4;n.radio=3;sRadio()}}}
-  if(!G.busy){G.realT+=dt;if(G.realT>spdSec()){G.realT=0;G.min+=1}}
+  if(!G.busy){G.realT+=dt;if(G.realT>spdSec()){G.realT-=spdSec();if(G.realT>spdSec())G.realT=0;G.min+=1}}
   const p=G.p;p.vx=p.vy=0;
   if(!G.busy&&!p.path.length&&!p.watch&&!p.eat&&!G.pending&&LOC==='office'&&performance.now()-LASTIN>35000){LASTIN=performance.now();if(Math.hypot(p.x-PCSTAND.x,p.y-PCSTAND.y)<16){p.watch=1;p.x=PCPOS.x;p.y=PCPOS.y;p.rot=0}else{p.path=astar(p.x,p.y,PCSTAND.x,PCSTAND.y,LOC);p.autoSit=p.path.length?1:0}}
   if(p.autoSit&&!p.path.length&&!G.busy){p.autoSit=0;if(Math.hypot(p.x-PCSTAND.x,p.y-PCSTAND.y)<16){p.watch=1;p.x=PCPOS.x;p.y=PCPOS.y;p.rot=0;toast('🖥️ Заявок нет. Присматриваешь за серверами','b')}}
@@ -2786,7 +2786,7 @@ const TUTS=[['👆','Коснись пола, и герой пойдёт туд�
 let TUTON=false,TUTOK=false;function showTut(){TUTON=true;G.busy=true;let i=0;const el=document.createElement('div');el.style.cssText='position:fixed;inset:0;z-index:60;background:#000a;display:flex;align-items:center;justify-content:center;padding:24px';document.body.appendChild(el);
   const draw=()=>{el.innerHTML=`<div style="max-width:320px;width:100%;background:#161b22;border:1px solid #30363d;border-radius:18px;padding:22px 20px;text-align:center;box-shadow:0 12px 40px #000a"><div style="font-size:44px;line-height:1">${TUTS[i][0]}</div><p style="font-size:16px;line-height:1.45;margin:14px 0 6px;color:#e6edf3">${TUTS[i][1]}</p><div style="font-size:12px;color:#8b949e;margin-bottom:14px">${i+1} из ${TUTS.length}</div><button class="btn" id="tutn">${i<TUTS.length-1?'Дальше':'Понятно, играем!'}</button>${i<TUTS.length-1?'<div id="tuts" style="margin-top:12px;font-size:13px;color:#8b949e">Пропустить</div>':''}</div>`;
     const done=()=>{el.remove();TUTON=false;if(G)G.busy=false;try{localStorage.setItem('uptime_tut','1')}catch(e){}};$('tutn').onclick=()=>{sPop();if(++i>=TUTS.length)done();else draw()};const sk=$('tuts');if(sk)sk.onclick=done};draw()}
-let HUDC='',HUDG='';function hud(){procTick();{const b=$('phb'),on=!!(G&&G.running&&!G.busy&&SCR==='game');if(b._on!==on){b._on=on;b.classList.toggle('on',on)}const bd=HS().ord.some(o=>o.st==='wait')||!!(G&&G.tq&&G.tq.some(t=>t.st==='new'));if(b._bd!==bd){b._bd=bd;b.classList.toggle('bd',bd)}}metaCheck();if(performance.now()-RUNT>4000){RUNT=performance.now();saveRun()}if(!TUTOK&&!TUTON&&G&&G.running&&!G.busy&&SCR==='game'){if(localStorage.getItem('uptime_tut'))TUTOK=true;else showTut()}const c=fmt(G.min);if(c!==HUDC){HUDC=c;$('clock').textContent=c}const o=objectives().find(x=>!x[1]),g=o?o[0]:'Все задачи выполнены!';if(g!==HUDG){HUDG=g;$('goaltx').textContent=g}}
+let HUDC='',HUDG='';function hud(){procTick();{const e=$('spdi'),on=EPN===0||EPN>=90;if(e._on!==on){e._on=on;e.style.display=on?'':'none'}}{const b=$('phb'),on=!!(G&&G.running&&!G.busy&&SCR==='game');if(b._on!==on){b._on=on;b.classList.toggle('on',on)}const bd=HS().ord.some(o=>o.st==='wait')||!!(G&&G.tq&&G.tq.some(t=>t.st==='new'));if(b._bd!==bd){b._bd=bd;b.classList.toggle('bd',bd)}}metaCheck();if(performance.now()-RUNT>4000){RUNT=performance.now();saveRun()}if(!TUTOK&&!TUTON&&G&&G.running&&!G.busy&&SCR==='game'){if(localStorage.getItem('uptime_tut'))TUTOK=true;else showTut()}const c=fmt(G.min);if(c!==HUDC){HUDC=c;$('clock').textContent=c}const o=objectives().find(x=>!x[1]),g=o?o[0]:'Все задачи выполнены!';if(g!==HUDG){HUDG=g;$('goaltx').textContent=g}}
 let lastT=performance.now();
 let FR=0;
 function frame(now){requestAnimationFrame(frame);if(document.hidden)return;const dt=Math.min(.05,(now-lastT)/1000);const live=G&&G.running&&!PAUSED;
@@ -3292,7 +3292,7 @@ function plovNode(){return {who:'hamid',mood:'h',text:'Плов свежий, с
   {t:'🍲 Плов · 25 тыс сум',if:()=>PR().money>=25000,go:()=>{PR().money-=25000;need('h',65);need('m',6);addTime(20);G.p.drink=3.2;saveSeason();toast('🍲 Наелся. Жить стало лучше','g');return END}},
   {t:'🥟 Самса и чай · 12 тыс сум',if:()=>PR().money>=12000,go:()=>{PR().money-=12000;need('h',35);need('m',3);addTime(10);G.p.drink=3.2;saveSeason();return END}},{t:'Спасибо, позже',go:END}]}}
 function LF(){const p=PR();if(!p.life)p.life={day:1};return p.life}
-function lifeMorning(){const l=LF();saveSeason();homeRefresh();playFree(90,'home',{min:450,next:null,x:246,y:350,rot:-Math.PI/2,intro:{who:'narr',text:'День '+l.day+'. 07:30, звенит будильник. Душ, завтрак, и на работу: смена начинается в 09:00.',next:END}});G.F.morning=1}
+function lifeMorning(){const l=LF();saveSeason();homeRefresh();playFree(90,'home',{min:450,next:null,x:246,y:350,rot:-Math.PI/2,intro:{who:'narr',text:'День '+l.day+'. 07:30, звенит будильник. Душ, завтрак, и на работу: смена начинается в 09:00. Зарплата за сегодня: '+fmtM(payDay().sum)+' сум.',next:END}});G.F.morning=1}
 function lifeToWork(){const car=myCar(),arr=G.min+(car?15:35),late=arr>545;freeStop();const s=$('screen');SCR='ending';s.classList.remove('hidden','menu','season');
   s.innerHTML=`<div class="tag">${fmt(arr-(car?15:35))} · ДОРОГА НА РАБОТУ</div>${rideSVG(car)}<p style="max-width:420px">${car?'Утренняя пробка, но в своей машине и с музыкой.':'Автобус №67 набит так, что двери закрываются с третьей попытки.'}${late?' <b style="color:#ff9b8a">Ты опоздал: директор заметил. Штраф 20 тыс сум.</b>':''}</p><button class="btn" id="lw1">На работу ▶</button>`;
   $('lw1').onclick=()=>{sPop();playEpisode(0);G.life=1;G.min=Math.max(540,arr);if(late){const p=PR();p.money=Math.max(0,p.money-20000);need('m',-10);saveSeason()}}}
@@ -3314,7 +3314,7 @@ function rankReq(r){const p=PR(),q=RANKS[r],o=[];if(!q)return o;const tk=(p.cnt&
   if(q.gear)o.push(['Установлено оборудования: '+q.gear,p.gear.length>=q.gear,p.gear.length+'/'+q.gear]);return o}
 const canPromo=()=>rank()<RANKS.length-1&&rankReq(rank()+1).every(x=>x[1]);
 const trancheK=()=>[1,1,1.5,1.5,1.5,2][rank()];
-function careerHTML(){const r=rank(),nx=RANKS[r+1];return `<div class="pcr" style="display:block;background:#161f2e;border-color:#2f4a7a"><b>💼 ${RANKS[r].t}</b><small style="display:block;margin-top:2px">${RANKS[r].perk}</small></div>`+
+function careerHTML(){const r=rank(),nx=RANKS[r+1];return `<div class="pcr" style="display:block;background:#161f2e;border-color:#2f4a7a"><b>💼 ${RANKS[r].t}</b><small style="display:block;margin-top:2px">${RANKS[r].perk}</small></div>`+(pd=>`<div class="pcr" style="display:block"><b>💰 Зарплата: ${fmtM(pd.sum)} сум за день</b><small style="display:block;margin-top:4px;line-height:1.6">Оклад: ${fmtM(pd.base)}<br>За уровень ${PR().lvl}: +${fmtM(pd.lvl)}<br>За сертификаты: +${fmtM(pd.cert)}<br>За должность: +${fmtM(pd.rank)}<br>Выплата вечером после смены в «Жизни админа». Раз в 5 дней аренда квартиры: −300 000</small></div>`)(payDay())+
   (nx?`<div class="pcr" style="display:block"><b>Следующая должность: ${nx.t}</b><small style="display:block;margin:2px 0 6px">${nx.perk}</small>${rankReq(r+1).map(x=>`<div style="display:flex;justify-content:space-between;font-size:13px;padding:3px 0;color:${x[1]?'#56d364':'#c9d1d9'}"><span>${x[1]?'✅':'⬜'} ${x[0]}</span><span>${x[2]}</span></div>`).join('')}<small style="display:block;margin-top:6px;color:${canPromo()?'#ffd166':'#8b949e'}">${canPromo()?'Всё выполнено! Подойди к директору на дежурстве или в «Жизни админа» и попроси повышение.':'Выполни условия, и директор тебя повысит.'}</small></div>`:'<p class="pcn">Ты на вершине карьеры. Выше только собственная ИТ-компания.</p>')+'<div class="pcsec">Навыки</div>'}
 function promoAsk(){const r=rank(),nx=RANKS[r+1];if(!nx)return {who:'boss',mood:'h',text:'Выше тебя в ИТ только я. А моё кресло пока занято.',next:END};
   if(!canPromo())return {who:'boss',mood:'n',text:'Повышение? Рано. До должности «'+nx.t+'» тебе не хватает: '+rankReq(r+1).filter(x=>!x[1]).map(x=>x[0].toLowerCase()+' (сейчас '+x[2].split('/')[0]+')').join('; ')+'. Сделаешь — приходи.',next:{who:'narr',text:'Все условия и твой прогресс видны в компьютере, вкладка «Карьера».',next:END}};
@@ -3430,14 +3430,17 @@ function showSupport(){SCR='about';const s=$('screen');s.classList.remove('menu'
 function showAbout(){SCR='about';const s=$('screen');s.classList.remove('menu');
   s.innerHTML=`<button class="backb" id="aback">← Назад</button><h2>Об игре</h2><div class="sum">АПТАЙМ — сюжетная игра про сисадмина в ташкентском офисе. Каждое решение влияет на следующие эпизоды.<br><br>Разработка: Uptime Studio<br>Движок: three.js (MIT)<br><br>Новые эпизоды приходят обновлением сами.<br><br><a href="https://coderuz2026.github.io/uptime-game/privacy.html" target="_blank" style="color:#79c0ff">Политика конфиденциальности</a></div>`;
   $('aback').onclick=()=>{sPop();showMainMenu()}}
-const SPDS=[[2.4,'спокойно'],[1.5,'быстро'],[1,'очень быстро']];let SPD=1;try{const v=localStorage.getItem('uptime_spd');if(v!=null&&SPDS[+v])SPD=+v}catch(e){}
+const SPDS=[[1.5,'обычно'],[.9,'быстро'],[.5,'очень быстро']];let SPD=1;try{const v=localStorage.getItem('uptime_spd2');if(v!=null&&SPDS[+v])SPD=+v}catch(e){}
 function spdSec(){return (EPN===0||EPN>=90)?SPDS[SPD][0]:2.4}
 function spdK(){return 2.4/spdSec()}
 function spdLabel(){return '⏩ Время: '+SPDS[SPD][1]}
+function spdNext(){SPD=(SPD+1)%SPDS.length;try{localStorage.setItem('uptime_spd2',SPD)}catch(e){}toast('⏩ Время: '+SPDS[SPD][1]+'. Смена 9:00–18:00 ≈ '+Math.round(540*SPDS[SPD][0]/60)+' мин','b')}
+$('clockchip').onclick=()=>{if(G&&G.running&&(EPN===0||EPN>=90)){sPop();spdNext()}};
+function payDay(){const p=PR(),cert=Object.values(p.sk).filter(v=>v>=4).length;return {base:50000,lvl:20000*p.lvl,cert:15000*cert,rank:RANKS[rank()].pay,sum:50000+20000*p.lvl+15000*cert+RANKS[rank()].pay}}
 function openPause(){if(!G||!G.running)return;PAUSED=true;const p=$('pause');p.classList.remove('hidden');
   p.innerHTML=`<div class="pbox"><h3>Пауза</h3><button class="mb1" id="p_go"><b>▶ Продолжить</b></button><button class="mb2" id="p_jr">📓 Журнал</button><button class="mb2" id="p_q">⚙️ Графика: ${qLabel()}</button><button class="mb2" id="p_snd">🔊 Звук</button>${EPN===0||EPN>=90?`<button class="mb2" id="p_spd">${spdLabel()}</button>`:``}<button class="mb2 red" id="p_exit">🚪 Выйти в меню</button><p class="pnote">Игра сохраняется сама. Продолжить можно из главного меню</p></div>`;
   $('p_go').onclick=closePause;$('p_jr').onclick=()=>{closePause();if(!G.busy)openJournal()};$('p_q').onclick=()=>{cycleQ();$('p_q').textContent='⚙️ Графика: '+qLabel()};
-  $('p_snd').onclick=()=>{sPop();showSound()};if($('p_spd'))$('p_spd').onclick=()=>{sPop();SPD=(SPD+1)%SPDS.length;try{localStorage.setItem('uptime_spd',SPD)}catch(e){}$('p_spd').textContent=spdLabel();toast('Смена 9:00–18:00 ≈ '+Math.round(540*SPDS[SPD][0]/60)+' мин','b')};$('p_exit').onclick=exitToMenu}
+  $('p_snd').onclick=()=>{sPop();showSound()};if($('p_spd'))$('p_spd').onclick=()=>{sPop();spdNext();$('p_spd').textContent=spdLabel()};$('p_exit').onclick=exitToMenu}
 function closePause(){PAUSED=false;$('pause').classList.add('hidden');lastT=performance.now()}
 function exitToMenu(){clubBeat(false);if(EPN>=90)freeStop();else if(LOC==='home'||LOC==='club')setLoc('office');saveRun();closePause();closePC();closePhone();if(G){G.running=false;G.busy=false}needsTick();if(D)closeDlg(true);$('dlg').classList.add('hidden');$('jr').classList.add('hidden');if(!$('mg').classList.contains('hidden')){if(mg.cleanup)mg.cleanup();mg.cleanup=null;$('mg').classList.add('hidden');$('mg').innerHTML=''}
   Object.values(NPC).forEach(n=>n.hold=false);setLoc('office');showMainMenu()}
