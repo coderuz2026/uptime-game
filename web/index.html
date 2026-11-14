@@ -1801,7 +1801,7 @@ const prevF=n=>(SEASON.done[n]&&SEASON.done[n].F)||{};
 const prevRel=()=>{const r={};for(let i=1;i<EPN;i++)Object.assign(r,(SEASON.done[i]||{}).rel||{});return r};
 function finishEpisode(n,title,F,rel){const first=!SEASON.done[n]||!SEASON.done[n].paid;SEASON.done[n]={title,F,rel,t:Date.now(),paid:1};if(first){PR().budget+=1500000;gainXP(150,500000);toast('Директор увеличил бюджет ИТ на 1,5 млн сум','y')}saveSeason()}
 /* dispatchers */
-function nodeFor(id){const base=EPS[EPN].nodeFor(id);if(id==='boss'&&G.F.met_boss&&!G.F.ev.final&&PR().orders.some(o=>o.st==='wait'))return reqNode(base);if(!base&&G.tk&&G.tk.id===id)return tkNode(id);if(!base&&EPN===0&&id==='hamid')return plovNode();if(!base&&EPN===0&&id==='boss'&&canPromo())return promoNode();if(!base&&G.F.lunch===1&&LOC==='yard'&&(id in LUNCHERS)&&NPC[id].state==='sit'&&NPC[id].loc==='yard')return lunchNode(id);return base}
+function nodeFor(id){const base=EPS[EPN].nodeFor(id);if(EPN===0&&id==='boss'&&!G.F.ev.final)return bossMenu();if(id==='boss'&&G.F.met_boss&&!G.F.ev.final&&PR().orders.some(o=>o.st==='wait'))return reqNode(base);if(!base&&G.tk&&G.tk.id===id)return tkNode(id);if(!base&&EPN===0&&id==='hamid')return plovNode();if(!base&&G.F.lunch===1&&LOC==='yard'&&(id in LUNCHERS)&&NPC[id].state==='sit'&&NPC[id].loc==='yard')return lunchNode(id);return base}
 function markerFor(id){if(id==='boss'&&G.F.met_boss&&PR().orders.some(o=>o.st==='wait'))return 't';const m=EPS[EPN].markerFor(id);return !m&&G.tk&&G.tk.id===id?'q':!m&&EPN===0&&id==='hamid'&&ND().h<40?'q':!m&&EPN===0&&id==='boss'&&canPromo()?'t':m}
 function objectives(){const o=EPS[EPN].objectives();if(EPN<90&&Object.values(PR().sk).every(v=>v===0)&&(EPN!==1||G.F.met_boss))o.unshift(['📚 Пройди первый курс за своим компьютером (серверная, слева внизу)',0]);PR().orders.forEach(r=>{const it=itemOf(r);o.push([r.st==='wait'?'📝 Согласовать у директора заявку: '+it.n:'📦 '+it.n+': '+stageOf(r)+', ещё '+fmtDur(r.eta-PR().clock),0])});return o}
 function checkEvents(){if(!G||G.busy||!G.running||G.F.ev.final)return;EPS[EPN].events();if(!G.busy)tkTick()}
@@ -3315,9 +3315,13 @@ const canPromo=()=>rank()<RANKS.length-1&&rankReq(rank()+1).every(x=>x[1]);
 const trancheK=()=>[1,1,1.5,1.5,1.5,2][rank()];
 function careerHTML(){const r=rank(),nx=RANKS[r+1];return `<div class="pcr" style="display:block;background:#161f2e;border-color:#2f4a7a"><b>💼 ${RANKS[r].t}</b><small style="display:block;margin-top:2px">${RANKS[r].perk}</small></div>`+
   (nx?`<div class="pcr" style="display:block"><b>Следующая должность: ${nx.t}</b><small style="display:block;margin:2px 0 6px">${nx.perk}</small>${rankReq(r+1).map(x=>`<div style="display:flex;justify-content:space-between;font-size:13px;padding:3px 0;color:${x[1]?'#56d364':'#c9d1d9'}"><span>${x[1]?'✅':'⬜'} ${x[0]}</span><span>${x[2]}</span></div>`).join('')}<small style="display:block;margin-top:6px;color:${canPromo()?'#ffd166':'#8b949e'}">${canPromo()?'Всё выполнено! Подойди к директору на дежурстве или в «Жизни админа» и попроси повышение.':'Выполни условия, и директор тебя повысит.'}</small></div>`:'<p class="pcn">Ты на вершине карьеры. Выше только собственная ИТ-компания.</p>')+'<div class="pcsec">Навыки</div>'}
-function promoNode(){const nx=RANKS[rank()+1];return {who:'boss',mood:'n',text:'Слушаю. Только коротко, у меня совещание.',choices:[
-  {t:'Бахтиёр Акмалович, я хочу поговорить о повышении',go:()=>({who:'boss',mood:'h',text:'Я смотрел твои результаты. Заявки закрыты, серверная в порядке, люди довольны. Заслужил. С сегодняшнего дня ты — '+nx.t.toLowerCase()+'.',
-    act:()=>{const p=PR();p.rank=rank()+1;gainXP(100,300000);need('m',30);saveSeason();sGood();toast('💼 Новая должность: '+nx.t,'y');metaCheck()},next:{who:'narr',text:'🎉 '+nx.perk+'.',next:END}})},
+function promoAsk(){const r=rank(),nx=RANKS[r+1];if(!nx)return {who:'boss',mood:'h',text:'Выше тебя в ИТ только я. А моё кресло пока занято.',next:END};
+  if(!canPromo())return {who:'boss',mood:'n',text:'Повышение? Рано. До должности «'+nx.t+'» тебе не хватает: '+rankReq(r+1).filter(x=>!x[1]).map(x=>x[0].toLowerCase()+' (сейчас '+x[2].split('/')[0]+')').join('; ')+'. Сделаешь — приходи.',next:{who:'narr',text:'Все условия и твой прогресс видны в компьютере, вкладка «Карьера».',next:END}};
+  return {who:'boss',mood:'h',text:'Я смотрел твои результаты. Заявки закрыты, серверная в порядке, люди довольны. Заслужил. С сегодняшнего дня ты — '+nx.t.toLowerCase()+'.',
+    act:()=>{const p=PR();p.rank=rank()+1;gainXP(100,300000);need('m',30);saveSeason();sGood();toast('💼 Новая должность: '+nx.t,'y');metaCheck()},next:{who:'narr',text:'🎉 '+nx.perk+'.',next:END}}}
+function bossMenu(){const wait=PR().orders.some(o=>o.st==='wait');return {who:'boss',mood:'n',text:'Слушаю. Только коротко, у меня совещание.',choices:[
+  {t:'📦 Согласовать закупку оборудования',if:()=>wait,go:()=>reqNode(null)},
+  {t:'💼 Поговорить о повышении',go:()=>promoAsk()},
   {t:'Ничего, зайду позже',go:END}]}}
 /* ================= ОБЕД С КОЛЛЕГОЙ В ЧАЙХАНЕ ================= */
 const LTALK={
