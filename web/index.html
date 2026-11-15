@@ -2724,8 +2724,8 @@ function tapAt(e){
   if(!best)for(const h of HOT){if(h.loc!==LOC||hotHidden(h))continue;const d=Math.hypot(x-h.x,y-h.y);if(d<(h.door?30:26)){best={hot:h};break}}
   if(best){interact(best);return}
   standUp();G.auto=null;if(G.pending?.npc)NPC[G.pending.npc].hold=false;G.pending=null;G.p.path=astar(G.p.x,G.p.y,clamp(x,14,346),clamp(y,40,474),LOC,true);puff(wx(x),.1,wz(y),8,{c:'#ffd166',sp:1.5,life:.4,g:0})}
-function autoStep(){const id=G&&G.auto;if(!id||!G.running||G.busy)return;const n=NPC[id];if(!n||n.away||!LOCS[n.loc]||!tkOf(id)){G.auto=null;return}
-  if(n.loc===LOC){G.auto=null;interact({npc:id});return}
+function autoStep(){const id=G&&G.auto;if(!id||!G.running||G.busy)return;const n=NPC[id];if(!n||n.away||!LOCS[n.loc]||(!tkOf(id)&&!G.autoAny)){G.auto=null;G.autoAny=0;return}
+  if(n.loc===LOC){G.auto=null;G.autoAny=0;interact({npc:id});return}
   const LF3=['hall','f6','f7'],to=LOC==='hall'||(LF3.includes(LOC)&&LF3.includes(n.loc))?n.loc:'hall',st=LOCS[LOC].doors[to]||LOCS[LOC].doors.hall;if(!st||!LOCS[to].entry[LOC]){G.auto=null;return}
   standUp();G.pending={auto:to};goTo(st.x,st.y);if(!G.p.path.length)arrive()}
 function arrive(){const t=G.pending;G.pending=null;if(!t)return;if(t.auto){switchLoc(t.auto);return}
@@ -2855,9 +2855,9 @@ let TUTON=false,TUTOK=false;function showTut(){TUTON=true;G.busy=true;let i=0;co
 let HUDC='',HUDG='';function hud(){procTick();{const e=$('spdi'),on=EPN===0||EPN>=90;if(e._on!==on){e._on=on;e.style.display=on?'':'none'}}{const b=$('phb'),on=!!(G&&G.running&&!G.busy&&SCR==='game');if(b._on!==on){b._on=on;b.classList.toggle('on',on)}const bd=HS().ord.some(o=>o.st==='wait')||!!(G&&G.tq&&G.tq.some(t=>t.st==='new'));if(b._bd!==bd){b._bd=bd;b.classList.toggle('bd',bd)}}metaCheck();if(performance.now()-RUNT>4000){RUNT=performance.now();saveRun()}if(!TUTOK&&!TUTON&&G&&G.running&&!G.busy&&SCR==='game'){if(localStorage.getItem('uptime_tut'))TUTOK=true;else showTut()}const c=fmt(G.min);if(c!==HUDC){HUDC=c;$('clock').textContent=c}const o=objectives().find(x=>!x[1]),g=o?o[0]:'Все задачи выполнены!';if(g!==HUDG){HUDG=g;$('goaltx').textContent=g}}
 let lastT=performance.now();
 let FR=0;
-function frame(now){requestAnimationFrame(frame);if(document.hidden)return;const dt=Math.min(.05,(now-lastT)/1000);const live=G&&G.running&&!PAUSED;
+function frame(now){requestAnimationFrame(frame);if(document.hidden)return;const rdt=Math.min(.2,(now-lastT)/1000),dt=Math.min(.05,rdt);const live=G&&G.running&&!PAUSED;
   if(!live&&now-lastT<66)return;lastT=now;T+=dt;FR++;
-  if(live){update(dt);if(FR%12===0)hud()}
+  if(live){let r=rdt;while(r>.001&&G&&G.running){const d=Math.min(.05,r);update(d);r-=d}if(FR%12===0)hud()}
   visuals(dt);updParts(dt);updMarkers();if(PHOTOQ.length)shootPhoto();renderer.shadowMap.needsUpdate=QL==='high'||(FR&1)===0;
   if(QL==='high')composer.render();else renderer.render(scene,camera);perfTick(dt)}
 
@@ -3537,8 +3537,8 @@ function dept(){const p=PR();if(p.rate==null)p.rate=80;return p}
 function rate(d){const p=dept();p.rate=clamp(p.rate+d,0,100)}
 function tkTick(){if(!G||!G.running||G.busy||EPN===3||EPN>=90||!G.F.met_boss||G.F.ev.final)return;const q=TQ(),duty=EPN===0;
   for(const t of [...q])if(G.min>t.till){q.splice(q.indexOf(t),1);const nm=CH[t.id].name;G.tkLate=(G.tkLate||0)+1;if(rank()>=3){rate(1);toast('🧑‍💻 Стажёр Азиз закрыл тикет №'+t.no+' за тебя: '+nm,'b')}else{rate(-6);need('m',-6);toast('⌛ Тикет №'+t.no+' просрочен: '+nm+' не дождался. Рейтинг отдела −6','r')}}
-  if(G.tkNext==null)G.tkNext=G.min+(duty?4:30);if(G.min<G.tkNext||q.length>=(duty?4+flOpen():1))return;
-  const c=['nigora','dilnoza','lola','timur','malika','sardor',...(duty?FLOORS.slice(0,flOpen()).flatMap(f=>f.who):[])].filter(id=>{const n=NPC[id];return n.loc===n.home.loc&&n.loc!=='yard'&&!n.away&&!n.hold&&n.state==='sit'&&!EPS[EPN].nodeFor(id)&&!tkOf(id)});G.tkNext=G.min+(duty?(9+Math.random()*14)*spdK()/(1+.25*flOpen()):40+Math.random()*35);if(!c.length)return;
+  if(G.tkNext==null)G.tkNext=G.min+(duty?4:30);if(G.min<G.tkNext||q.length>=(duty?4+flOpen():1)||(duty&&G.min>=1040))return;
+  const c=['nigora','dilnoza','lola','timur','malika','sardor',...(duty?FLOORS.slice(0,flOpen()).flatMap(f=>f.who):[])].filter(id=>{const n=NPC[id];return n.loc===n.home.loc&&n.loc!=='yard'&&!n.away&&!n.hold&&n.state==='sit'&&!EPS[EPN].nodeFor(id)&&!tkOf(id)});G.tkNext=G.min+(duty?(6+Math.random()*9)*spdK()/(1+.25*flOpen()):40+Math.random()*35);if(!c.length)return;
   const p=PR();p.tno=(p.tno||100)+1;let k;do{k=Math.floor(Math.random()*TICKETS.length)}while(k===G.tkLastK);G.tkLastK=k;const T=TICKETS[k],id=rnd(c),t={no:p.tno,id,k,t0:G.min,till:G.min+(duty?Math.round(([75,55,40][T.p]+(flOf(id)?20:0))*spdK()):90),st:'new'};q.push(t);
   sayBubble(NPC[id],T.b);NPC[id].chatT=5;tkNotify(t)}
 function tkNotify(t){const T=TICKETS[t.k],b=$('msgb');b.innerHTML=`<div class="ap" style="background:linear-gradient(135deg,${TPRI[T.p][1]},#30363d)">🎫</div><div style="flex:1;min-width:0"><b>Тикет №${t.no} · ${CH[t.id].name}${flOf(t.id)?' · '+flOf(t.id).n+' этаж':''}</b><span>${T.c}: ${T.b} · приоритет ${TPRI[T.p][0]}</span></div>`;
@@ -3565,9 +3565,9 @@ EPS[0]={intro:'fs_intro',
  setup(){setAway('farrukh');if(prevF(2).rb){setAway('sardor');setHome('rustam',deskOf(5))}},
  nodeFor:()=>null,markerFor:()=>'',hot:{},hotHidden:h=>!h.door&&!h.common,
  objectives(){return [...(BQ().st?[[BQ().st===1?'💰 Бюджет: получи визу у Дильнозы опа':'💰 Бюджет: защити заявку у директора',0]]:[]),[ND().h<25?'🍲 Ты голоден: плов у Хамид-аки во дворе':(G.tq&&G.tq.length)?'🎫 Тикетов открыто: '+G.tq.length+'. Список в телефоне':'Жди тикетов от коллег',0],['Закрыто заявок: '+(G.tkDone||0),0],['Смена до 18:00',0]]},
- events(){const f=G.F,e=f.ev,m=G.min;{const nf=flNews();if(nf){sGood();talk({who:'narr',text:'🏢 Новость дня. '+nf.news+' Лифт в коридоре, кнопка «'+nf.n+'».',next:END});return}}if(!e.lunch&&m>=720){e.lunch=1;f.lunch=1;talk('lunchEv');return}if(e.lunch===1&&m>=780){e.lunch=2;f.lunch=0;toast('🏢 Обед окончен, все возвращаются в офис','b')}if(m>=1080&&!e.final)startFinal()},
+ events(){const f=G.F,e=f.ev,m=G.min;{const nf=flNews();if(nf){sGood();talk({who:'narr',text:'🏢 Новость дня. '+nf.news+' Лифт в коридоре, кнопка «'+nf.n+'».',next:END});return}}if(!e.lunch&&m>=720){e.lunch=1;f.lunch=1;talk({who:'narr',text:'🍲 12:00. Время обеда! Офис дружно идёт вниз, в чайхану во дворе. Голод: '+(ND().h<35?'сильный, пора поесть.':ND().h<65?'есть хочется.':'пока терпимо.'),choices:[{t:'🍲 Пойти в чайхану к Хамид-аке',go:()=>{G.auto='hamid';G.autoAny=1;setTimeout(autoStep,60);return END}},{t:'Поработаю ещё',go:END}]});return}if(e.lunch===1&&m>=780){e.lunch=2;f.lunch=0;toast('🏢 Обед окончен, все возвращаются в офис','b')}if(m>=1080&&!e.final)startFinal()},
  final(){if(G.busy){G.pendingFinal=true;return}G.F.ev.final=1;endingScreen()},
- ending(){clubBeat(false);G.running=false;ov.style.display='none';const n=G.tkDone||0,s=$('screen'),pb=PR().best||0,rec=n>pb,life=G.life,lt=life?lifeEnd(n):'';if(rec)PR().best=n;s.classList.remove('hidden');saveSeason();
+ ending(){clearTimeout(MSGT);$('msgb').classList.remove('on');G.auto=null;clubBeat(false);G.running=false;ov.style.display='none';const n=G.tkDone||0,s=$('screen'),pb=PR().best||0,rec=n>pb,life=G.life,lt=life?lifeEnd(n):'';if(rec)PR().best=n;s.classList.remove('hidden');saveSeason();
   s.innerHTML=`<div class="tag">СМЕНА ОКОНЧЕНА</div><h2 style="font-size:24px">${n>=8?'🏆 Герой офиса':n>=4?'👍 Хорошая смена':'☕ Тихий день'}</h2><p>Закрыто заявок: <b style="color:#ffd166">${n}</b>${rec&&n?' · 🎉 новый рекорд!':pb?' · рекорд: '+pb:''}</p><div class="sum">За каждую заявку ты получил опыт и премию. Заявки идут в задания дня и достижения.</div>${lt}${seasonButton('В меню ▶')}`;$('tosea').onclick=()=>showEvening(life?()=>{LF().day++;lifeMorning()}:()=>showMainMenu())}};
 function showMainMenu(){SCR='main';PAUSED=false;$('pause').classList.add('hidden');const s=$('screen');s.classList.remove('hidden','season');s.classList.add('menu');
   const n=nextEp(),e=EPLIST.find(x=>x.n===n),started=Object.keys(SEASON.done).length>0,run=loadRun();
