@@ -22,6 +22,7 @@ jobs:
           gradle-version: '8.13'
       - name: Встроить игру в APK
         run: |
+          npm i --no-save acorn@8 acorn-walk@8 && node tools/i18n.js
           python3 tools/version.py
           mkdir -p android/app/src/main/assets/www
           cp -r web/* android/app/src/main/assets/www/

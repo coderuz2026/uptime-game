@@ -2,6 +2,7 @@
 <html lang="ru">
 <head>
 <meta charset="utf-8">
+<script>try{var L=localStorage.getItem('uptime_lang');if(!L)L=/^(ru|uz|kk|ky|tg|be|uk)/i.test(navigator.language||'')?'ru':'en';if(L!==document.documentElement.lang){var U=L==='en'?'en.html':'index.html';fetch(U,{method:'HEAD',cache:'no-store'}).then(function(r){if(r.ok)location.replace(U+location.search)}).catch(function(){})}}catch(e){}</script>
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <title>АПТАЙМ: День первый</title>
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
@@ -2558,7 +2559,7 @@ function show(node){
   if(who!=='narr'&&NPC[who]&&NPC[who].loc===LOC){const n=NPC[who];cam.tt.set(wx(n.x),1.15,wz(n.y)+.3);cam.td=Math.min(baseDist*.5,15)}
   const tx=$('dtx');let i=0,done=false;D.node=node;D.typing=true;
   if(who!=='narr'){speak(who,txt,node.mood);emote(who,node.mood)}else stopSpeak();
-  const finish=()=>{if(done)return;done=true;if(D)D.typing=false;if(i<txt.length)stopSpeak();tx.textContent=txt;clearInterval(D.iv);showChoices(node)};
+  const finish=()=>{if(done)return;done=true;if(D)D.typing=false;if(i<txt.length)stopSpeak();tx.textContent=txt;clearInterval(D?.iv);showChoices(node)};
   D.iv=setInterval(()=>{i+=2;tx.textContent=txt.slice(0,i);if(who==='narr'&&i%6===0)beep(300,.02,'square',.012);if(i>=txt.length)finish()},28);
   dlgEl.querySelector('.dbox').onclick=e=>{if(e.target.closest('.ch'))return;if(!done)finish();else if(!node.choices)advance(node.next)};
 }
@@ -2894,8 +2895,9 @@ function reqNode(base){const p=PR(),wait=p.orders.filter(o=>o.st==='wait'),other
       {t:'Я передумал, отзываю заявку',go:()=>{p.orders=p.orders.filter(x=>x!==r);saveSeason();return END}}]})}}).concat([{t:'По другому делу',go:other}])}}
 const SKN={net:'Сети',sec:'Безопасность',hw:'Железо',sys:'Системы'};
 const xpNeed=l=>100*l;
-const fmtM=n=>n>=1e6?(n/1e6).toFixed(1).replace('.0','').replace('.',',')+' млн':Math.round(n/1000)+' тыс';
-const upPct=()=>Math.min(99.99,95+PR().gear.length*.7+Object.values(PR().sk).reduce((a,b)=>a+b,0)*.12+Math.min(40,PR().tasks)*.03+(PR().small.includes('spare')?.3:0)+(PR().small.includes('label')?.2:0)).toFixed(2).replace('.',',');
+const DEC=document.documentElement.lang==='en'?'.':',';
+const fmtM=n=>n>=1e6?(n/1e6).toFixed(1).replace('.0','').replace('.',DEC)+' млн':Math.round(n/1000)+' тыс';
+const upPct=()=>Math.min(99.99,95+PR().gear.length*.7+Object.values(PR().sk).reduce((a,b)=>a+b,0)*.12+Math.min(40,PR().tasks)*.03+(PR().small.includes('spare')?.3:0)+(PR().small.includes('label')?.2:0)).toFixed(2).replace('.',DEC);
 function updProf(){const e=$('proftx');if(e)e.textContent=PR().lvl}
 function gainXP(x,m){const p=PR();p.xp+=x;p.money+=m||0;let up=false;while(p.xp>=xpNeed(p.lvl)){p.xp-=xpNeed(p.lvl);p.lvl++;up=true}
   toast(`+${x} опыта`+(m?` · +${fmtM(m)} сум`:''),'g');if(up){toast('Новый уровень: '+p.lvl+'! Открыты новые курсы','y');sGood()}saveSeason();updProf()}
@@ -3577,7 +3579,7 @@ function showMainMenu(){SCR='main';PAUSED=false;$('pause').classList.add('hidden
   <p class="mver">версия ${window.UPTIME_V||'dev'}</p>`;
   $('m_play').onclick=()=>{sPop();s.classList.remove('menu');if(!resumeRun())playEpisode(n)};$('m_eps').onclick=()=>{sPop();s.classList.remove('menu');showSeason()};
   $('m_q').onclick=()=>{cycleQ();$('m_q').textContent='⚙️ Графика: '+qLabel()};$('m_snd').onclick=()=>{sPop();showSound()};$('m_ach').onclick=()=>{sPop();showAch()};$('m_life').onclick=()=>{sPop();s.classList.remove('menu');lifeMorning()};$('m_home').onclick=()=>{sPop();s.classList.remove('menu');playHome(()=>showMainMenu(),{visit:1})};if($('m_fs'))$('m_fs').onclick=()=>{sPop();s.classList.remove('menu');playEpisode(0)};
-  $('m_about').onclick=()=>{sPop();showAbout()};$('m_sup').onclick=()=>{sPop();showSupport()};metaCheck();dailyLogin()}
+  $('m_about').onclick=()=>{sPop();showAbout()};langBtn(s.querySelector('.mbtns'));$('m_sup').onclick=()=>{sPop();showSupport()};metaCheck();dailyLogin()}
 /* ---- реклама: пока заглушка. Позже сюда подключается AdMob через window.UptimeNative.showRewarded ---- */
 const AD_CAP=6;function adLeft(){const p=PR(),d=new Date().toDateString();if(!p.ad||p.ad.d!==d)p.ad={d,n:0};return AD_CAP-p.ad.n}
 function showAd(onReward){if(adLeft()<=0){toast('На сегодня реклама закончилась. Приходи завтра','r');return}const el=$('adov'),was=PAUSED;PAUSED=true;el.classList.remove('hidden');let t=5;
@@ -3599,6 +3601,7 @@ function spdLabel(){return '⏩ Время: '+SPDS[SPD][1]}
 function spdNext(){SPD=(SPD+1)%SPDS.length;try{localStorage.setItem('uptime_spd2',SPD)}catch(e){}toast('⏩ Время: '+SPDS[SPD][1]+'. Смена 9:00–18:00 ≈ '+Math.round(540*SPDS[SPD][0]/60)+' мин','b')}
 $('clockchip').onclick=()=>{if(G&&G.running&&(EPN===0||EPN>=90)){sPop();spdNext()}};
 function payDay(){const p=PR(),cert=Object.values(p.sk).filter(v=>v>=4).length;return {base:50000,lvl:20000*p.lvl,cert:15000*cert,rank:RANKS[rank()].pay,sum:50000+20000*p.lvl+15000*cert+RANKS[rank()].pay}}
+function langBtn(box){if(!box)return;const en=document.documentElement.lang==='en',b=document.createElement('button');b.className='mb2';b.textContent='🌐 '+(en?'Русский':'English');b.onclick=()=>{sPop();try{localStorage.setItem('uptime_lang',en?'ru':'en')}catch(e){}saveSeason();location.replace(en?'index.html':'en.html')};box.appendChild(b)}
 function openPause(){if(!G||!G.running)return;PAUSED=true;const p=$('pause');p.classList.remove('hidden');
   p.innerHTML=`<div class="pbox"><h3>Пауза</h3><button class="mb1" id="p_go"><b>▶ Продолжить</b></button><button class="mb2" id="p_jr">📓 Журнал</button><button class="mb2" id="p_q">⚙️ Графика: ${qLabel()}</button><button class="mb2" id="p_snd">🔊 Звук</button>${EPN===0||EPN>=90?`<button class="mb2" id="p_spd">${spdLabel()}</button>`:``}<button class="mb2 red" id="p_exit">🚪 Выйти в меню</button><p class="pnote">Игра сохраняется сама. Продолжить можно из главного меню</p></div>`;
   $('p_go').onclick=closePause;$('p_jr').onclick=()=>{closePause();if(!G.busy)openJournal()};$('p_q').onclick=()=>{cycleQ();$('p_q').textContent='⚙️ Графика: '+qLabel()};
